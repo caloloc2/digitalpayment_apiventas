@@ -125,48 +125,37 @@ class Authentication{
     function Valida_Sesion($hash){
         $retorno = array("estado" => false, "usuario" => []);
 
-        $mysql = new Database(CRM);        
+        $mysql = new Database('vtgsa_ventas');
         $decrypt = $this->encrypt_decrypt('decrypt', $hash);
 
         $info = explode("|", $decrypt);
-        if (isset($info[0])){            
-            $verifica = $mysql->Consulta_Unico("SELECT
-            U.usu_codigo, U.usu_apellido, U.usu_nombre, CONCAT(U.usu_apellido,' ',U.usu_nombre) AS nombreCompleto, U.usu_email, U.usu_estado, D.tid_nombre AS acceso, D.tid_estado AS estadoGrupo, D.tid_ruta
-            FROM mve_usuarios U
-            LEFT JOIN gen_tipo_detalle D
-            ON U.tid_codigo = D.tid_codigo
-            WHERE (usu_codigo=".$info[0].") AND (U.hash='".$hash."')");
-            
-            if (isset($verifica['usu_codigo'])){
-                if ($verifica['estadoGrupo'] == 1){
-                    
-                    if ($verifica['usu_estado'] == 1){
-                    
-                        $iniciales = substr($verifica['usu_nombre'], 0, 1).substr($verifica['usu_apellido'], 0, 1);
-                        $retorno['usuario'] = array(
-                            "id_usuario" => (int) $verifica['usu_codigo'],
-                            "nombres" => $verifica['nombreCompleto'],
-                            "correo" => $verifica['usu_email'],
-                            "iniciales" => $iniciales 
-                        );
-        
-                        $retorno['estado'] = true;
-                    }else{
-                        $retorno['error'] = "Su usuario ha sido deshabilitado.";
-                    }
+        if (isset($info[0])){
+            $verifica = $mysql->Consulta_Unico("SELECT id_usuario, id_usuario_crm, nombres, correo, estado FROM usuarios WHERE (id_usuario=".$info[0].") AND (hash='".$hash."')");
+
+            if (isset($verifica['id_usuario'])){
+                if ($verifica['estado'] == 0){
+
+                    $retorno['usuario'] = array(
+                        "id_usuario" => (int) $verifica['id_usuario'],
+                        "id_usuario_crm" => (int) $verifica['id_usuario_crm'],
+                        "nombres" => $verifica['nombres'],
+                        "correo" => $verifica['correo']
+                    );
+
+                    $retorno['estado'] = true;
                 }else{
-                    $retorno['error'] = "Su grupo de acceso ha sido deshabilitado.";
+                    $verifica['error'] = "Su usuario ha sido deshabilitado.";
                 }
-                
-                
+
             }else{
-                $retorno['error'] = "Su token no corresponde a ningún cliente registrado";                
-            }                    
+                $retorno['error'] = "Su token no corresponde a ningún cliente registrado";
+            }
         }else{
             $retorno['error'] = "Su token no es correcto o se encuentra caducado.";
-        }                
+        }
         return $retorno;
     }
+
 
     function Valida_Sesion_Cliente($hash){
         $retorno = array("estado" => false, "usuario" => []);
