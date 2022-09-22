@@ -1,0 +1,10 @@
+{
+    "require": {
+        "slim/slim": "3.*",
+        "aws/aws-sdk-php": "^3.158",
+        "ext-simplexml": "^7.2",
+        "twilio/sdk": "^6.16",
+        "stripe/stripe-php": "^7.125",
+        "spipu/html2pdf": "^5.2"
+    }
+}

@@ -1,0 +1,5 @@
+src/config/mysql/credentials.txt
+public/storage
+public/tmp
+public/json
+public/cayetano
