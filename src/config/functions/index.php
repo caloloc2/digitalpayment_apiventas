@@ -903,7 +903,7 @@ class CRM_API {
     
     function __construct($ambiente = "test"){
         if ($ambiente == "test"){
-            $this->url = "http://devcrm.mvevip.com";
+            $this->url = "https://datacrm.mvevip.com/api";
         }else{
             $this->url = "https://datacrm.mvevip.com/api";
         }
