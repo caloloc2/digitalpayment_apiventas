@@ -3884,6 +3884,9 @@ $app->group('/api', function() use ($app) {
 
                                         if ($estado == 7){
                                             $consultaVendedorCodigo = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE id_usuario=".$id_asesor);
+                                            $respuesta['aqls'] = "SELECT * FROM usuarios WHERE id_usuario=".$id_asesor;
+                                            $respuesta['aqls2'] = $consultaVendedorCodigo;
+                                            
                                             if (isset($consultaVendedorCodigo['id_usuario'])){
                                                 $idVendedor = $consultaVendedorCodigo['id_referencia'];
                                                 $fechaVenta = date("Y-m-d");
