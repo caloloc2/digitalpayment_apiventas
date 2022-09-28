@@ -3889,7 +3889,21 @@ $app->group('/api', function() use ($app) {
                                             if (isset($consultaVendedorCodigo['id_usuario'])){
                                                 $idVendedor = $consultaVendedorCodigo['id_referencia'];
                                                 $fechaVenta = date("Y-m-d");
+                                                
                                                 $id_lider = 26;
+
+                                                switch ($id_asesor) {
+                                                    case 331: // ALCIVAR
+                                                        $id_lider = 26;
+                                                        break;
+                                                    case 332: // CARRASCO
+                                                        $id_lider = 28;
+                                                        break;
+                                                    case 333: // ORTIZ
+                                                        $id_lider = 29;
+                                                        break;
+                                                }
+
                                                 $dummy = "";
                                                 $id_cliente = "";
                                                 $documento = "";
