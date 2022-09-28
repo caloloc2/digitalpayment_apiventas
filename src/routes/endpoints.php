@@ -3884,9 +3884,8 @@ $app->group('/api', function() use ($app) {
 
                                         if ($estado == 7){
                                             $consultaVendedorCodigo = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE id_usuario=".$id_asesor);
-                                            $respuesta['aqls'] = "SELECT * FROM usuarios WHERE id_usuario=".$id_asesor;
-                                            $respuesta['aqls2'] = $consultaVendedorCodigo;
                                             
+
                                             if (isset($consultaVendedorCodigo['id_usuario'])){
                                                 $idVendedor = $consultaVendedorCodigo['id_referencia'];
                                                 $fechaVenta = date("Y-m-d");
@@ -3911,7 +3910,7 @@ $app->group('/api', function() use ($app) {
                                                 $estado = 4;
 
                                                 // REaliza el registro rapido
-                                                $nuevaVentaRapida = $mysql->Ingreso("INSERT INTO (fecha_venta, id_vendedor, id_lider, dummy, id_cliente, documento, nombres_apellidos, ciudad, correo, convencional, celular, pago_cuadro, tipo_venta, fecha_caducidad, tipo, que_destino, id_destino, fecha_alta, fecha_modificacion, estado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", array($fechaVenta, $idVendedor, $id_lider, $dummy, $id_cliente, $documento, $nombres_apellidos, $ciudad, $correo, $convencional, $celular, $pago_cuadro, $tipo_venta, $fecha_caducidad, $tipo, $que_destino, $id_destino, $fecha_alta, $fecha_modificacion, $estado));
+                                                $nuevaVentaRapida = $mysql->Ingreso("INSERT INTO registros (fecha_venta, id_vendedor, id_lider, dummy, id_cliente, documento, nombres_apellidos, ciudad, correo, convencional, celular, pago_cuadro, tipo_venta, fecha_caducidad, tipo, que_destino, id_destino, fecha_alta, fecha_modificacion, estado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", array($fechaVenta, $idVendedor, $id_lider, $dummy, $id_cliente, $documento, $nombres_apellidos, $ciudad, $correo, $convencional, $celular, $pago_cuadro, $tipo_venta, $fecha_caducidad, $tipo, $que_destino, $id_destino, $fecha_alta, $fecha_modificacion, $estado));
                                             }
                                             
                                         }   
