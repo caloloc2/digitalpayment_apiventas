@@ -3745,6 +3745,7 @@ $app->group('/api', function() use ($app) {
                     $verifica = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE id_lista=".$id_lista);
 
                     if (isset($verifica['id_lista'])){
+                        $id_asesor = $verifica['asignado'];
                         $impreso = $verifica['impreso']; // ESTE CAMPO OCUPAR PARA VALIDAR QUE LLAME O NO OBLIGATORIAMENTE... USADA PARA NO USAR SIP.
                         $intentos_llamado = $verifica['llamado'];
 
@@ -3881,6 +3882,36 @@ $app->group('/api', function() use ($app) {
                                         $fecha_ultima_contacto = date("Y-m-d H:i:s");
                                         $modificar = $mysql->Modificar("UPDATE notas_registros SET ciudad=?, direccion=?, orden=?, observaciones=?, hora_prox_llamada=?, fecha_prox_llamada=?, fecha_ultima_contacto=?, estado=? WHERE id_lista=?", array($ciudad, $direccion, 1, $observaciones, $hora, $fecha, $fecha_ultima_contacto, $estado, $id_lista));
 
+                                        if ($estado == 7){
+                                            $consultaVendedorCodigo = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE id_usuario=".$id_asesor);
+                                            if (isset($consultaVendedorCodigo['id_usuario'])){
+                                                $idVendedor = $consultaVendedorCodigo['id_referencia'];
+                                                $fechaVenta = date("Y-m-d");
+                                                $id_lider = 26;
+                                                $dummy = "";
+                                                $id_cliente = "";
+                                                $documento = "";
+                                                $nombres_apellidos = "";
+                                                $ciudad = "";
+                                                $correo = "";
+                                                $convencional = "";
+                                                $celular = "";
+                                                $pago_cuadro = 1;
+                                                $tipo_venta = 0;
+                                                $tipo = 0;
+                                                $que_destino = "";
+                                                $id_destino = 0;
+                                                $fecha_alta = date("Y-m-d H:i:s");
+                                                $fecha_modificacion = $fecha_alta;            
+                                                $fecha_caducidad = $fecha_alta;
+                                                
+                                                $estado = 4;
+
+                                                // REaliza el registro rapido
+                                                $nuevaVentaRapida = $mysql->Ingreso("INSERT INTO (fecha_venta, id_vendedor, id_lider, dummy, id_cliente, documento, nombres_apellidos, ciudad, correo, convencional, celular, pago_cuadro, tipo_venta, fecha_caducidad, tipo, que_destino, id_destino, fecha_alta, fecha_modificacion, estado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", array($fechaVenta, $idVendedor, $id_lider, $dummy, $id_cliente, $documento, $nombres_apellidos, $ciudad, $correo, $convencional, $celular, $pago_cuadro, $tipo_venta, $fecha_caducidad, $tipo, $que_destino, $id_destino, $fecha_alta, $fecha_modificacion, $estado));
+                                            }
+                                            
+                                        }   
                                         $respuesta['estado'] = true;
                                     }
                                 }                            
