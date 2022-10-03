@@ -5273,52 +5273,28 @@ $app->group('/api', function() use ($app) {
                 try{
                     $mysql = new Database("vtgsa_ventas");
 
-                    $usuarios = $mysql->Consulta("SELECT
-                    id_usuario, nombres
-                    FROM usuarios
-                    WHERE (tipo=6) AND (estado=0)
-                    ORDER BY nombres ASC ");
+                    $consulta = $mysql->Consulta("SELECT 
+                    N.estado, COUNT(N.estado) AS total
+                    FROM notas_registros N
+                    WHERE (N.banco=23)
+                    GROUP BY N.estado
+                    ORDER BY COUNT(N.asignado) DESC");
 
-                    $resultados = [];
-
-                    if (is_array($usuarios)){
-                        if (count($usuarios) > 0){
-                            foreach ($usuarios as $lineaUsuario) {
-                                $id_usuario = $lineaUsuario['id_usuario'];
-                                $nombres = $lineaUsuario['nombres'];
-
-                                $consulta = $mysql->Consulta("SELECT 
-                                N.estado, COUNT(N.estado) AS total
-                                FROM notas_registros N
-                                WHERE (N.banco=23) AND (asignado=".$id_usuario.")
-                                GROUP BY N.estado
-                                ORDER BY COUNT(N.asignado) DESC");
-
-                                $detalle = [];
-                                if (is_array($consulta)){
-                                    if (count($consulta) > 0){
-                                        foreach ($consulta as $linea) {
-                                            array_push($detalle, array(
-                                                "id" => (int) $linea['estado'],
-                                                "total" => (int) $linea['total']
-                                            ));
-                                        }
-                                    }
-                                }
-
-                                if (count($detalle) > 0){
-                                    array_push($resultados, array(
-                                        "id" => $id_usuario,
-                                        "nombres" => $nombres,
-                                        "detalle" => $detalle
-                                    ));
-                                }
+                    $detalle = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($detalle, array(
+                                    "id" => (int) $linea['estado'],
+                                    "total" => (int) $linea['total']
+                                ));
                             }
                         }
                     }
 
 
-                    $respuesta['consulta'] = $resultados;
+
+                    $respuesta['consulta'] = $detalle;
                     
                     $respuesta['estado'] = true;
                     
