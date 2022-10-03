@@ -5272,6 +5272,7 @@ $app->group('/api', function() use ($app) {
             
                 try{
                     $mysql = new Database("vtgsa_ventas");
+                    $funciones = new Functions();
 
                     $consulta = $mysql->Consulta("SELECT 
                     N.estado, COUNT(N.estado) AS total
@@ -5286,7 +5287,8 @@ $app->group('/api', function() use ($app) {
                             foreach ($consulta as $linea) {
                                 array_push($detalle, array(
                                     "id" => (int) $linea['estado'],
-                                    "total" => (int) $linea['total']
+                                    "total" => (int) $linea['total'],
+                                    "estado" => $funciones->Obtener_Estado($linea['estado'])
                                 ));
                             }
                         }
