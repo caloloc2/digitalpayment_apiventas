@@ -5302,7 +5302,7 @@ $app->group('/api', function() use ($app) {
                                 $infoEstado =  $funciones->Obtener_Estado($linea['estado']);
                                 $porcentaje = $linea['total'] / $total_registros;
                                 array_push($pie, array(
-                                    "name" => $infoEstado['descripcion']
+                                    "name" => $infoEstado['descripcion'],
                                     "y" => (float) $porcentaje,
                                 ));
                             }
