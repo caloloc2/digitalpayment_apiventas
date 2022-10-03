@@ -5300,7 +5300,7 @@ $app->group('/api', function() use ($app) {
 
                             foreach ($consulta as $linea) {
                                 $infoEstado =  $funciones->Obtener_Estado($linea['estado']);
-                                $porcentaje = $linea['total'] / $total_registros;
+                                $porcentaje = ($linea['total'] / $total_registros) * 100;
                                 array_push($pie, array(
                                     "name" => $infoEstado['descripcion'],
                                     "y" => (float) $porcentaje,
