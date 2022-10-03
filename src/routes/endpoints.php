@@ -5282,9 +5282,11 @@ $app->group('/api', function() use ($app) {
                     ORDER BY COUNT(N.asignado) DESC");
 
                     $detalle = [];
+                    $pie = [];
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
-                            
+
+                            $total_registros = 0;
                             foreach ($consulta as $linea) {
                                 $infoEstado =  $funciones->Obtener_Estado($linea['estado']);
                                 array_push($detalle, array(
@@ -5292,11 +5294,23 @@ $app->group('/api', function() use ($app) {
                                     "total" => (int) $linea['total'],
                                     "estado" => $infoEstado['descripcion']
                                 ));
+
+                               $total_registros += $linea['total']; 
+                            }
+
+                            foreach ($consulta as $linea) {
+                                $infoEstado =  $funciones->Obtener_Estado($linea['estado']);
+                                $porcentaje = $linea['total'] / $total_registros;
+                                array_push($pie, array(
+                                    "name" => $infoEstado['descripcion']
+                                    "y" => (float) $porcentaje,
+                                ));
                             }
                         }
                     }
 
                     $respuesta['consulta'] = $detalle;
+                    $respuesta['pie'] = $pie;
                     
                     $respuesta['estado'] = true;
                     
