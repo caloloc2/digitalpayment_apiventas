@@ -5284,17 +5284,16 @@ $app->group('/api', function() use ($app) {
                     $detalle = [];
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
+                            $infoEstado =  $funciones->Obtener_Estado($linea['estado']);
                             foreach ($consulta as $linea) {
                                 array_push($detalle, array(
                                     "id" => (int) $linea['estado'],
                                     "total" => (int) $linea['total'],
-                                    "estado" => $funciones->Obtener_Estado($linea['estado'])
+                                    "estado" => $infoEstado['descripcion']
                                 ));
                             }
                         }
                     }
-
-
 
                     $respuesta['consulta'] = $detalle;
                     
