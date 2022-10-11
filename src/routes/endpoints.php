@@ -3755,6 +3755,10 @@ $app->group('/api', function() use ($app) {
                         $fecha = $data['fecha'];                        
                         $direccion = trim($data['direccion']);
                         $ciudad = trim($data['ciudad']);
+                        $id_delivery = 0;
+                        if ((isset($data['id_delivery'])) && (!empty($data['id_delivery']))){
+                            $id_delivery = $data['id_delivery'];
+                        }
 
                         $deja_pasar = true;
                         if ($estado != 4){
@@ -3880,7 +3884,7 @@ $app->group('/api', function() use ($app) {
 
                                     if ($finalizaModificacion){
                                         $fecha_ultima_contacto = date("Y-m-d H:i:s");
-                                        $modificar = $mysql->Modificar("UPDATE notas_registros SET ciudad=?, direccion=?, orden=?, observaciones=?, hora_prox_llamada=?, fecha_prox_llamada=?, fecha_ultima_contacto=?, estado=? WHERE id_lista=?", array($ciudad, $direccion, 1, $observaciones, $hora, $fecha, $fecha_ultima_contacto, $estado, $id_lista));
+                                        $modificar = $mysql->Modificar("UPDATE notas_registros SET ciudad=?, direccion=?, orden=?, observaciones=?, hora_prox_llamada=?, fecha_prox_llamada=?, fecha_ultima_contacto=?, id_delivery=?, estado=? WHERE id_lista=?", array($ciudad, $direccion, 1, $observaciones, $hora, $fecha, $fecha_ultima_contacto, $id_delivery, $estado, $id_lista));
 
                                         if ($estado == 7){
                                             $consultaVendedorCodigo = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE id_usuario=".$id_asesor);
