@@ -5284,10 +5284,15 @@ $app->group('/api', function() use ($app) {
                         $to = $params['to'];
                     }
 
+                    $bases = "2022-10-07 3000";
+                    if ((isset($params['bases'])) && (!empty($params['bases']))){
+                        $bases = $params['bases'];
+                    }
+
                     $consulta = $mysql->Consulta("SELECT 
                     N.estado, COUNT(N.estado) AS total
                     FROM notas_registros N
-                    WHERE (N.fecha_asignacion BETWEEN '".$from." 00:00:01' AND '".$to." 23:59:59')
+                    WHERE (N.identificador='".$bases."')
                     GROUP BY N.estado
                     ORDER BY COUNT(N.asignado) DESC");
 
