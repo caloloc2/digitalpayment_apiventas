@@ -5338,7 +5338,7 @@ $app->group('/api', function() use ($app) {
             });
         });
 
-        $app->get("/estadisticasDia", function(Request $request, Response $response){
+        $app->get("/estadisticas-dia", function(Request $request, Response $response){
             $authorization = $request->getHeader('Authorization');
             $params = $request->getQueryParams();
             $respuesta['estado'] = false;
