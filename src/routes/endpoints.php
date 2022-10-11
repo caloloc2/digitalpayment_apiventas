@@ -5338,6 +5338,56 @@ $app->group('/api', function() use ($app) {
             });
         });
 
+        $app->get("/estadisticasDia", function(Request $request, Response $response){
+            $authorization = $request->getHeader('Authorization');
+            $params = $request->getQueryParams();
+            $respuesta['estado'] = false;
+
+            $respuesta['params'] = $params;
+        
+            try{
+                $mysql = new Database("vtgsa_ventas");
+                $funciones = new Functions();
+
+                $from = date("Y-m-01");
+                if ((isset($params['from'])) && (!empty($params['from']))){
+                    $from = $params['from'];
+                }
+
+                $to = date("Y-m-d");
+                if ((isset($params['to'])) && (!empty($params['to']))){
+                    $to = $params['to'];
+                }
+
+                $consulta = $mysql->Consulta("SELECT
+                fecha_venta, COUNT(fecha_venta) AS total
+                FROM registros
+                WHERE (fecha_venta BETWEEN '".$from."' AND '".$to."') 
+                GROUP BY fecha_venta
+                ORDER BY fecha_venta ASC");
+
+                $detalle = []; 
+                if (is_array($consulta)){
+                    if (count($consulta) > 0){
+                        foreach ($consulta as $linea) {
+                           array_push($detalle, [$linea['fecha_venta'], (int) $linea['total']]);
+                        }
+                    }
+                }
+
+                $respuesta['consulta'] = $detalle;
+                
+                $respuesta['estado'] = true;
+                
+            }catch(PDOException $e){
+                $respuesta['error'] = $e->getMessage();
+            }
+
+            $newResponse = $response->withJson($respuesta);
+            
+            return $newResponse;
+        }); 
+
         $app->group('/cotizaciones', function() use ($app) {
             
             $app->get("/mis_cotizaciones", function(Request $request, Response $response){
