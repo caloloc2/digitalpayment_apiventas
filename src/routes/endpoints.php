@@ -5291,8 +5291,7 @@ $app->group('/api', function() use ($app) {
 
                     $consulta = $mysql->Consulta("SELECT 
                     N.estado, COUNT(N.estado) AS total
-                    FROM notas_registros N
-                    WHERE (N.identificador='".$bases."')
+                    FROM notas_registros N 
                     GROUP BY N.estado
                     ORDER BY COUNT(N.asignado) DESC");
 
