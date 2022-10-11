@@ -5347,7 +5347,7 @@ $app->group('/api', function() use ($app) {
         
             try{
                 $mysql = new Database("vtgsa_ventas");
-                $funciones = new Functions();
+                // $funciones = new Functions();
 
                 // $from = date("Y-m-01");
                 // if ((isset($params['from'])) && (!empty($params['from']))){
