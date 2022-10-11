@@ -5274,10 +5274,20 @@ $app->group('/api', function() use ($app) {
                     $mysql = new Database("vtgsa_ventas");
                     $funciones = new Functions();
 
+                    $from = date("Y-m-01");
+                    if ((isset($params['from'])) && (!empty($params['from']))){
+                        $from = $params['from'];
+                    }
+
+                    $to = date("Y-m-d");
+                    if ((isset($params['to'])) && (!empty($params['to']))){
+                        $to = $params['to'];
+                    }
+
                     $consulta = $mysql->Consulta("SELECT 
                     N.estado, COUNT(N.estado) AS total
                     FROM notas_registros N
-                    WHERE (N.banco=23)
+                    WHERE (N.fecha_asignacion BETWEEN '".$from." 00:00:01' AND '".$to." 23:59:59')
                     GROUP BY N.estado
                     ORDER BY COUNT(N.asignado) DESC");
 
