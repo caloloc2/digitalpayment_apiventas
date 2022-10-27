@@ -1603,8 +1603,8 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
     
                 try{                    
-                    $auth = new Authentication();
-                    $sesion = $auth->Valida_Usuario($authorization[0]);
+                    // $auth = new Authentication();
+                    // $sesion = $auth->Valida_Usuario($authorization[0]);
 
                     // if ($sesion['estado']){
                         $mysql = new Database("digitalpayment");
