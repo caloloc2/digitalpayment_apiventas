@@ -1496,6 +1496,299 @@ $app->group('/api', function() use ($app) {
     // Route Group v1
     $app->group('/v1', function() use ($app) {
 
+
+        $app->group('/documentacion', function() use ($app) {
+
+            // BASE
+
+            $app->get("/base/{id}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');   
+                $data = $request->getParsedBody();
+                $id = $request->getAttribute('id');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false;
+    
+                try{
+                    // $auth = new Authentication();
+                    // $autenticacion = $auth->Verifica_Comercio($authorization[0]);
+    
+                    // if ($autenticacion['estado']){
+                    //     $id_usuario = $autenticacion['id_usuario'];
+                    //     $database = $autenticacion['database'];
+                        
+                    //     $mysql = new Database($database);
+    
+                    // }else{
+                        // $respuesta['error'] = $autenticacion['error'];
+                    // }
+                }catch(Exception $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+    
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });         
+
+            $app->post("/login", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $data = $request->getParsedBody();
+                $respuesta['estado'] = false;
+    
+                try{
+                    $mysql = new Database(DATABASE);
+                    $auth = new Authentication();
+
+                    $correo = $data['correo'];
+                    $password = $data['password'];
+                    $fecha = date("Y-m-d H:00:00"); // el hash caducada cada hora
+                    $fecha_ingreso = date("Y-m-d H:i:s");
+
+                    $consulta = $mysql->Consulta_Unico("SELECT U.id_usuario, U.nombres, A.acceso, A.url, U.estado FROM usuarios U, usuarios_accesos A WHERE ((U.correo='".$correo."') AND (U.password='".$password."')) AND (U.id_acceso=A.id_acceso)");
+
+                    if (isset($consulta['id_usuario'])){
+                        $estado = $consulta['estado'];
+
+                        if ($estado == 0){
+                            $id_usuario = $consulta['id_usuario'];
+                            $nombres = $consulta['nombres'];
+                            
+                            $string_hash = $id_usuario."|".$nombres."|".$fecha;
+        
+                            $hash = $auth->encrypt_decrypt('encrypt', $string_hash);
+        
+                            $actualiza_usuario = $mysql->Modificar("UPDATE usuarios SET hash=?, fecha_ultimo_ingreso=? WHERE id_usuario=?", array($hash, $fecha_ingreso, $id_usuario));
+        
+                            $respuesta['acceso'] = $consulta['url'];
+                            $respuesta['hash'] = $hash;
+                            $respuesta['estado'] = true;
+                        }else{
+                            $respuesta['error'] = "Sus credenciales se encuentran deshabilitadas.";
+                        }                    
+                    }else{
+                        $respuesta['error'] = "No se encuentra las credenciales, su usuario no se encuentra registrado.";
+                    }
+
+                }catch(Exception $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+    
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            }); 
+            
+            $app->get("/sesion", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');                
+                $respuesta['estado'] = false;
+    
+                try{                    
+                    $auth = new Authentication();
+                    $respuesta['usuario'] = $auth->Valida_Usuario($authorization[0]);
+
+                }catch(Exception $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+    
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            }); 
+            
+            // ESTABLECIMIENTOS
+
+            $app->get("/establecimientos", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $params = $request->getQueryParams();               
+                $respuesta['estado'] = false;
+    
+                try{                    
+                    $auth = new Authentication();
+                    $sesion = $auth->Valida_Usuario($authorization[0]);
+
+                    // if ($sesion['estado']){
+                        $mysql = new Database(DATABASE);
+
+                        $id_usuario = 1;//$sesion['usuario']['id_usuario'];
+
+                        $buscador = "";
+                        if (isset($params['buscador'])){
+                            $buscador = $params['buscador'];
+                        }
+
+                        $consulta = $mysql->Consulta("SELECT
+                        E.id_establecimiento, E.ruc, E.establecimiento, E.direccion, E.contacto, E.telefono, E.celular, E.correo, E.dependiente, E.logotipo, E.observaciones, E.estado,
+                        E.id_sector, S.sector, S.id_ciudad, C.ciudad, C.id_provincia, P.provincia, E.id_usuario, U.nombres
+                        FROM establecimientos E
+                        LEFT JOIN params_sectores S
+                        ON E.id_sector = S.id_sector
+                        LEFT JOIN params_ciudades C
+                        ON S.id_ciudad = C.id_ciudad
+                        LEFT JOIN params_provincias P
+                        ON C.id_provincia = P.id_provincia
+                        LEFT JOIN usuarios U
+                        ON E.id_usuario = U.id_usuario
+                        WHERE
+                        (E.ruc LIKE '%".$buscador."%')");
+
+                        $resultados = [];
+                        if (is_array($consulta)){
+                            if (count($consulta) > 0){
+                                foreach ($consulta as $linea) {
+                                    $adjuntos = $mysql->Consulta("SELECT * FROM establecimientos_adjuntos WHERE id_establecimiento=".$linea['id_establecimiento']);
+
+                                    array_push($resultados, array(
+                                        "id_establecimiento" => (int) $linea['id_establecimiento'],
+                                        "ruc" => $linea['ruc'],
+                                        "establecimiento" => $linea['establecimiento'],
+                                        "direccion" => $linea['direccion'],
+                                        "contacto" => $linea['contacto'],
+                                        "telefono" => $linea['telefono'],
+                                        "celular" => $linea['celular'],
+                                        "correo" => $linea['correo'],
+                                        "dependiente" => $linea['dependiente'],
+                                        "logotipo" => $linea['logotipo'],
+                                        "observaciones" => $linea['observaciones'],
+                                        "estado" => array(
+                                            "valor" => (int) $linea['estado'],
+                                            "descripcion" => "Pendiente"
+                                        ),
+                                        "sector" => array(
+                                            "id" => (int) $linea['id_sector'],
+                                            "descripcion" => $linea['sector']
+                                        ),
+                                        "ciudad" => array(
+                                            "id" => (int) $linea['id_ciudad'],
+                                            "descripcion" => $linea['ciudad']
+                                        ),
+                                        "provincia" => array(
+                                            "id" => (int) $linea['id_provincia'],
+                                            "descripcion" => $linea['provincia']
+                                        ),
+                                        "usuario" => array(
+                                            "id" => (int) $linea['id_usuario'],
+                                            "descripcion" => $linea['nombres']
+                                        ),
+                                        "adjuntos" => $adjuntos
+                                    ));
+                                }
+                            }
+                        }
+
+                        $respuesta['resultados'] = $resultados;
+                        $respuesta['estado'] = true;
+
+                    // }else{
+                    //     $respuesta['error'] = $sesion['error'];
+                    // }
+
+                }catch(Exception $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+    
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            }); 
+
+            $app->get("/establecimientos/{id_establecimiento}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $id_establecimiento = $request->getAttribute('id_establecimiento');
+                $respuesta['estado'] = false;
+    
+                try{                    
+                    $auth = new Authentication();
+                    $sesion = $auth->Valida_Usuario($authorization[0]);
+
+                    // if ($sesion['estado']){
+                        $mysql = new Database(DATABASE);
+
+                        $id_usuario =  1; //$sesion['usuario']['id_usuario'];
+
+                        $buscador = "";
+                        if (isset($params['buscador'])){
+                            $buscador = $params['buscador'];
+                        }
+
+                        $consulta = $mysql->Consulta_Unico("SELECT
+                        E.id_establecimiento, E.ruc, E.establecimiento, E.direccion, E.contacto, E.telefono, E.celular, E.correo, E.dependiente, E.logotipo, E.observaciones, E.estado,
+                        E.id_sector, S.sector, S.id_ciudad, C.ciudad, C.id_provincia, P.provincia, E.id_usuario, U.nombres
+                        FROM establecimientos E
+                        LEFT JOIN params_sectores S
+                        ON E.id_sector = S.id_sector
+                        LEFT JOIN params_ciudades C
+                        ON S.id_ciudad = C.id_ciudad
+                        LEFT JOIN params_provincias P
+                        ON C.id_provincia = P.id_provincia
+                        LEFT JOIN usuarios U
+                        ON E.id_usuario = U.id_usuario
+                        WHERE
+                        E.id_establecimiento=".$id_establecimiento);
+
+                        $resultados = [];
+
+                        if (isset($consulta['id_establecimiento'])){
+                            $resultados = array(
+                                "id_establecimiento" => (int) $consulta['id_establecimiento'],
+                                "ruc" => $consulta['ruc'],
+                                "establecimiento" => $consulta['establecimiento'],
+                                "direccion" => $consulta['direccion'],
+                                "contacto" => $consulta['contacto'],
+                                "telefono" => $consulta['telefono'],
+                                "celular" => $consulta['celular'],
+                                "correo" => $consulta['correo'],
+                                "dependiente" => $consulta['dependiente'],
+                                "logotipo" => $consulta['logotipo'],
+                                "observaciones" => $consulta['observaciones'],
+                                "estado" => array(
+                                    "valor" => (int) $consulta['estado'],
+                                    "descripcion" => "Pendiente"
+                                ),
+                                "sector" => array(
+                                    "id" => (int) $consulta['id_sector'],
+                                    "descripcion" => $consulta['sector']
+                                ),
+                                "ciudad" => array(
+                                    "id" => (int) $consulta['id_ciudad'],
+                                    "descripcion" => $consulta['ciudad']
+                                ),
+                                "provincia" => array(
+                                    "id" => (int) $consulta['id_provincia'],
+                                    "descripcion" => $consulta['provincia']
+                                ),
+                                "usuario" => array(
+                                    "id" => (int) $consulta['id_usuario'],
+                                    "descripcion" => $consulta['nombres']
+                                ),
+                                "adjuntos" => []
+                            );                            
+
+                            $respuesta['resultados'] = $resultados;
+                            $respuesta['estado'] = true;
+                            
+                        }else{
+                            $respuesta['error'] = "No se encuentra informacion del establecimiento.";
+                        }                       
+
+                        
+
+                    // }else{
+                    //     $respuesta['error'] = $sesion['error'];
+                    // }
+
+                }catch(Exception $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+    
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            }); 
+
+        });
+
+
+
         $app->post("/auth", function(Request $request, Response $response) {
             $data = $request->getParsedBody();
             $respuesta['estado'] = false;
