@@ -1536,7 +1536,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
     
                 try{
-                    $mysql = new Database(DATABASE);
+                    $mysql = new Database("digitalpayment");
                     $auth = new Authentication();
 
                     $correo = $data['correo'];
@@ -1607,7 +1607,7 @@ $app->group('/api', function() use ($app) {
                     $sesion = $auth->Valida_Usuario($authorization[0]);
 
                     // if ($sesion['estado']){
-                        $mysql = new Database(DATABASE);
+                        $mysql = new Database("digitalpayment");
 
                         $id_usuario = 1;//$sesion['usuario']['id_usuario'];
 
@@ -1701,7 +1701,7 @@ $app->group('/api', function() use ($app) {
                     $sesion = $auth->Valida_Usuario($authorization[0]);
 
                     // if ($sesion['estado']){
-                        $mysql = new Database(DATABASE);
+                        $mysql = new Database("digitalpayment");
 
                         $id_usuario =  1; //$sesion['usuario']['id_usuario'];
 
