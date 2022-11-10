@@ -4056,16 +4056,21 @@ $app->group('/api', function() use ($app) {
                         $opcionOP3 = 0;
                         $opcionOP4 = 0;
                         if (isset($opciones['opcionOP1'])){
-                            $opcionOP1 = (int) $opciones['opcionOP1'];
+                            $opcionOP1 = (bool) $opciones['opcionOP1'];
                         }
                         if (isset($opciones['opcionOP2'])){
-                            $opcionOP2 = (int) $opciones['opcionOP2'];
+                            $opcionOP2 = (bool) $opciones['opcionOP2'];
                         }
                         if (isset($opciones['opcionOP3'])){
-                            $opcionOP3 = (int) $opciones['opcionOP3'];
+                            $opcionOP3 = (bool) $opciones['opcionOP3'];
                         }
                         if (isset($opciones['opcionOP4'])){
-                            $opcionOP4 = (int) $opciones['opcionOP4'];
+                            $opcionOP4 = (bool) $opciones['opcionOP4'];
+                        } 
+
+                        $opcionNoDesea = 0;
+                        if (isset($data['opcionNoDesea'])){
+                            $opcionNoDesea = $data['opcionNoDesea'];
                         } 
 
                         $opcionesRegistradas = $opcionOP1."|".$opcionOP2."|".$opcionOP3."|".$opcionOP4;
@@ -4194,7 +4199,7 @@ $app->group('/api', function() use ($app) {
 
                                     if ($finalizaModificacion){
                                         $fecha_ultima_contacto = date("Y-m-d H:i:s");
-                                        $modificar = $mysql->Modificar("UPDATE notas_registros SET observaciones_entregada=?, ciudad=?, direccion=?, orden=?, observaciones=?, hora_prox_llamada=?, fecha_prox_llamada=?, fecha_ultima_contacto=?, id_delivery=?, estado=? WHERE id_lista=?", array($opcionesRegistradas, $ciudad, $direccion, 1, $observaciones, $hora, $fecha, $fecha_ultima_contacto, $id_delivery, $estado, $id_lista));
+                                        $modificar = $mysql->Modificar("UPDATE notas_registros SET observaciones_entregada=?, impreso=?, ciudad=?, direccion=?, orden=?, observaciones=?, hora_prox_llamada=?, fecha_prox_llamada=?, fecha_ultima_contacto=?, id_delivery=?, estado=? WHERE id_lista=?", array($opcionesRegistradas, $opcionNoDesea, $ciudad, $direccion, 1, $observaciones, $hora, $fecha, $fecha_ultima_contacto, $id_delivery, $estado, $id_lista));
 
                                         if ($estado == 7){
                                             $consultaVendedorCodigo = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE id_usuario=".$id_asesor);
