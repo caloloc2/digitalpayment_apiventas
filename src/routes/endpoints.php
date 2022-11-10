@@ -4162,6 +4162,7 @@ $app->group('/api', function() use ($app) {
                                     $siguiente_cliente = true;
                                 }
                                 
+                                $siguiente_cliente = true;
 
                                 if ($siguiente_cliente){
 
@@ -4250,6 +4251,7 @@ $app->group('/api', function() use ($app) {
                                             }
                                             
                                         }   
+
                                         $respuesta['estado'] = true;
                                     }
                                 }                            
