@@ -4222,8 +4222,20 @@ $app->group('/api', function() use ($app) {
                                                     case 333: // ORTIZ
                                                         $id_lider = 29;
                                                         break;
-                                                    case 334: // CHACHA
+                                                    case 334: // CHACHA STEFANIA
                                                         $id_lider = 30;
+                                                        break;
+                                                    case 337: // CHACHA JENNIFER
+                                                        $id_lider = 32;
+                                                        break;
+                                                    case 338: // AMAYA
+                                                        $id_lider = 33;
+                                                        break;
+                                                    case 339: // VILANEZ
+                                                        $id_lider = 34;
+                                                        break;
+                                                    case 340: // RAZA
+                                                        $id_lider = 35;
                                                         break;
                                                 }
 
