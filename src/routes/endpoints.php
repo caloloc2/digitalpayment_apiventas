@@ -3668,6 +3668,8 @@ $app->group('/api', function() use ($app) {
                                 $no_interesados = [];
                                 $ventas = [];
                                 $incorrectos = [];
+                                $formularios = [];
+                                $temporal = [];
                                 if (is_array($registros)){
                                     if (count($registros) > 0){
                                         foreach ($registros as $linea) {
@@ -3743,6 +3745,12 @@ $app->group('/api', function() use ($app) {
                                                 case 7:
                                                     array_push($ventas, $datos);
                                                     break;
+                                                case 14:
+                                                    array_push($formularios, $datos);
+                                                    break;
+                                                case 13:
+                                                    array_push($temporal, $datos);
+                                                    break;
                                             }
                                         }
                                     }
@@ -3770,6 +3778,8 @@ $app->group('/api', function() use ($app) {
                                 $respuesta['registros']['incorrectos'] = $incorrectos;
                                 $respuesta['registros']['no_interesados'] = $no_interesados;
                                 $respuesta['registros']['ventas'] = $ventas;
+                                $respuesta['registros']['formularios'] = $formularios;
+                                $respuesta['registros']['temporal'] = $temporal;
                                 $respuesta['paquetes'] = $paquetes;
 
                                 $respuesta['estado'] = true;
