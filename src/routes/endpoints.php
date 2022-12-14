@@ -4247,6 +4247,18 @@ $app->group('/api', function() use ($app) {
                                                     case 340: // RAZA
                                                         $id_lider = 35;
                                                         break;
+
+                                                    case 341: // vintimilla
+                                                        $id_lider = 36;
+                                                        break;
+
+                                                    case 343: // CHAMORRO
+                                                        $id_lider = 37;
+                                                        break;
+
+                                                    case 344: // LAPO
+                                                        $id_lider = 38;
+                                                        break;
                                                 }
 
                                                 $dummy = "";
