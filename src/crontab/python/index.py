@@ -16,7 +16,7 @@ db =  mysql.connect(
 )
 
 cursor = db.cursor()
-query = "SELECT N.id_lista, N.documento, N.nombres, N.ciudad, N.telefono, N.correo, N.ruc, N.cedula, N.razonSocial, N.actividadContribuyente, N.fechaInicioActividades, E.nombreComercial, E.direccionCompleta FROM notas_registros N LEFT JOIN notas_registros_establecimientos E ON N.id_lista = E.id_lista WHERE (N.banco=25) AND (N.identificador='2022-12-12') AND (E.tipoEstablecimiento='MAT') ORDER BY N.id_lista"
+query = "SELECT N.id_lista, N.documento, N.nombres, N.ciudad, N.telefono, N.correo, N.ruc, N.cedula, N.razonSocial, N.actividadContribuyente, N.fechaInicioActividades, E.nombreComercial, E.direccionCompleta FROM notas_registros N LEFT JOIN notas_registros_establecimientos E ON N.id_lista = E.id_lista WHERE (N.documento='1303751349001') AND (N.banco=25) AND (N.identificador='2022-12-12') AND (E.tipoEstablecimiento='MAT') ORDER BY N.id_lista"
  
 cursor.execute(query) 
 records = cursor.fetchall() 
@@ -286,55 +286,18 @@ for record in records:
     writer.update_page_form_field_values(
         writer.pages[0], {"PROPOSITO 01": "ORGANIZAR GASTOS DE EMPRESA"},
     )
+
+    nombreFormulario = "Formulario-"+str(documento)+".pdf"
     
+    cursorAct = db.cursor()
+    query = "UPDATE notas_registros SET formulario='"+str(nombreFormulario)+"' WHERE id_lista="+str(id_lista)
+    cursorAct.execute(query)
+    db.commit()
 
     # write "output" to PyPDF2-output.pdf
-    with open("Formulario-"+str(documento)+".pdf", "wb") as output_stream:
+    with open(nombreFormulario, "wb") as output_stream:
         writer.write(output_stream)
 
     print(record[1])
 
 db.close()
-
- 
-
-
-
-# c=0
-# for field in fields:
-#     print(field)
-#     # if c==0:
-#     #     print(NameObject(field))
-#     # c=+1
-
-
-    
-
-
-
-# writer.add_page(page)
-
-# for field in fields:
-#     writer.update_page_form_field_values(
-#         writer.pages[0], {field: "CARLOS MINO"},
-#     )
-# # writer.update_page_form_field_values(
-# #     writer.pages[0], {"CIUDAD": "QUITOFS"},
-# # )
-
-# # write "output" to PyPDF2-output.pdf
-# with open("filled-out.pdf", "wb") as output_stream:
-#     writer.write(output_stream)
-
-
-
-
-
-
-
-# writer.add_page(page)
-# writer.update_page_form_field_values(
-#     writer.pages[0], {"PROPOSITO 03": "LLENADO AUTOMATICO"},
-# )
-# with open("filled-out-12.pdf", "wb") as output_stream:
-#     writer.write(output_stream)
