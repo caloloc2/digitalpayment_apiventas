@@ -7,7 +7,6 @@ reader = PdfReader("baseOriginal.pdf")
 
 page = reader.pages[0]
 fields = reader.get_fields()
-page.compress_content_streams() 
 
 db =  mysql.connect(
   host ="localhost",
