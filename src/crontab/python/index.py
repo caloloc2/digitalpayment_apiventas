@@ -10,9 +10,9 @@ fields = reader.get_fields()
 
 db =  mysql.connect(
   host ="localhost",
-  user ="root",
+  user ="userdp",
   passwd ="385402292Mica_02",
-  database = "base_call_digital"
+  database = "vtgsa_ventas"
 )
 
 cursor = db.cursor()
