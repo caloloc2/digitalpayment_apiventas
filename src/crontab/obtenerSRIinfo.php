@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
 
 class CURLRequest{
 
-    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjcxMTMyMTUwLCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjcxMTMyNzUwfQ.htolmeAAPzv2wo5xIhKgh2kXHoLyq1LIyTNzujXNZf8";
+    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjcxMTMyMjk1LCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjcxMTMyODk1fQ.WAVTk7sMY5LCNggcqT5t-MvGtYUbduW0Z8AbmEh7Nss";
 
     public function setRequest($tipo, $documento){
         $url = "";
@@ -93,7 +93,7 @@ if (is_array($consulta)){
                 // "establecimientos" => $establecimientos
             );
 
-            $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, actividadContribuyente=?, fechaInicioActividades=?, clasificacionMiPyme=? WHERE id_lista=?", array(
+            $actualizar = $mysql->Modificar("UPDATE notas_registros SET fechaInicioActividades=? WHERE id_lista=?", array(
                 $guardar['fechaInicioActividades'],
                 $id_lista
             ));
