@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
 
 class CURLRequest{
 
-    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjcxMTIyNzI4LCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjcxMTIzMzI4fQ.8p2v8KJXfWX8bIHzhd68NDb5o1HgmtHbSvjc8WHt414";
+    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjcxMTIyODMyLCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjcxMTIzNDMyfQ.LcBLkakCUOWMeO2yBoePYmmgyfSY4RXA58m3Eqpy2fU";
 
     public function setRequest($tipo, $documento){
         $url = "";
@@ -62,7 +62,7 @@ $mysql = new Database("vtgsa_ventas");
 $banco = 25;
 $identificador = "2022-12-12";
 
-$consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') ORDER BY id_lista LIMIT 1");
+$consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') ORDER BY id_lista ASC");
 
 if (is_array($consulta)){
     if (count($consulta) > 0){
