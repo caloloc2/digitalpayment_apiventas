@@ -5746,6 +5746,32 @@ $app->group('/api', function() use ($app) {
                 
                 return $newResponse;
             }); 
+
+            $app->get("/enviarmeFormulario/{id_lista}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $idTarjeta = $request->getAttribute('idTarjeta');
+                $respuesta['estado'] = false;
+
+                $respuesta['params'] = $params;
+            
+                try{
+                    $mysql = new Database("vtgsa_ventas");
+                     
+                    
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            }); 
+
+
+
+
         }); 
 
         $app->group('/cotizaciones', function() use ($app) {
