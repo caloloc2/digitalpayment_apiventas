@@ -61,7 +61,7 @@ for record in records:
     propietario = "PROPIETARIO"
 
     writer = PdfWriter()
-
+    page.compress_content_streams() 
     writer.add_page(page)
 
     writer.update_page_form_field_values(
@@ -287,6 +287,8 @@ for record in records:
         writer.pages[0], {"PROPOSITO 01": "ORGANIZAR GASTOS DE EMPRESA"},
     )
 
+    carpeta = "/var/www/html/digitalpayment_api/public/tmp/formularios"
+
     nombreFormulario = "Formulario-"+str(documento)+".pdf"
     
     cursorAct = db.cursor()
@@ -295,7 +297,7 @@ for record in records:
     db.commit()
 
     # write "output" to PyPDF2-output.pdf
-    with open(nombreFormulario, "wb") as output_stream:
+    with open(carpeta+"/"+nombreFormulario, "wb") as output_stream:
         writer.write(output_stream)
 
     print(record[1])
