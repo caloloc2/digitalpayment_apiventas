@@ -7,6 +7,7 @@ reader = PdfReader("baseOriginal.pdf")
 
 page = reader.pages[0]
 fields = reader.get_fields()
+page.compress_content_streams() 
 
 db =  mysql.connect(
   host ="localhost",
@@ -61,7 +62,7 @@ for record in records:
     propietario = "PROPIETARIO"
 
     writer = PdfWriter()
-    page.compress_content_streams() 
+   
     writer.add_page(page)
 
     writer.update_page_form_field_values(
