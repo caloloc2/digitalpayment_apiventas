@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
 
 class CURLRequest{
 
-    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjcxMTIyMDc0LCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjcxMTIyNjc0fQ.-N94RkSm5mv2-eDjHROHvhDkxGIel46Vv28hCTx6l5k";
+    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjcxMTIyNzI4LCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjcxMTIzMzI4fQ.8p2v8KJXfWX8bIHzhd68NDb5o1HgmtHbSvjc8WHt414";
 
     public function setRequest($tipo, $documento){
         $url = "";
@@ -93,6 +93,25 @@ if (is_array($consulta)){
                 "establecimientos" => $establecimientos
             );
 
+            $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, actividadContribuyente=?, fechaInicioActividades=?, clasificacionMiPyme=? WHERE id_lista=?", array(
+                $guardar['ruc'],
+                $guardar['cedula'],
+                $guardar['razonSocial'],
+                $guardar['actividadContribuyente'],
+                $guardar['fechaInicioActividades'],
+                $guardar['clasificacionMiPyme'],
+                $id_lista
+            ));
+
+            if (is_array($guardar['establecimientos'])){
+                if (count($guardar['establecimientos']) > 0){
+                    foreach ($guardar['establecimientos'] as $establecimiento) {
+                        
+                        $id_establecimiento = $mysql->Ingreso("INSERT INTO notas_registros_establecimientos (id_lista, nombreComercial, tipoEstablecimiento, direccionCompleta, estado, numeroEstablecimiento) VALUES (?,?,?,?,?,?)", array($id_lista, $establecimiento['nombreFantasiaComercial'], $establecimiento['tipoEstablecimiento'], $establecimiento['direccionCompleta'], $establecimiento['estado'], $establecimiento['numeroEstablecimiento']));
+
+                    }
+                }
+            }
             
         
             print_r($guardar);
