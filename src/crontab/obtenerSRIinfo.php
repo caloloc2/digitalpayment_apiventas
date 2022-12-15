@@ -114,7 +114,7 @@ if (is_array($consulta)){
             }
             
         
-            print_r($guardar);
+            // print_r($guardar);
         }
     }
 }
