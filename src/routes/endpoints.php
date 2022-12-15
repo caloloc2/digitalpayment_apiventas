@@ -5755,7 +5755,46 @@ $app->group('/api', function() use ($app) {
                 $respuesta['id_lista'] = $id_lista;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+
+                    if ($id_lista > 0){
+                        $mysql = new Database("vtgsa_ventas");
+
+                        $consulta = $mysql->Consulta_Unico("SELECT
+                        R.id_lista, R.documento, R.ruc, R.cedula, R.razonSocial, R.formulario, U.nombres, U.celular
+                        FROM notas_registros R
+                        LEFT JOIN usuarios U
+                        ON R.asignado = U.id_usuario
+                        WHERE (R.id_lista=".$id_lista.")");
+
+                        if (isset($consulta['id_lista'])){
+
+                            $nibemi = new nibemi();
+
+                            $respuesta['envio'] = $nibemi->enviarPlantilla(array(
+                                "phone" => "0958978745",
+                                "header" => [
+                                    array(
+                                        "type" => "document",
+                                        "document" => array(
+                                            "link" => "http://api.digitalpaymentnow.com/tmp/Formulario-0100348937001.pdf",
+                                            "caption" => "Formulario1.pdf"
+                                        ),
+                                        "body" => [
+                                            array(
+                                                "type" => "text",
+                                                "text" => "Carlos Mino"
+                                            )
+                                        ]
+                                    )
+                                ]
+                            ), "diners_formulario");
+
+                        }else{
+                            $respuesta['error'] = "No se encuentra el registro para enviar.";
+                        }
+
+                    }
+                    
                      
                     
                     $respuesta['estado'] = true;
