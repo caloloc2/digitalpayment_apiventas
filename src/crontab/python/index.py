@@ -16,7 +16,7 @@ db =  mysql.connect(
 )
 
 cursor = db.cursor()
-query = "SELECT N.id_lista, N.documento, N.nombres, N.ciudad, N.telefono, N.correo, N.ruc, N.cedula, N.razonSocial, N.actividadContribuyente, N.fechaInicioActividades, E.nombreComercial, E.direccionCompleta FROM notas_registros N LEFT JOIN notas_registros_establecimientos E ON N.id_lista = E.id_lista WHERE (N.documento='1303751349001') AND (N.banco=25) AND (N.identificador='2022-12-12') AND (E.tipoEstablecimiento='MAT') ORDER BY N.id_lista"
+query = "SELECT N.id_lista, N.documento, N.nombres, N.ciudad, N.telefono, N.correo, N.ruc, N.cedula, N.razonSocial, N.actividadContribuyente, N.fechaInicioActividades, E.nombreComercial, E.direccionCompleta FROM notas_registros N LEFT JOIN notas_registros_establecimientos E ON N.id_lista = E.id_lista WHERE (N.banco=25) AND (N.identificador='2022-12-12') AND (E.tipoEstablecimiento='MAT') ORDER BY N.id_lista"
  
 cursor.execute(query) 
 records = cursor.fetchall() 
