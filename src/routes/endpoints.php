@@ -5749,10 +5749,10 @@ $app->group('/api', function() use ($app) {
 
             $app->get("/enviarmeFormulario/{id_lista}", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
-                $idTarjeta = $request->getAttribute('idTarjeta');
+                $id_lista = $request->getAttribute('id_lista');
                 $respuesta['estado'] = false;
 
-                $respuesta['params'] = $params;
+                $respuesta['id_lista'] = $id_lista;
             
                 try{
                     $mysql = new Database("vtgsa_ventas");
