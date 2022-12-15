@@ -5778,13 +5778,12 @@ $app->group('/api', function() use ($app) {
                                         "document" => array(
                                             "link" => "http://api.digitalpaymentnow.com/tmp/Formulario-0100348937001.pdf",
                                             "caption" => "Formulario1.pdf"
-                                        ),
-                                        "body" => [
-                                            array(
-                                                "type" => "text",
-                                                "text" => "Carlos Mino"
-                                            )
-                                        ]
+                                        )
+                                ],
+                                "body" => [
+                                    array(
+                                        "type" => "text",
+                                        "text" => "Carlos Mino"
                                     )
                                 ]
                             ), "diners_formulario");
