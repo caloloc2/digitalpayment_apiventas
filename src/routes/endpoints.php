@@ -5770,23 +5770,23 @@ $app->group('/api', function() use ($app) {
 
                             $nibemi = new nibemi();
 
-                            $respuesta['envio'] = $nibemi->enviarPlantilla(array(
-                                "phone" => "0958978745",
-                                "header" => [
-                                    array(
-                                        "type" => "document",
-                                        "document" => array(
-                                            "link" => "http://api.digitalpaymentnow.com/tmp/Formulario-0100348937001.pdf",
-                                            "caption" => "Formulario1.pdf"
-                                        )
-                                ],
-                                "body" => [
-                                    array(
-                                        "type" => "text",
-                                        "text" => "Carlos Mino"
-                                    )
-                                ]
-                            ), "diners_formulario");
+                            // $respuesta['envio'] = $nibemi->enviarPlantilla(array(
+                            //     "phone" => "0958978745",
+                            //     "header" => [
+                            //         array(
+                            //             "type" => "document",
+                            //             "document" => array(
+                            //                 "link" => "http://api.digitalpaymentnow.com/tmp/Formulario-0100348937001.pdf",
+                            //                 "caption" => "Formulario1.pdf"
+                            //             )
+                            //     ],
+                            //     "body" => [
+                            //         array(
+                            //             "type" => "text",
+                            //             "text" => "Carlos Mino"
+                            //         )
+                            //     ]
+                            // ), "diners_formulario");
 
                         }else{
                             $respuesta['error'] = "No se encuentra el registro para enviar.";
