@@ -64,7 +64,9 @@ for record in records:
    
     writer.add_page(page)
 
-    
+    writer.update_page_form_field_values(
+        writer.pages[0], {"cliente": nombresApellidos},
+    )
     writer.update_page_form_field_values(
         writer.pages[0], {"establecimiento": nombresApellidos},
     )
