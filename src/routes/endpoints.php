@@ -5901,7 +5901,7 @@ $app->group('/api', function() use ($app) {
 
                     $identificadores = "";
                     if ((isset($identificador)) && (!empty($identificador))){
-                        $identificadores = 'AND (R.identificador='".$identificador."')';
+                        // $identificadores = 'AND (R.identificador='".$identificador."')';
                     }
 
                     // AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."')
