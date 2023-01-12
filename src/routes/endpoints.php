@@ -5902,9 +5902,7 @@ $app->group('/api', function() use ($app) {
                     $identificadores = "";
                     if ((isset($identificador)) && (!empty($identificador))){
                         $identificadores = "AND (R.identificador='".$identificador."')";
-                    }
-
-                    // AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."')
+                    } 
 
                     $sql = "SELECT
                     E.descripcion, COUNT(R.estado) AS total
@@ -5913,9 +5911,7 @@ $app->group('/api', function() use ($app) {
                     ON R.estado = E.id_estados
                     WHERE (R.banco=".$idBanco.") ".$identificadores." AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."')
                     GROUP BY R.estado
-                    ORDER BY COUNT(R.estado) DESC";
-
-                    $respuesta['sql'] = $sql;
+                    ORDER BY COUNT(R.estado) DESC"; 
 
                     $porEstado = $mysql->Consulta($sql);
 
@@ -5931,8 +5927,7 @@ $app->group('/api', function() use ($app) {
                             }
                         }
                     }
-
-                    $respuesta['consulta'] = $porEstado;
+ 
                     $respuesta['porEstado'] = $listaporEstado;  
                     $respuesta['estado'] = true;
                     
