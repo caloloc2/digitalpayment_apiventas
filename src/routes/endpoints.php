@@ -5879,6 +5879,44 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->get("/estadisticas/{idBanco}/{identificador}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $idBanco = $request->getAttribute('idBanco');
+                $identificador = $request->getAttribute('identificador');
+                $respuesta['estado'] = false; 
+            
+                try{
+                    $mysql = new Database("vtgsa_ventas");
+
+                    $from = date("Y-m-01");
+                    if ((isset($params['from'])) && (!empty($params['from']))){
+                        $from = $params['from'];
+                    } 
+
+                    $to = date("Y-m-d");
+                    if ((isset($params['to'])) && (!empty($params['to']))){
+                        $to = $params['to'];
+                    } 
+
+
+                    $respuesta['from'] = $from;
+                    $respuesta['to'] = $to;
+                    $respuesta['bacno'] = $idBanco;
+                    $respuesta['identi'] = $identificador;
+
+                    $respuesta['identificadores'] = $identificadores;
+
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
         }); 
 
         $app->group('/cotizaciones', function() use ($app) {
