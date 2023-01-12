@@ -5849,7 +5849,35 @@ $app->group('/api', function() use ($app) {
                 $newResponse = $response->withJson($respuesta);
                 
                 return $newResponse;
-            }); 
+            });
+            
+            
+            $app->get("/identificadores/{idBanco}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $idBanco = $request->getAttribute('idBanco');
+                $respuesta['estado'] = false; 
+            
+                try{
+                    $mysql = new Database("vtgsa_ventas");
+
+                    $identificadores = $mysql->Consulta("SELECT
+                    identificador
+                    FROM notas_registros
+                    WHERE (banco=".$idBanco.")
+                    GROUP BY identificador");
+
+                    $respuesta['identificadores'] = $identificadores;
+
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
 
         }); 
 
