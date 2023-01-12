@@ -5814,6 +5814,45 @@ $app->group('/api', function() use ($app) {
 
         }); 
 
+        $app->group('/analisis', function() use ($app) {
+
+
+            $app->get("/informacion", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false; 
+            
+                try{
+                    $mysql = new Database("vtgsa_ventas");
+
+                    $bancos = $mysql->Consulta("SELECT * FROM notas_registros_bancos WHERE estado=0");
+
+                    $listaBancos = [];
+                    if (is_array($bancos)){
+                        if (count($bancos) > 0){
+                            foreach ($bancos as $linea) {
+                                array_push($listaBancos, array(
+                                    "id" => (int) $linea['id_banco'],
+                                    "banco" => strtoupper($linea['banco'])
+                                ));
+                            }
+                        }
+                    }
+                    
+                    $respuesta['bancos'] = $listaBancos;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            }); 
+
+        }); 
+
         $app->group('/cotizaciones', function() use ($app) {
             
             $app->get("/mis_cotizaciones", function(Request $request, Response $response){
