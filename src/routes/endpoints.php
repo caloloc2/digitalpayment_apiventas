@@ -5899,12 +5899,14 @@ $app->group('/api', function() use ($app) {
                         $to = $params['to'];
                     } 
 
+                    // AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."')
+
                     $sql = "SELECT
                     E.descripcion, COUNT(R.estado) AS total
                     FROM notas_registros R
                     LEFT JOIN notas_registros_estados E
                     ON R.estado = E.id_estados
-                    WHERE (R.banco=".$idBanco.") AND (R.identificador='".$identificador."') AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."')
+                    WHERE (R.banco=".$idBanco.") AND (R.identificador='".$identificador."') 
                     GROUP BY R.estado
                     ORDER BY COUNT(R.estado) DESC";
 
