@@ -5883,6 +5883,7 @@ $app->group('/api', function() use ($app) {
                 $authorization = $request->getHeader('Authorization');
                 $idBanco = $request->getAttribute('idBanco');
                 $identificador = $request->getAttribute('identificador');
+                $params = $request->getQueryParams();
                 $respuesta['estado'] = false; 
             
                 try{
