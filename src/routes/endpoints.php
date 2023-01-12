@@ -5920,8 +5920,10 @@ $app->group('/api', function() use ($app) {
                     if (is_array($porEstado)){
                         if (count($porEstado) > 0){
 
-                            $total = count($porEstado);
-                            $respuesta['total'] = $total;
+                            $total = 0;
+                            foreach ($porEstado as $linea) {
+                                $total += $linea['total'];
+                            }
 
                             foreach ($porEstado as $linea) {
 
