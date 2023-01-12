@@ -5908,25 +5908,22 @@ $app->group('/api', function() use ($app) {
                     GROUP BY R.estado
                     ORDER BY COUNT(R.estado) DESC";
 
-                    $respuesta['sql'] = $sql;
+                    $porEstado = $mysql->Consulta($sql);
 
+                    $listaporEstado = [];
 
-                    // $porEstado = $mysql->Consulta();
+                    if (is_array($porEstado)){
+                        if (count($porEstado) > 0){
+                            foreach ($porEstado as $linea) {
+                                array_push($listaporEstado, array(
+                                    "name" => $linea['descripcion'],
+                                    "y" => (int) $linea['total']
+                                ));
+                            }
+                        }
+                    }
 
-                    // $listaporEstado = [];
-
-                    // if (is_array($porEstado)){
-                    //     if (count($porEstado) > 0){
-                    //         foreach ($porEstado as $linea) {
-                    //             array_push($listaporEstado, array(
-                    //                 "name" => $linea['descripcion'],
-                    //                 "y" => (int) $linea['total']
-                    //             ));
-                    //         }
-                    //     }
-                    // }
-
-                    // $respuesta['porEstado'] = $listaporEstado;  
+                    $respuesta['porEstado'] = $listaporEstado;  
                     $respuesta['estado'] = true;
                     
                 }catch(PDOException $e){
