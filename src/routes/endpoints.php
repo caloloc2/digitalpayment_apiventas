@@ -5900,11 +5900,11 @@ $app->group('/api', function() use ($app) {
                     } 
 
 
-                    
 
 
-                    // $respuesta['from'] = $from;
-                    // $respuesta['to'] = $to;
+
+                    $respuesta['from'] = $from;
+                    $respuesta['to'] = $to;
                     $respuesta['bacno'] = $idBanco;
                     $respuesta['identi'] = $identificador;
 
