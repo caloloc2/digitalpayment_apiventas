@@ -5899,30 +5899,34 @@ $app->group('/api', function() use ($app) {
                         $to = $params['to'];
                     } 
 
-
-                    $porEstado = $mysql->Consulta("SELECT
+                    $sql = "SELECT
                     E.descripcion, COUNT(R.estado) AS total
                     FROM notas_registros R
                     LEFT JOIN notas_registros_estados E
                     ON R.estado = E.id_estados
                     WHERE (R.banco=".$idBanco.") AND (R.identificador='".$identificador."') AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to"')
                     GROUP BY R.estado
-                    ORDER BY COUNT(R.estado) DESC");
+                    ORDER BY COUNT(R.estado) DESC";
 
-                    $listaporEstado = [];
+                    $respuesta['sql'] = $sql;
 
-                    if (is_array($porEstado)){
-                        if (count($porEstado) > 0){
-                            foreach ($porEstado as $linea) {
-                                array_push($listaporEstado, array(
-                                    "name" => $linea['descripcion'],
-                                    "y" => (int) $linea['total']
-                                ));
-                            }
-                        }
-                    }
 
-                    $respuesta['porEstado'] = $listaporEstado;  
+                    // $porEstado = $mysql->Consulta();
+
+                    // $listaporEstado = [];
+
+                    // if (is_array($porEstado)){
+                    //     if (count($porEstado) > 0){
+                    //         foreach ($porEstado as $linea) {
+                    //             array_push($listaporEstado, array(
+                    //                 "name" => $linea['descripcion'],
+                    //                 "y" => (int) $linea['total']
+                    //             ));
+                    //         }
+                    //     }
+                    // }
+
+                    // $respuesta['porEstado'] = $listaporEstado;  
                     $respuesta['estado'] = true;
                     
                 }catch(PDOException $e){
