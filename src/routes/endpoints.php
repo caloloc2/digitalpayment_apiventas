@@ -5925,6 +5925,7 @@ $app->group('/api', function() use ($app) {
                         }
                     }
 
+                    $respuesta['consulta'] = $porEstado;
                     $respuesta['porEstado'] = $listaporEstado;  
                     $respuesta['estado'] = true;
                     
