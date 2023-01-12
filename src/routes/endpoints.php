@@ -5919,10 +5919,16 @@ $app->group('/api', function() use ($app) {
 
                     if (is_array($porEstado)){
                         if (count($porEstado) > 0){
+
+                            $total = count($porEstado);
+
                             foreach ($porEstado as $linea) {
+
+                                $porcentaje = ($linea['total'] * 100) / $total; 
+
                                 array_push($listaporEstado, array(
                                     "name" => $linea['descripcion'],
-                                    "y" => (int) $linea['total']
+                                    "y" => (float) $porcentaje
                                 ));
                             }
                         }
