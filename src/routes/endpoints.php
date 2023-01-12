@@ -5921,6 +5921,7 @@ $app->group('/api', function() use ($app) {
                         if (count($porEstado) > 0){
 
                             $total = count($porEstado);
+                            $respuesta['total'] = $total;
 
                             foreach ($porEstado as $linea) {
 
