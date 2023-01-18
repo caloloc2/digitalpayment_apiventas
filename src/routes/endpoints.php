@@ -5946,7 +5946,7 @@ $app->group('/api', function() use ($app) {
 
                                 array_push($listaporEstado, array(
                                     "name" => $linea['descripcion'],
-                                    "y" => (float) $porcentaje
+                                    "y" => (float) $linea['total']
                                 ));
                             }
                         }
