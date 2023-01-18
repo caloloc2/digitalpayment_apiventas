@@ -5963,9 +5963,8 @@ $app->group('/api', function() use ($app) {
                     GROUP BY MONTH(R.fecha_ultima_contacto), YEAR(R.fecha_ultima_contacto)
                     ORDER BY YEAR(R.fecha_ultima_contacto) ASC, MONTH(R.fecha_ultima_contacto) ASC");
 
-                    $avancePorProducto = [];
+                    // Obtiene las categorias de los meses con anios
                     $categoriasProductos = [];
-
                     if (is_array($mesAnio)){
                         if (count($mesAnio) > 0){
                             foreach ($mesAnio as $linea) {
@@ -5976,50 +5975,75 @@ $app->group('/api', function() use ($app) {
                                     $am = $anio."-".$mes;
 
                                     array_push($categoriasProductos, $am);
-
-                                    $from = date("Y-m-01", strtotime($am));
-                                    $to = date("Y-m-t", strtotime($am));
-
-                                    // Busca avance por mes y anio por producto
-                                    $avances = $mysql->Consulta("SELECT
-                                    B.banco, COUNT(R.estado) AS total
-                                    FROM notas_registros R
-                                    LEFT JOIN notas_registros_bancos B
-                                    ON R.banco = B.id_banco
-                                    WHERE (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') AND (R.estado=7) AND (B.estado=0)
-                                    GROUP BY R.banco
-                                    ORDER BY R.banco ASC");
-
-                                    $nombreProducto = "";
-                                    $data = [];
- 
-                                    if (is_array($avances)){
-                                        if (count($avances) > 0){
-                                            foreach ($avances as $producto) {
-                                                $nombreProducto = $producto['banco'];
- 
-                                                array_push($data, (float) $producto['total']);
-                                            }
-                                        }else{
-                                            array_push($data, 0);
-                                        }
-                                    }
-
-                                    array_push($avancePorProducto, array(
-                                        "name" => $nombreProducto,
-                                        "data" => $data
-                                    )); 
-
-                                   
                                 }
-                                
                             }
                         }
                     }
 
+                    $productos = $mysql->Consulta("SELECT
+                    id_banco, banco
+                    FROM notas_registros_bancos
+                    WHERE estado=0");
+
+                    $seriesProductos = [];
+
+                    if (is_array($productos)){
+                        if (count($productos) > 0){
+                            foreach ($productos as $producto) {
+                                $idProducto = $producto['id_banco'];
+                                $nombreProducto = $producto['banco'];
+                                $data = [];
+
+                                if (is_array($mesAnio)){
+                                    if (count($mesAnio) > 0){
+                                        foreach ($mesAnio as $linea) {
+                                            if (!is_null($linea['mes'])){
+                                                $mes = $linea['mes'];
+                                                $anio = $linea['anio'];
+            
+                                                $am = $anio."-".$mes;
+            
+                                                $from = date("Y-m-01", strtotime($am));
+                                                $to = date("Y-m-t", strtotime($am));
+
+                                                $avances = $mysql->Consulta("SELECT
+                                                B.banco, COUNT(R.estado) AS total
+                                                FROM notas_registros R
+                                                LEFT JOIN notas_registros_bancos B
+                                                ON R.banco = B.id_banco
+                                                WHERE (R.banco=".$idProducto.") AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') AND (R.estado=7) AND (B.estado=0) ");
+            
+                                                if (is_array($avances)){
+                                                    if (count($avances) > 0){
+                                                        foreach ($avances as $lineaAvance) {
+                                                            array_push($data, (float) $lineaAvance['total']);
+                                                        }
+                                                    }else{
+                                                        array_push($data, 0);
+                                                    }
+                                                }
+                                               
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+
+                                array_push($seriesProductos, array(
+                                    "name" => $nombreProducto,
+                                    "data" => $data
+                                ));
+                            }
+                        }
+                    }
+
+                    
+
+                    
+
                     $respuesta['avances'] = array(
                         "categorias" => $categoriasProductos,
-                        "series" => $avancePorProducto
+                        "series" => $seriesProductos
                     );
  
                     $respuesta['efectividad'] = (float) $efectividad;
