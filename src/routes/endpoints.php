@@ -6048,14 +6048,15 @@ $app->group('/api', function() use ($app) {
                     ON R.banco = B.id_banco
                     WHERE (B.estado=0)
                     GROUP BY R.estado
-                    ORDER BY COUNT(R.id_lista) DESC");
-
-
-
-                    $totalContactados = 0;
-                    $totalBases = 0;
+                    ORDER BY COUNT(R.id_lista) DESC"); 
+                    
                     if (is_array($consulta)){
-                        if (count($consulta) > 0){
+                        $totalContactados = 0;
+                        $totalBases = 0;
+                        $porcentaje = 0;
+
+                        if (count($consulta) > 0){ 
+                            
                             foreach ($consulta as $linea) {
                                 $totalBases += $linea['total'];
                                 if ($linea['estado'] != 0){
@@ -6063,15 +6064,15 @@ $app->group('/api', function() use ($app) {
                                 } 
                             }
 
-                            $porcentaje = ($totalContactados / $totalBases) * 100;
-
-                            array_push($widgets, array(
-                                "total" => (int) $totalContactados,
-                                "base" => (int) $totalBases,
-                                "nombre" => "Registros",
-                                "porcentaje" => (float) $porcentaje
-                            ));
+                            $porcentaje = ($totalContactados / $totalBases) * 100; 
                         }
+
+                        array_push($widgets, array(
+                            "total" => (int) $totalContactados,
+                            "base" => (int) $totalBases,
+                            "nombre" => "Registros",
+                            "porcentaje" => (float) $porcentaje
+                        ));
                     }
 
                     
