@@ -5974,7 +5974,17 @@ $app->group('/api', function() use ($app) {
                                     $from = date("Y-m-01", strtotime($am));
                                     $to = date("Y-m-t", strtotime($am));
 
-                                    $respuesta['qwe'] = $from.", ".$to;
+                                    // Busca avance por mes y anio por producto
+                                    $avances = $mysql->Consulta("SELECT
+                                    B.banco, COUNT(R.estado) AS total
+                                    FROM notas_registros R
+                                    LEFT JOIN notas_registros_bancos B
+                                    ON R.banco = B.id_banco
+                                    WHERE (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') AND (R.estado=7) AND (B.estado=0)
+                                    GROUP BY R.banco
+                                    ORDER BY R.banco ASC");
+
+                                    $respuesta['aqw'] = $avances;
                                 }
                                 
                             }
