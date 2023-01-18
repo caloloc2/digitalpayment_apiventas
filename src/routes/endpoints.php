@@ -5996,7 +5996,7 @@ $app->group('/api', function() use ($app) {
                                     if (is_array($avances)){
                                         if (count($avances) > 0){
                                             foreach ($avances as $producto) {
-                                                $nombreProducto = $producto;
+                                                $nombreProducto = $producto['banco'];
  
                                                 array_push($data, (float) $producto['total']);
                                             }
