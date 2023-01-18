@@ -5953,6 +5953,17 @@ $app->group('/api', function() use ($app) {
                     }
 
                     $efectividad = ($totalVentas / $totalContactados) * 100;
+
+
+                    /// PARA GRAFICO DE AVANCES POR MES
+                    $mesAnio = $mysql->Consulta("SELECT
+                    MONTH(R.fecha_ultima_contacto) AS mes, YEAR(R.fecha_ultima_contacto) AS anio
+                    FROM notas_registros R
+                    WHERE (R.banco=".$idBanco.") ".$identificadores."
+                    GROUP BY MONTH(R.fecha_ultima_contacto), YEAR(R.fecha_ultima_contacto)
+                    ORDER BY YEAR(R.fecha_ultima_contacto) ASC, MONTH(R.fecha_ultima_contacto) ASC");
+
+                    $respuesta['asdfASD'] = $mesAnio;
  
                     $respuesta['efectividad'] = (float) $efectividad;
                     $respuesta['porEstado'] = $listaporEstado;  
