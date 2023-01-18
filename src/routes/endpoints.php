@@ -6076,7 +6076,8 @@ $app->group('/api', function() use ($app) {
                             "base" => number_format($totalBases, 0, ".", ","),
                             "nombre" => "Registros de ".number_format($totalBases, 0, ".", ","),
                             "porcentaje" => (float) $porcentaje,
-                            "icon" => "aperture"
+                            "icon" => "aperture",
+                            "color" => "blue"
                         ));
 
                         $porcentaje = ($totalVentas / $totalBases) * 100; 
@@ -6085,7 +6086,8 @@ $app->group('/api', function() use ($app) {
                             "base" => number_format($totalBases, 0, ".", ","),
                             "nombre" => "Ventas Efectivas de ".number_format($totalBases, 0, ".", ","),
                             "porcentaje" => (float) $porcentaje,
-                            "icon" => "award"
+                            "icon" => "award",
+                            "color" => "success"
                         ));
                     } 
 
