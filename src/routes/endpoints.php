@@ -6055,6 +6055,7 @@ $app->group('/api', function() use ($app) {
                         $totalBases = 0;
                         $porcentaje = 0;
                         $totalVentas = 0;
+                        $totalIncontactables = 0;
 
                         if (count($consulta) > 0){ 
                             
@@ -6066,6 +6067,10 @@ $app->group('/api', function() use ($app) {
 
                                 if ($linea['estado'] == 7){
                                     $totalVentas += $linea['total'];
+                                } 
+
+                                if (($linea['estado'] == 2) || ($linea['estado'] == 3) || ($linea['estado'] == 6)){
+                                    $totalIncontactables += $linea['total'];
                                 } 
                             } 
                         }
@@ -6088,6 +6093,16 @@ $app->group('/api', function() use ($app) {
                             "porcentaje" => (float) $porcentaje,
                             "icon" => "award",
                             "color" => "success"
+                        ));
+
+                        $porcentaje = ($totalIncontactables / $totalBases) * 100; 
+                        array_push($widgets, array(
+                            "total" => (int) $totalIncontactables,
+                            "base" => number_format($totalBases, 0, ".", ","),
+                            "nombre" => "Incontactables de ".number_format($totalBases, 0, ".", ","),
+                            "porcentaje" => (float) $porcentaje,
+                            "icon" => "phone-off",
+                            "color" => "danger"
                         ));
                     } 
 
