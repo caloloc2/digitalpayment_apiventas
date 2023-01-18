@@ -6056,6 +6056,7 @@ $app->group('/api', function() use ($app) {
                         $porcentaje = 0;
                         $totalVentas = 0;
                         $totalIncontactables = 0;
+                        $totalNoInteresados = 0;
 
                         if (count($consulta) > 0){ 
                             
@@ -6071,6 +6072,10 @@ $app->group('/api', function() use ($app) {
 
                                 if (($linea['estado'] == 2) || ($linea['estado'] == 3) || ($linea['estado'] == 6)){
                                     $totalIncontactables += $linea['total'];
+                                } 
+
+                                if ($linea['estado'] == 5){
+                                    $totalNoInteresados += $linea['total'];
                                 } 
                             } 
                         }
@@ -6103,6 +6108,16 @@ $app->group('/api', function() use ($app) {
                             "porcentaje" => (float) $porcentaje,
                             "icon" => "phone-off",
                             "color" => "danger"
+                        ));
+
+                        $porcentaje = ($totalNoInteresados / $totalBases) * 100; 
+                        array_push($widgets, array(
+                            "total" => (int) $totalNoInteresados,
+                            "base" => number_format($totalBases, 0, ".", ","),
+                            "nombre" => "No Interesados de ".number_format($totalBases, 0, ".", ","),
+                            "porcentaje" => (float) $porcentaje,
+                            "icon" => "trending-down",
+                            "color" => "warning"
                         ));
                     } 
 
