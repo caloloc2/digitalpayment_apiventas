@@ -5905,7 +5905,7 @@ $app->group('/api', function() use ($app) {
                     } 
 
                     $sql = "SELECT
-                    E.descripcion, COUNT(R.estado) AS total
+                    R.estado, E.descripcion, COUNT(R.estado) AS total
                     FROM notas_registros R
                     LEFT JOIN notas_registros_estados E
                     ON R.estado = E.id_estados
@@ -5918,6 +5918,9 @@ $app->group('/api', function() use ($app) {
                     $porEstado = $mysql->Consulta($sql);
 
                     $listaporEstado = [];
+                    $efectividad = 0;
+                    $totalVentas = 0;
+                    $totalContactados = 0;
 
                     if (is_array($porEstado)){
                         if (count($porEstado) > 0){
@@ -5929,6 +5932,16 @@ $app->group('/api', function() use ($app) {
 
                             foreach ($porEstado as $linea) {
 
+                                $id_estado = $linea['estado'];
+
+                                if ($id_estado == 7){
+                                    $totalVentas += $linea['total'];
+                                }
+
+                                if (($id_estado != 2) && ($id_estado != 3) && ($id_estado != 6)){
+                                    $totalContactados += $linea['total'];
+                                }
+
                                 $porcentaje = ($linea['total'] * 100) / $total; 
 
                                 array_push($listaporEstado, array(
@@ -5938,7 +5951,10 @@ $app->group('/api', function() use ($app) {
                             }
                         }
                     }
+
+                    $efectividad = ($totalVentas / $totalContactados) * 100;
  
+                    $respuesta['efectividad'] = (float) $efectividad;
                     $respuesta['porEstado'] = $listaporEstado;  
                     $respuesta['estado'] = true;
                     
