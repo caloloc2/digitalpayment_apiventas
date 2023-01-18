@@ -6071,7 +6071,8 @@ $app->group('/api', function() use ($app) {
                             "total" => (int) $totalContactados,
                             "base" => (int) $totalBases,
                             "nombre" => "Registros",
-                            "porcentaje" => (float) $porcentaje
+                            "porcentaje" => (float) $porcentaje,
+                            "icon" => "aperture"
                         ));
                     }
 
