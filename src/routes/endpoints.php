@@ -6073,7 +6073,7 @@ $app->group('/api', function() use ($app) {
                         $porcentaje = ($totalContactados / $totalBases) * 100; 
                         array_push($widgets, array(
                             "total" => (int) $totalContactados,
-                            "base" => (int) $totalBases,
+                            "base" => number_format($totalBases, 0, ".", ","),
                             "nombre" => "Registros",
                             "porcentaje" => (float) $porcentaje,
                             "icon" => "aperture"
@@ -6082,7 +6082,7 @@ $app->group('/api', function() use ($app) {
                         $porcentaje = ($totalVentas / $totalBases) * 100; 
                         array_push($widgets, array(
                             "total" => (int) $totalVentas,
-                            "base" => (int) $totalBases,
+                            "base" => number_format($totalBases, 0, ".", ","),
                             "nombre" => "Ventas Efectivas",
                             "porcentaje" => (float) $porcentaje,
                             "icon" => "award"
