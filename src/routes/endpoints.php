@@ -6074,7 +6074,7 @@ $app->group('/api', function() use ($app) {
                         array_push($widgets, array(
                             "total" => (int) $totalContactados,
                             "base" => number_format($totalBases, 0, ".", ","),
-                            "nombre" => "Registros",
+                            "nombre" => "Registros de ".number_format($totalContactados, 0, ".", ","),
                             "porcentaje" => (float) $porcentaje,
                             "icon" => "aperture"
                         ));
@@ -6083,7 +6083,7 @@ $app->group('/api', function() use ($app) {
                         array_push($widgets, array(
                             "total" => (int) $totalVentas,
                             "base" => number_format($totalBases, 0, ".", ","),
-                            "nombre" => "Ventas Efectivas",
+                            "nombre" => "Ventas Efectivas de ".number_format($totalVentas, 0, ".", ","),
                             "porcentaje" => (float) $porcentaje,
                             "icon" => "award"
                         ));
