@@ -5909,9 +5909,11 @@ $app->group('/api', function() use ($app) {
                     FROM notas_registros R
                     LEFT JOIN notas_registros_estados E
                     ON R.estado = E.id_estados
-                    WHERE (R.banco=".$idBanco.") ".$identificadores." AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."')
+                    WHERE (R.banco=".$idBanco.") ".$identificadores."
                     GROUP BY R.estado
                     ORDER BY COUNT(R.estado) DESC"; 
+
+                    // AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."')
 
                     $porEstado = $mysql->Consulta($sql);
 
