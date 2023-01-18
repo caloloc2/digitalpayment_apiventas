@@ -5963,7 +5963,7 @@ $app->group('/api', function() use ($app) {
                     GROUP BY MONTH(R.fecha_ultima_contacto), YEAR(R.fecha_ultima_contacto)
                     ORDER BY YEAR(R.fecha_ultima_contacto) ASC, MONTH(R.fecha_ultima_contacto) ASC");
 
-                    $avancePorProducto = [];
+                    $categoriasAvances = [];
                     $categoriasProductos = [];
 
                     if (is_array($mesAnio)){
@@ -5989,23 +5989,24 @@ $app->group('/api', function() use ($app) {
                                     WHERE (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') AND (R.estado=7) AND (B.estado=0)
                                     GROUP BY R.banco
                                     ORDER BY R.banco ASC");
+
+                                    $avancePorProducto = [];
  
                                     if (is_array($avances)){
                                         if (count($avances) > 0){
                                             foreach ($avances as $producto) {
-                                                array_push($avancePorProducto, array(
-                                                    "fecha" => $am,
-                                                    "producto" => strtoupper($producto['banco']),
-                                                    "total" => (float) $producto['total']
-                                                ));
+                                                array_push($avancePorProducto, (float) $producto['total']);
                                             }
                                         }else{
-                                            array_push($avancePorProducto, array(
-                                                "producto" => "",
-                                                "total" => 0
-                                            ));
+                                            array_push($avancePorProducto, 0);
                                         }
                                     }
+
+                                    array_push($categoriasAvances, array(
+                                        "fecha" => $am,
+                                        "producto" => strtoupper($producto['banco']),
+                                        "avances" => $avancePorProducto
+                                    ));
                                 }
                                 
                             }
@@ -6014,7 +6015,7 @@ $app->group('/api', function() use ($app) {
 
                     $respuesta['avances'] = array(
                         "categorias" => $categoriasProductos,
-                        "data" => $avancePorProducto
+                        "data" => $categoriasAvances
                     );
  
                     $respuesta['efectividad'] = (float) $efectividad;
