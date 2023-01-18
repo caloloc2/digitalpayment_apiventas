@@ -6035,12 +6035,8 @@ $app->group('/api', function() use ($app) {
                                 ));
                             }
                         }
-                    }
-
+                    }  
                     
-
-                    
-
                     $respuesta['avances'] = array(
                         "categorias" => $categoriasProductos,
                         "series" => $seriesProductos
