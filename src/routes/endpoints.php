@@ -5963,6 +5963,24 @@ $app->group('/api', function() use ($app) {
                     GROUP BY MONTH(R.fecha_ultima_contacto), YEAR(R.fecha_ultima_contacto)
                     ORDER BY YEAR(R.fecha_ultima_contacto) ASC, MONTH(R.fecha_ultima_contacto) ASC");
 
+                    if (is_array($mesAnio)){
+                        if (count($mesAnio) > 0){
+                            foreach ($mesAnio as $linea) {
+                                if (!is_null($linea['mes'])){
+                                    $mes = $linea['mes'];
+                                    $anio = $linea['anio'];
+
+                                    $am = $anio."-".$mes;
+                                    $from = date("Y-m-01", strtotime($am));
+                                    $to = date("Y-m-t", strtotime($am));
+
+                                    $respuesta['qwe'] = $from.", ".$to;
+                                }
+                                
+                            }
+                        }
+                    }
+
                     $respuesta['asdfASD'] = $mesAnio;
  
                     $respuesta['efectividad'] = (float) $efectividad;
