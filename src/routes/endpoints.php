@@ -6037,6 +6037,51 @@ $app->group('/api', function() use ($app) {
                         }
                     }  
 
+                    // WIDGETS GENERALES
+                    $widgets = [];
+
+                    // Obtiene el avance de contactabilidad en general
+                    $consulta = $mysql->Consulta("SELECT
+                    R.estado, COUNT(R.id_lista) AS total
+                    FROM notas_registros R
+                    LEFT JOIN notas_registros_bancos B
+                    ON R.banco = B.id_banco
+                    WHERE (B.estado=0)
+                    GROUP BY R.estado
+                    ORDER BY COUNT(R.id_lista) DESC");
+
+
+
+                    $totalContactados = 0;
+                    $totalBases = 0;
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                $totalBases += $linea['total'];
+                                if ($linea['estado'] != 0){
+                                    $totalContactados += $linea['total'];
+                                } 
+                            }
+
+                            $porcentaje = ($totalContactados / $totalBases) * 100;
+
+                            array_push($widgets, array(
+                                "total" => (int) $totalContactados,
+                                "base" => (int) $totalBases,
+                                "nombre" => "Registros",
+                                "porcentaje" => (float) $porcentaje
+                            ));
+                        }
+                    }
+
+                    
+
+                    // Obtiene las ventas efectivas en general 
+
+
+                   
+                    $respuesta['widgets'] = $widgets;
+
                     $respuesta['avances'] = array(
                         "categorias" => $categoriasProductos,
                         "series" => $seriesProductos
