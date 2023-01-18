@@ -5974,7 +5974,7 @@ $app->group('/api', function() use ($app) {
 
                                     $am = $anio."-".$mes;
 
-                                    array_push($categoriasProductos, $am);
+                                    array_push($categoriasProductos, date("M, Y", strtotime($am)));
                                 }
                             }
                         }
