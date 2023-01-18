@@ -6011,7 +6011,7 @@ $app->group('/api', function() use ($app) {
                                                 FROM notas_registros R
                                                 LEFT JOIN notas_registros_bancos B
                                                 ON R.banco = B.id_banco
-                                                WHERE (R.banco=".$idProducto.") AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') AND (R.estado=7) AND (B.estado=0) ");
+                                                WHERE (R.banco=".$idProducto.") ".$identificadores." AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') AND (R.estado=7) AND (B.estado=0) ");
             
                                                 if (is_array($avances)){
                                                     if (count($avances) > 0){
@@ -6036,7 +6036,7 @@ $app->group('/api', function() use ($app) {
                             }
                         }
                     }  
-                    
+
                     $respuesta['avances'] = array(
                         "categorias" => $categoriasProductos,
                         "series" => $seriesProductos
