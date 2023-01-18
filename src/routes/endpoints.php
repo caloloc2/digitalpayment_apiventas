@@ -5963,6 +5963,9 @@ $app->group('/api', function() use ($app) {
                     GROUP BY MONTH(R.fecha_ultima_contacto), YEAR(R.fecha_ultima_contacto)
                     ORDER BY YEAR(R.fecha_ultima_contacto) ASC, MONTH(R.fecha_ultima_contacto) ASC");
 
+                    $avancePorProducto = [];
+                    $categoriasProductos = [];
+
                     if (is_array($mesAnio)){
                         if (count($mesAnio) > 0){
                             foreach ($mesAnio as $linea) {
@@ -5971,6 +5974,9 @@ $app->group('/api', function() use ($app) {
                                     $anio = $linea['anio'];
 
                                     $am = $anio."-".$mes;
+
+                                    array_push($categoriasProductos, $am);
+
                                     $from = date("Y-m-01", strtotime($am));
                                     $to = date("Y-m-t", strtotime($am));
 
@@ -5983,15 +5989,32 @@ $app->group('/api', function() use ($app) {
                                     WHERE (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') AND (R.estado=7) AND (B.estado=0)
                                     GROUP BY R.banco
                                     ORDER BY R.banco ASC");
-
-                                    $respuesta['aqw'] = $avances;
+ 
+                                    if (is_array($avances)){
+                                        if (count($avances) > 0){
+                                            foreach ($avances as $producto) {
+                                                array_push($avancePorProducto, array(
+                                                    "producto" => strtoupper($producto['banco']),
+                                                    "total" => (float) $producto['total']
+                                                ));
+                                            }
+                                        }else{
+                                            array_push($avancePorProducto, array(
+                                                "producto" => "",
+                                                "total" => 0
+                                            ));
+                                        }
+                                    }
                                 }
                                 
                             }
                         }
                     }
 
-                    $respuesta['asdfASD'] = $mesAnio;
+                    $respuesta['avances'] = array(
+                        "categorias" => $categoriasProductos,
+                        "data" => $avancePorProducto
+                    );
  
                     $respuesta['efectividad'] = (float) $efectividad;
                     $respuesta['porEstado'] = $listaporEstado;  
