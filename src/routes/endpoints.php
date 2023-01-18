@@ -6054,6 +6054,7 @@ $app->group('/api', function() use ($app) {
                         $totalContactados = 0;
                         $totalBases = 0;
                         $porcentaje = 0;
+                        $totalVentas = 0;
 
                         if (count($consulta) > 0){ 
                             
@@ -6062,11 +6063,14 @@ $app->group('/api', function() use ($app) {
                                 if ($linea['estado'] != 0){
                                     $totalContactados += $linea['total'];
                                 } 
-                            }
 
-                            $porcentaje = ($totalContactados / $totalBases) * 100; 
+                                if ($linea['estado'] == 7){
+                                    $totalVentas += $linea['total'];
+                                } 
+                            } 
                         }
 
+                        $porcentaje = ($totalContactados / $totalBases) * 100; 
                         array_push($widgets, array(
                             "total" => (int) $totalContactados,
                             "base" => (int) $totalBases,
@@ -6074,9 +6078,16 @@ $app->group('/api', function() use ($app) {
                             "porcentaje" => (float) $porcentaje,
                             "icon" => "aperture"
                         ));
-                    }
 
-                    
+                        $porcentaje = ($totalVentas / $totalBases) * 100; 
+                        array_push($widgets, array(
+                            "total" => (int) $totalVentas,
+                            "base" => (int) $totalBases,
+                            "nombre" => "Ventas Efectivas",
+                            "porcentaje" => (float) $porcentaje,
+                            "icon" => "award"
+                        ));
+                    } 
 
                     // Obtiene las ventas efectivas en general 
 
