@@ -4246,16 +4246,13 @@ $app->group('/api', function() use ($app) {
                                                         break;
                                                     case 340: // RAZA
                                                         $id_lider = 35;
-                                                        break;
-
+                                                        break; 
                                                     case 341: // vintimilla
                                                         $id_lider = 36;
-                                                        break;
-
+                                                        break; 
                                                     case 343: // CHAMORRO
                                                         $id_lider = 37;
-                                                        break;
-
+                                                        break; 
                                                     case 344: // LAPO
                                                         $id_lider = 38;
                                                         break;
@@ -4264,6 +4261,9 @@ $app->group('/api', function() use ($app) {
                                                         break;
                                                     case 346: // LUPITA
                                                         $id_lider = 40;
+                                                        break;
+                                                    case 347: // NICOLE
+                                                        $id_lider = 41;
                                                         break;
                                                 }
 
