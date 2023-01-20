@@ -4259,6 +4259,12 @@ $app->group('/api', function() use ($app) {
                                                     case 344: // LAPO
                                                         $id_lider = 38;
                                                         break;
+                                                    case 345: // NORMA
+                                                        $id_lider = 39;
+                                                        break;
+                                                    case 346: // LUPITA
+                                                        $id_lider = 40;
+                                                        break;
                                                 }
 
                                                 $dummy = "";
