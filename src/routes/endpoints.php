@@ -4265,6 +4265,9 @@ $app->group('/api', function() use ($app) {
                                                     case 347: // NICOLE
                                                         $id_lider = 41;
                                                         break;
+                                                    case 348: // ALEXIS ENRIQUEZ
+                                                        $id_lider = 42;
+                                                        break;
                                                 }
 
                                                 $dummy = "";
