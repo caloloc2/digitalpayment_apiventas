@@ -62,7 +62,7 @@ $mysql = new Database("vtgsa_ventas");
 $banco = 23;
 $identificador = "2023-01-31 NEGOCIOS NUEVOS";
 
-$consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') ORDER BY id_lista ASC");
+$consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc!='') ORDER BY id_lista ASC");
 
 if (is_array($consulta)){
     if (count($consulta) > 0){
