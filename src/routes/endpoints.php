@@ -6192,7 +6192,7 @@ $app->group('/api', function() use ($app) {
                     FROM notas_registros R
                     LEFT JOIN usuarios U
                     ON R.asignado = U.id_usuario
-                    WHERE (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') ".$producto." ".$identificador." 
+                    WHERE (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') ".$producto." ".$identificador." AND (U.nombres LIKE '%".$buscador."%')
                     GROUP BY R.asignado 
                     ORDER BY COUNT(R.asignado) DESC"); 
 
