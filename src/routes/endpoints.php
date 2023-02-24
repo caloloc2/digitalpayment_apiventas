@@ -6200,6 +6200,25 @@ $app->group('/api', function() use ($app) {
 
                     $categories = [];
 
+                    $series1 = [];
+                    array_push($series1, array(
+                        "name" => 'Contactos Asignados',
+                        "type" => 'column',
+                        "yAxis" => 1,
+                        "data" => [],
+                        "tooltip" => array(
+                            "valueSuffix" => ' '
+                        )
+                    ));
+                    array_push($series1, array(
+                        "name" => 'Ventas Efectivas',
+                        "type" => 'spline', 
+                        "data" => [],
+                        "tooltip" => array(
+                            "valueSuffix" => ' '
+                        )
+                    ));
+
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
@@ -6244,6 +6263,10 @@ $app->group('/api', function() use ($app) {
 
                                 $porcentajeEfectividad = ($totalVentas / $totalRegistros) * 100;
 
+                                
+                                array_push($series1[0]['data'], $totalRegistros);
+                                array_push($series1[0]['data'], $totalVentas);
+
                                 if (count($detalle) > 0){
                                     array_push($listados, array(
                                         "id" => (int) $id_asesor,
@@ -6261,6 +6284,7 @@ $app->group('/api', function() use ($app) {
                     }
                     
                     $respuesta['categories'] = $categories;
+                    $respuesta['series1'] = $series1;
                     $respuesta['listados'] = $listados;
                     $respuesta['consulta'] = $consulta;
                     
