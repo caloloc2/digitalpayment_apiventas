@@ -6196,6 +6196,32 @@ $app->group('/api', function() use ($app) {
                     GROUP BY R.asignado 
                     ORDER BY COUNT(R.asignado) DESC"); 
 
+                    $listaAsesores = "";
+
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                $listaAsesores .= '<div class="col-md-6 col-xl-3">';
+                                $listaAsesores .= '<div class="widget-rounded-circle card">';
+                                $listaAsesores .= '<div class="card-body">';
+                                $listaAsesores .= '<div class="row align-items-center">';
+                                $listaAsesores .= '<div class="col-auto">';
+                                $listaAsesores .= '<div class="avatar-lg">';
+                                $listaAsesores .= '<img src="../assets/images/users/user-3.jpg" class="img-fluid rounded-circle" alt="user-img" />';
+                                $listaAsesores .= '</div>';
+                                $listaAsesores .= '</div>';
+                                $listaAsesores .= '<div class="col">';
+                                $listaAsesores .= '<h5 class="mb-1 mt-2">'.$linea['nombres'].'</h5>';
+                                $listaAsesores .= '<p class="mb-2 text-muted">'.$linea['total'].' contactos</p>';
+                                $listaAsesores .= '</div>';
+                                $listaAsesores .= '</div> ';
+                                $listaAsesores .= '</div>';
+                                $listaAsesores .= '</div> ';
+                                $listaAsesores .= '</div> ';
+                            }
+                        }
+                    }
+
                     $respuesta['consulta'] = $consulta;
                     
                     $respuesta['estado'] = true;
