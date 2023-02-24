@@ -6222,6 +6222,7 @@ $app->group('/api', function() use ($app) {
                         }
                     }
 
+                    $respuesta['listaAsesores'] = $listaAsesores;
                     $respuesta['consulta'] = $consulta;
                     
                     $respuesta['estado'] = true;
