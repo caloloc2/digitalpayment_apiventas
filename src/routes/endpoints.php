@@ -6196,7 +6196,47 @@ $app->group('/api', function() use ($app) {
                     GROUP BY R.asignado 
                     ORDER BY COUNT(R.asignado) DESC"); 
 
+                    $listados = [];
+
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                $id_asesor = $linea['asignado'];
+                                $total = $linea['total'];
+
+                                $porEstados = $mysql->Consulta("SELECT
+                                R.estado, E.descripcion, COUNT(R.estado) AS total
+                                FROM notas_registros R
+                                LEFT JOIN notas_registros_estados E
+                                ON R.estado = E.id_estados
+                                WHERE (R.asignado=".$id_asesor.") AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') ".$producto." ".$identificador."
+                                GROUP BY R.estado 
+                                ORDER BY COUNT(R.estado) DESC");
+
+                                if (is_array($porEstados)){
+                                    if (count($porEstados) > 0){
+                                        foreach ($porEstados as $lineaEstado) {
+                                            array_push($detalle, array(
+                                                "id" => (int) $lineaEstado['estado'],
+                                                "descripcion" => strtoupper($lineaEstado['descripcion']),
+                                                "total" => (int) $lineaEstado['total']
+                                            ));
+                                        }
+                                    }
+                                }
+
+                                if (count($detalle) > 0){
+                                    array_push($listados, array(
+                                        "id" => (int) $id_asesor,
+                                        "total" => (int) $total,
+                                        "detalle" => $detalle
+                                    ));
+                                }
+                            }
+                        }
+                    }
                     
+                    $respuesta['listados'] = $listados;
                     $respuesta['consulta'] = $consulta;
                     
                     $respuesta['estado'] = true;
