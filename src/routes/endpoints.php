@@ -6265,7 +6265,7 @@ $app->group('/api', function() use ($app) {
 
                                 
                                 array_push($series1[0]['data'], $totalRegistros);
-                                array_push($series1[0]['data'], $totalVentas);
+                                array_push($series1[1]['data'], $totalVentas);
 
                                 if (count($detalle) > 0){
                                     array_push($listados, array(
