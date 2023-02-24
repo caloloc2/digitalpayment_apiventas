@@ -6218,6 +6218,7 @@ $app->group('/api', function() use ($app) {
 
                                 $totalVentas = 0;
                                 $totalRegistros = 0;
+                                $porcentajeEfectividad = 0;
 
                                 if (is_array($porEstados)){
                                     if (count($porEstados) > 0){
@@ -6237,6 +6238,8 @@ $app->group('/api', function() use ($app) {
                                     }
                                 }
 
+                                $porcentajeEfectividad = ($totalVentas / $totalRegistros) * 100;
+
                                 if (count($detalle) > 0){
                                     array_push($listados, array(
                                         "id" => (int) $id_asesor,
@@ -6244,7 +6247,7 @@ $app->group('/api', function() use ($app) {
                                         "total" => (int) $total,
                                         "efectividad" => array(
                                             "ventas" => (int) $totalVentas,
-                                            "porcentaje" => (float) 0
+                                            "porcentaje" => (float) $porcentajeEfectividad
                                         ),
                                         "detalle" => $detalle
                                     ));
