@@ -6162,7 +6162,7 @@ $app->group('/api', function() use ($app) {
                 try{
                     $mysql = new Database("vtgsa_ventas");
 
-                    
+                    $respuesta['params'] = $params;
                     
                     $respuesta['estado'] = true;
                     
