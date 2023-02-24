@@ -6204,6 +6204,8 @@ $app->group('/api', function() use ($app) {
                                 $id_asesor = $linea['asignado'];
                                 $total = $linea['total'];
 
+                                $detalle = [];
+
                                 $porEstados = $mysql->Consulta("SELECT
                                 R.estado, E.descripcion, COUNT(R.estado) AS total
                                 FROM notas_registros R
