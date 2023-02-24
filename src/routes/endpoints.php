@@ -6202,7 +6202,7 @@ $app->group('/api', function() use ($app) {
 
                     $series1 = [];
                     array_push($series1, array(
-                        "name" => 'Contactos Asignados',
+                        "name" => 'Ventas Efectivas',
                         "type" => 'column',
                         "yAxis" => 1,
                         "data" => [],
@@ -6211,13 +6211,15 @@ $app->group('/api', function() use ($app) {
                         )
                     ));
                     array_push($series1, array(
-                        "name" => 'Ventas Efectivas',
+                        "name" => 'Contactos Asignados',
                         "type" => 'spline', 
                         "data" => [],
                         "tooltip" => array(
                             "valueSuffix" => ' '
                         )
                     ));
+
+                    $series2 = [];
 
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
@@ -6264,8 +6266,8 @@ $app->group('/api', function() use ($app) {
                                 $porcentajeEfectividad = ($totalVentas / $totalRegistros) * 100;
 
                                 
-                                array_push($series1[0]['data'], $totalRegistros);
-                                array_push($series1[1]['data'], $totalVentas);
+                                array_push($series1[0]['data'], $totalVentas);
+                                array_push($series1[1]['data'], $totalRegistros);
 
                                 if (count($detalle) > 0){
                                     array_push($listados, array(
