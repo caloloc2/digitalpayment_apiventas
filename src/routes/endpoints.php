@@ -6198,12 +6198,16 @@ $app->group('/api', function() use ($app) {
 
                     $listados = [];
 
+                    $categories = [];
+
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
                                 $id_asesor = $linea['asignado'];
                                 $total = $linea['total'];
                                 $asesor = strtoupper($linea['nombres']);
+
+                                array_push($categories, $asesor);
 
                                 $detalle = [];
 
@@ -6256,6 +6260,7 @@ $app->group('/api', function() use ($app) {
                         }
                     }
                     
+                    $respuesta['categories'] = $categories;
                     $respuesta['listados'] = $listados;
                     $respuesta['consulta'] = $consulta;
                     
