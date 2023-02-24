@@ -6203,6 +6203,7 @@ $app->group('/api', function() use ($app) {
                             foreach ($consulta as $linea) {
                                 $id_asesor = $linea['asignado'];
                                 $total = $linea['total'];
+                                $asesor = strtoupper($linea['nombres']);
 
                                 $detalle = [];
 
@@ -6230,6 +6231,7 @@ $app->group('/api', function() use ($app) {
                                 if (count($detalle) > 0){
                                     array_push($listados, array(
                                         "id" => (int) $id_asesor,
+                                        "asesor" => $asesor,
                                         "total" => (int) $total,
                                         "detalle" => $detalle
                                     ));
