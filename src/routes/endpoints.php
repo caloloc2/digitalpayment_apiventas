@@ -6162,7 +6162,41 @@ $app->group('/api', function() use ($app) {
                 try{
                     $mysql = new Database("vtgsa_ventas");
 
-                    $respuesta['params'] = $params;
+                    $from = date("Y-m-01");
+                    if ((isset($params['from'])) && (!empty($params['from']))){
+                        $from = $params['from'];
+                    }
+
+                    $to = date("Y-m-d");
+                    if ((isset($params['to'])) && (!empty($params['to']))){
+                        $to = $params['to'];
+                    }
+
+                    $producto = "";
+                    if ((isset($params['producto'])) && (!empty($params['producto']))){
+                        $producto = " AND (R.banco=".$params['producto'].")";
+                    }
+
+                    $identificador = "";
+                    if ((isset($params['identificador'])) && (!empty($params['identificador']))){
+                        $identificador = " AND (R.identificador='".$params['identificador']."')";
+                    }
+
+                    $buscador = "";
+                    if ((isset($params['buscador'])) && (!empty($params['buscador']))){
+                        $buscador = $params['buscador'];
+                    }
+
+                    $consulta = $mysql->Consulta("SELECT
+                    R.asignado, UPPER(U.nombres) AS nombres, COUNT(R.asignado) AS total
+                    FROM notas_registros R
+                    LEFT JOIN usuarios U
+                    ON R.asignado = U.id_usuario
+                    WHERE (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."') ".$producto." ".$identificador." 
+                    GROUP BY R.asignado 
+                    ORDER BY COUNT(R.asignado) DESC"); 
+
+                    $respuesta['consulta'] = $consulta;
                     
                     $respuesta['estado'] = true;
                     
