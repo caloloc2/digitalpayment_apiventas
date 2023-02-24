@@ -6208,7 +6208,7 @@ $app->group('/api', function() use ($app) {
                                 $detalle = [];
 
                                 $porEstados = $mysql->Consulta("SELECT
-                                R.estado, E.descripcion, COUNT(R.estado) AS total
+                                R.estado, E.descripcion, COUNT(R.estado) AS total, E.es_venta
                                 FROM notas_registros R
                                 LEFT JOIN notas_registros_estados E
                                 ON R.estado = E.id_estados
@@ -6216,9 +6216,18 @@ $app->group('/api', function() use ($app) {
                                 GROUP BY R.estado 
                                 ORDER BY COUNT(R.estado) DESC");
 
+                                $totalVentas = 0;
+                                $totalRegistros = 0;
+
                                 if (is_array($porEstados)){
                                     if (count($porEstados) > 0){
                                         foreach ($porEstados as $lineaEstado) {
+
+                                            if ($lineaEstado['es_venta'] == 1){
+                                                $totalVentas += $lineaEstado['total'];
+                                            }
+                                            $totalRegistros += $lineaEstado['total'];
+
                                             array_push($detalle, array(
                                                 "id" => (int) $lineaEstado['estado'],
                                                 "descripcion" => strtoupper($lineaEstado['descripcion']),
@@ -6233,6 +6242,10 @@ $app->group('/api', function() use ($app) {
                                         "id" => (int) $id_asesor,
                                         "asesor" => $asesor,
                                         "total" => (int) $total,
+                                        "efectividad" => array(
+                                            "ventas" => (int) $totalVentas,
+                                            "porcentaje" => (float) 0
+                                        ),
                                         "detalle" => $detalle
                                     ));
                                 }
