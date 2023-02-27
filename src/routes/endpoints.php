@@ -6263,8 +6263,7 @@ $app->group('/api', function() use ($app) {
                                     }
                                 }
 
-                                $porcentajeEfectividad = ($totalVentas / $totalRegistros) * 100;
-
+                                $porcentajeEfectividad = ($totalVentas / $totalRegistros) * 100; 
                                 
                                 array_push($series1[0]['data'], $totalVentas);
                                 array_push($series1[1]['data'], $totalRegistros);
