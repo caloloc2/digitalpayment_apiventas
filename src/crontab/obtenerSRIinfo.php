@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
 
 class CURLRequest{
 
-    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjc3NTI4ODc0LCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjc3NTI5NDc0fQ.6uj_NfOYs7cdhfL0HOnElKUcGa9rgy4EzHDw5nc6X5A";
+    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjc3NTI5MDY3LCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjc3NTI5NjY3fQ.vlfyMlagsATI4aU4ptGV08s42tvJjyAGuLyEUW1RiS0";
 
     public function setRequest($tipo, $documento){
         $url = "";
@@ -119,7 +119,7 @@ if (is_array($consulta)){
             }
             
         
-            print_r($guardar);
+            print_r($resultado);
         }
     }
 }
