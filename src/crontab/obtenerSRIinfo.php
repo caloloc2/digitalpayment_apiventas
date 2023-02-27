@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
 
 class CURLRequest{
 
-    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjc3NTE2ODUyLCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjc3NTE3NDUyfQ.pR35i5XSlOm2rwv83Dtlp3gv4oLfzlIUejmxQehuqF4";
+    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjc3NTE4MjY1LCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjc3NTE4ODY1fQ.COfRV6b51w1WkEjiY9ZU8_WL820YjgTpJPFuwYoE9ck";
 
     public function setRequest($tipo, $documento){
         $url = "";
