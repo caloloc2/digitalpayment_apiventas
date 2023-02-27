@@ -16,7 +16,7 @@ db =  mysql.connect(
 )
 
 cursor = db.cursor()
-query = "SELECT N.id_lista, N.documento, N.nombres, N.ciudad, N.telefono, N.correo, N.ruc, N.cedula, N.razonSocial, N.actividadContribuyente, N.fechaInicioActividades, E.nombreComercial, E.direccionCompleta FROM notas_registros N LEFT JOIN notas_registros_establecimientos E ON N.id_lista = E.id_lista WHERE (N.banco=28) AND (N.identificador='2023-02-09-1') AND (E.tipoEstablecimiento='MAT') ORDER BY N.id_lista"
+query = "SELECT N.id_lista, N.documento, N.nombres, N.ciudad, N.telefono, N.correo, N.ruc, N.cedula, N.razonSocial, N.actividadContribuyente, N.fechaInicioActividades, E.nombreComercial, E.direccionCompleta FROM notas_registros N LEFT JOIN notas_registros_establecimientos E ON N.id_lista = E.id_lista WHERE (N.banco=28) AND (N.identificador='2023-02-09-1') AND (E.tipoEstablecimiento='MAT') ORDER BY N.id_lista LIMIT 1"
  
 cursor.execute(query) 
 records = cursor.fetchall() 
@@ -86,7 +86,7 @@ for record in records:
         writer.pages[0], {"RUC": ruc},
     )
 
-    carpeta = "/var/www/html/digitalpayment_api/public/tmp/formularios"
+    carpeta = "/var/www/html/digitalpayment_api/public/tmp/autorizaciones"
 
     nombreFormulario = "Autorizacion-"+str(documento)+".pdf"
     
