@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
 
 class CURLRequest{
 
-    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjc1MjA0MDQyLCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjc1MjA0NjQyfQ.-6opE1py87qT_iO-C7xOb6rSrBlWXTOksq41HK4w82Y";
+    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjc3NTEzODkxLCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjc3NTE0NDkxfQ.s2-Q7cQXINCO1O0xrAyCA1wltxlqhmAaZy4l5svDRjs";
 
     public function setRequest($tipo, $documento){
         $url = "";
@@ -59,8 +59,8 @@ class CURLRequest{
 
 $mysql = new Database("vtgsa_ventas");
 
-$banco = 23;
-$identificador = "2023-01-31 NEGOCIOS NUEVOS";
+$banco = 28;
+$identificador = "2023-02-09-1";
 
 $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') ORDER BY id_lista ASC");
 
