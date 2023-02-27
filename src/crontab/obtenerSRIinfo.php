@@ -14,7 +14,11 @@ use Psr\Http\Message\StreamInterface;
 
 class CURLRequest{
 
-    private $apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJERUNMQVJBQ0lPTkVTIiwiaWF0IjoxNjc3NTI5MDY3LCJzdWIiOiJERUNMQVJBVE9SSUEgUFJFU0NSSVBDSU9OIEhFUkVOQ0lBIiwiZXhwIjoxNjc3NTI5NjY3fQ.vlfyMlagsATI4aU4ptGV08s42tvJjyAGuLyEUW1RiS0";
+    private $apiKey = null;
+
+    function __construct($llave){
+        $this->apiKey = $llave;
+    }
 
     public function setRequest($tipo, $documento){
         $url = "";
@@ -59,67 +63,86 @@ class CURLRequest{
 
 $mysql = new Database("vtgsa_ventas");
 
-$banco = 28;
-$identificador = "2023-02-09-1";
+$buscaLlave = $mysql->Consulta_Unico("SELECT tokenregistrocivil FROM configuracion WHERE id_configuracion=1 ORDER BY id_configuracion DESC LIMIT 1");
 
-$consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') ORDER BY id_lista ASC");
+if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregistrocivil']))){
 
-if (is_array($consulta)){
-    if (count($consulta) > 0){
-        $request = new CURLRequest();
+    $llave = $buscaLlave['tokenregistrocivil'];
 
-        foreach ($consulta as $contacto) {
-            $id_lista = $contacto['id_lista'];
-            $documento = $contacto['documento'];
+    $banco = 23;
+    $identificador = "2023-02-22";
 
-            // saca informacion del ruc
-            $infoRuc = json_decode($request->setRequest('ruc', $documento), true);
-            $contribuyente = json_decode($request->setRequest('contribuyente', $documento), true);
-            $establecimientos = json_decode($request->setRequest('establecimientos', $documento), true);
+    $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') ORDER BY id_lista ASC");
 
-            $resultado = array(
-                "ruc" => $infoRuc,
-                "contribuyente" => $contribuyente,
-                "establecimientos" => $establecimientos
-            );
+    if (is_array($consulta)){
+        if (count($consulta) > 0){
+            $request = new CURLRequest();
 
-            $guardar = array(
-                "ruc" => $infoRuc[0]['numeroRuc'],
-                "cedula" => substr($infoRuc[0]['numeroRuc'], 0, 10),
-                "razonSocial" => $infoRuc[0]['razonSocial'],
-                "actividadContribuyente" => $infoRuc[0]['actividadContribuyente'],
-                "fechaInicioActividades" => $infoRuc[0]['informacionFechasContribuyente']['fechaInicioActividades'], 
-                "clasificacionMiPyme" => $contribuyente['clasificacionMiPyme'],
-                "establecimientos" => $establecimientos
-            );
+            foreach ($consulta as $contacto) {
+                $id_lista = $contacto['id_lista'];
+                $documento = $contacto['documento'];
 
-            $actualizar = $mysql->Modificar("UPDATE notas_registros SET fechaInicioActividades=? WHERE id_lista=?", array(
-                $guardar['fechaInicioActividades'],
-                $id_lista
-            ));
+                // saca informacion del ruc
+                $infoRuc = json_decode($request->setRequest('ruc', $documento), true);
+                $contribuyente = json_decode($request->setRequest('contribuyente', $documento), true);
+                $establecimientos = json_decode($request->setRequest('establecimientos', $documento), true);
 
-            $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, actividadContribuyente=?, fechaInicioActividades=?, clasificacionMiPyme=? WHERE id_lista=?", array(
-                $guardar['ruc'],
-                $guardar['cedula'],
-                $guardar['razonSocial'],
-                $guardar['actividadContribuyente'],
-                $guardar['fechaInicioActividades'],
-                $guardar['clasificacionMiPyme'],
-                $id_lista
-            ));
+                $resultado = array(
+                    "ruc" => $infoRuc,
+                    "contribuyente" => $contribuyente,
+                    "establecimientos" => $establecimientos
+                );
 
-            if (is_array($guardar['establecimientos'])){
-                if (count($guardar['establecimientos']) > 0){
-                    foreach ($guardar['establecimientos'] as $establecimiento) {
-                        
-                        $id_establecimiento = $mysql->Ingreso("INSERT INTO notas_registros_establecimientos (id_lista, nombreComercial, tipoEstablecimiento, direccionCompleta, estado, numeroEstablecimiento) VALUES (?,?,?,?,?,?)", array($id_lista, $establecimiento['nombreFantasiaComercial'], $establecimiento['tipoEstablecimiento'], $establecimiento['direccionCompleta'], $establecimiento['estado'], $establecimiento['numeroEstablecimiento']));
+                if (isset($infoRuc['mensajeServidor'])){
+                    echo $infoRuc['mensajeServidor']['texto'];
 
+                    break;
+                }else{
+                    $guardar = array(
+                        "ruc" => $infoRuc[0]['numeroRuc'],
+                        "cedula" => substr($infoRuc[0]['numeroRuc'], 0, 10),
+                        "razonSocial" => $infoRuc[0]['razonSocial'],
+                        "actividadContribuyente" => $infoRuc[0]['actividadContribuyente'],
+                        "fechaInicioActividades" => $infoRuc[0]['informacionFechasContribuyente']['fechaInicioActividades'], 
+                        "clasificacionMiPyme" => $contribuyente['clasificacionMiPyme'],
+                        "establecimientos" => $establecimientos
+                    );
+
+                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET fechaInicioActividades=? WHERE id_lista=?", array(
+                        $guardar['fechaInicioActividades'],
+                        $id_lista
+                    ));
+
+                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, actividadContribuyente=?, fechaInicioActividades=?, clasificacionMiPyme=? WHERE id_lista=?", array(
+                        $guardar['ruc'],
+                        $guardar['cedula'],
+                        $guardar['razonSocial'],
+                        $guardar['actividadContribuyente'],
+                        $guardar['fechaInicioActividades'],
+                        $guardar['clasificacionMiPyme'],
+                        $id_lista
+                    ));
+
+                    if (is_array($guardar['establecimientos'])){
+                        if (count($guardar['establecimientos']) > 0){
+                            foreach ($guardar['establecimientos'] as $establecimiento) {
+                                
+                                $id_establecimiento = $mysql->Ingreso("INSERT INTO notas_registros_establecimientos (id_lista, nombreComercial, tipoEstablecimiento, direccionCompleta, estado, numeroEstablecimiento) VALUES (?,?,?,?,?,?)", array($id_lista, $establecimiento['nombreFantasiaComercial'], $establecimiento['tipoEstablecimiento'], $establecimiento['direccionCompleta'], $establecimiento['estado'], $establecimiento['numeroEstablecimiento']));
+
+                            }
+                        }
                     }
+                    
+                
+                    print_r($resultado);
                 }
+
+                
             }
-            
-        
-            print_r($resultado);
         }
     }
+
+}else{
+    echo "No se encontro la llave del SRI.";
 }
+
