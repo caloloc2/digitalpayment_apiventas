@@ -16,7 +16,7 @@ db =  mysql.connect(
 )
 
 cursor = db.cursor()
-query = "SELECT N.id_lista, N.documento, N.nombres, N.ciudad, N.telefono, N.correo, N.ruc, N.cedula, N.razonSocial, N.actividadContribuyente, N.fechaInicioActividades, E.nombreComercial, E.direccionCompleta FROM notas_registros N LEFT JOIN notas_registros_establecimientos E ON N.id_lista = E.id_lista WHERE (N.banco=25) AND (N.identificador='2022-12-12') AND (E.tipoEstablecimiento='MAT') ORDER BY N.id_lista"
+query = "SELECT N.id_lista, N.documento, N.nombres, N.ciudad, N.telefono, N.correo, N.ruc, N.cedula, N.razonSocial, N.actividadContribuyente, N.fechaInicioActividades, E.nombreComercial, E.direccionCompleta FROM notas_registros N LEFT JOIN notas_registros_establecimientos E ON N.id_lista = E.id_lista WHERE (N.banco=28) AND (N.identificador='2023-02-09-1') AND (E.tipoEstablecimiento='MAT') ORDER BY N.id_lista"
  
 cursor.execute(query) 
 records = cursor.fetchall() 
@@ -33,7 +33,7 @@ for record in records:
 
     convencional = celular
     cursor2 = db.cursor()
-    cursor2.execute("SELECT contacto FROM notas_registros_contactos  WHERE (id_lista=212061) AND (LENGTH(contacto)=9) ORDER BY id_contacto ASC LIMIT 1") 
+    cursor2.execute("SELECT contacto FROM notas_registros_contactos  WHERE (id_lista="+str(id_lista)+") AND (LENGTH(contacto)=9) ORDER BY id_contacto ASC LIMIT 1") 
     listaContactos = cursor2.fetchall() 
     for contacto in listaContactos:
         convencional = contacto[0]
