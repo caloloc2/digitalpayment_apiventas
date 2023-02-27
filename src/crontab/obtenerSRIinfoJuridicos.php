@@ -88,7 +88,7 @@ if (is_array($consulta)){
                 "razonSocial" => $infoRuc[0]['razonSocial'],
                 "actividadContribuyente" => $infoRuc[0]['actividadEconomicaPrincipal'],
                 "fechaInicioActividades" => $infoRuc[0]['informacionFechasContribuyente']['fechaInicioActividades'],  
-                "representantesLegales" => $infoRuc['representantesLegales'][0],
+                "representantesLegales" => $infoRuc['representantesLegales'],
                 "establecimientos" => $establecimientos
             );
 
@@ -119,7 +119,7 @@ if (is_array($consulta)){
             }
             
         
-            print_r($guardar);
+            print_r($resultado);
         }
     }
 }
