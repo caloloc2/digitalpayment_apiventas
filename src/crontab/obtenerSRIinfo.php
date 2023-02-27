@@ -76,7 +76,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
 
     if (is_array($consulta)){
         if (count($consulta) > 0){
-            $request = new CURLRequest();
+            $request = new CURLRequest($llave);
 
             foreach ($consulta as $contacto) {
                 $id_lista = $contacto['id_lista'];
