@@ -92,44 +92,52 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                     "establecimientos" => $establecimientos
                 );
 
-                $guardar = array(
-                    "ruc" => $infoRuc[0]['numeroRuc'],
-                    "cedula" => substr($infoRuc[0]['numeroRuc'], 0, 10),
-                    "razonSocial" => $infoRuc[0]['razonSocial'],
-                    "actividadContribuyente" => $infoRuc[0]['actividadEconomicaPrincipal'],
-                    "fechaInicioActividades" => $infoRuc[0]['informacionFechasContribuyente']['fechaInicioActividades'],  
-                    "representantesLegales" => $infoRuc[0]['representantesLegales'][0],
-                    "establecimientos" => $establecimientos
-                );
+                if (isset($infoRuc['mensajeServidor'])){
+                    echo $infoRuc['mensajeServidor']['texto'];
 
-                $actualizar = $mysql->Modificar("UPDATE notas_registros SET fechaInicioActividades=? WHERE id_lista=?", array(
-                    $guardar['fechaInicioActividades'],
-                    $id_lista
-                ));
+                    break;
+                }else{
+                    $guardar = array(
+                        "ruc" => $infoRuc[0]['numeroRuc'],
+                        "cedula" => substr($infoRuc[0]['numeroRuc'], 0, 10),
+                        "razonSocial" => $infoRuc[0]['razonSocial'],
+                        "actividadContribuyente" => $infoRuc[0]['actividadEconomicaPrincipal'],
+                        "fechaInicioActividades" => $infoRuc[0]['informacionFechasContribuyente']['fechaInicioActividades'],  
+                        "representantesLegales" => $infoRuc[0]['representantesLegales'][0],
+                        "establecimientos" => $establecimientos
+                    );
 
-                $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, actividadContribuyente=?, fechaInicioActividades=?, docRepresentanteLegal=?, representanteLegal=? WHERE id_lista=?", array(
-                    $guardar['ruc'],
-                    $guardar['cedula'],
-                    $guardar['razonSocial'],
-                    $guardar['actividadContribuyente'],
-                    $guardar['fechaInicioActividades'],
-                    $guardar['representantesLegales']['identificacion'],
-                    $guardar['representantesLegales']['nombre'],
-                    $id_lista
-                ));
+                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET fechaInicioActividades=? WHERE id_lista=?", array(
+                        $guardar['fechaInicioActividades'],
+                        $id_lista
+                    ));
 
-                if (is_array($guardar['establecimientos'])){
-                    if (count($guardar['establecimientos']) > 0){
-                        foreach ($guardar['establecimientos'] as $establecimiento) {
-                            
-                            $id_establecimiento = $mysql->Ingreso("INSERT INTO notas_registros_establecimientos (id_lista, nombreComercial, tipoEstablecimiento, direccionCompleta, estado, numeroEstablecimiento) VALUES (?,?,?,?,?,?)", array($id_lista, $establecimiento['nombreFantasiaComercial'], $establecimiento['tipoEstablecimiento'], $establecimiento['direccionCompleta'], $establecimiento['estado'], $establecimiento['numeroEstablecimiento']));
+                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, actividadContribuyente=?, fechaInicioActividades=?, docRepresentanteLegal=?, representanteLegal=? WHERE id_lista=?", array(
+                        $guardar['ruc'],
+                        $guardar['cedula'],
+                        $guardar['razonSocial'],
+                        $guardar['actividadContribuyente'],
+                        $guardar['fechaInicioActividades'],
+                        $guardar['representantesLegales']['identificacion'],
+                        $guardar['representantesLegales']['nombre'],
+                        $id_lista
+                    ));
 
+                    if (is_array($guardar['establecimientos'])){
+                        if (count($guardar['establecimientos']) > 0){
+                            foreach ($guardar['establecimientos'] as $establecimiento) {
+                                
+                                $id_establecimiento = $mysql->Ingreso("INSERT INTO notas_registros_establecimientos (id_lista, nombreComercial, tipoEstablecimiento, direccionCompleta, estado, numeroEstablecimiento) VALUES (?,?,?,?,?,?)", array($id_lista, $establecimiento['nombreFantasiaComercial'], $establecimiento['tipoEstablecimiento'], $establecimiento['direccionCompleta'], $establecimiento['estado'], $establecimiento['numeroEstablecimiento']));
+
+                            }
                         }
                     }
-                }
+                    
                 
-            
-                print_r($resultado);
+                    print_r($resultado);
+                }
+
+                
             }
         }
     }
