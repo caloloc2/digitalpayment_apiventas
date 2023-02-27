@@ -102,7 +102,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                         "ruc" => $infoRuc[0]['numeroRuc'],
                         "cedula" => substr($infoRuc[0]['numeroRuc'], 0, 10),
                         "razonSocial" => $infoRuc[0]['razonSocial'],
-                        "actividadContribuyente" => $infoRuc[0]['actividadContribuyente'],
+                        "actividadContribuyente" => $infoRuc[0]['actividadEconomicaPrincipal'],
                         "fechaInicioActividades" => $infoRuc[0]['informacionFechasContribuyente']['fechaInicioActividades'], 
                         "clasificacionMiPyme" => $contribuyente['clasificacionMiPyme'],
                         "establecimientos" => $establecimientos
