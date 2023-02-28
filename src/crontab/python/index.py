@@ -84,7 +84,6 @@ for record in records:
     print(nombresApellidos)
     print(nombresApellidos)
 
-
     writer = PdfWriter()
    
     writer.add_page(page)
