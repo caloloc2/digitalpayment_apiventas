@@ -57,6 +57,8 @@ for record in records:
     canton = separa[1]
     parroquia = separa[2]
     direccionCompleta = separa[3]
+    if (direccionCompleta != ''):
+        direccionCompleta = "X"
 
     propietario = "PROPIETARIO"
 
