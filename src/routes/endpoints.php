@@ -5833,7 +5833,7 @@ $app->group('/api', function() use ($app) {
                         $mysql = new Database("vtgsa_ventas");
 
                         // verifica que el dato sea solamente de la base nova
-                        $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_regitros WHERE id_lista=".$id_lista);
+                        $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE id_lista=".$id_lista);
                         $respuesta['consulta'] = $consulta;
 
                         if (isset($consulta['id_lista'])){
