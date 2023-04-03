@@ -5842,7 +5842,7 @@ $app->group('/api', function() use ($app) {
                                 $documento = $data['documento'];
 
                                 if ((isset($data['nombres'])) && (!empty($data['nombres']))){
-                                    $nombres = $data['nombres'];
+                                    $nombres = strtoupper($data['nombres']);
     
                                     if ((isset($data['fecha_nacimiento'])) && (!empty($data['fecha_nacimiento']))){
                                         $fecha_nacimiento = $data['fecha_nacimiento'];
@@ -5851,13 +5851,13 @@ $app->group('/api', function() use ($app) {
                                             $telefono = $data['telefono'];
             
                                             if ((isset($data['correo'])) && (!empty($data['correo']))){
-                                                $correo = $data['correo'];
+                                                $correo = strtolower($data['correo']);
                 
                                                 if ((isset($data['direccion'])) && (!empty($data['direccion']))){
-                                                    $direccion = $data['direccion'];
+                                                    $direccion = strtoupper($data['direccion']);
                     
                                                     if ((isset($data['tipo_construccion'])) && (!empty($data['tipo_construccion']))){
-                                                        $tipo_construccion = $data['tipo_construccion'];
+                                                        $tipo_construccion = strtoupper($data['tipo_construccion']);
                         
                                                         if ((isset($data['anio_construccion'])) && (!empty($data['anio_construccion']))){
                                                             $anio_construccion = $data['anio_construccion'];
@@ -5865,6 +5865,9 @@ $app->group('/api', function() use ($app) {
                                                             if ((isset($data['num_pisos'])) && (!empty($data['num_pisos']))){
                                                                 $num_pisos = $data['num_pisos'];
                                 
+                                                                $id_formulario = $mysql->Ingreso("INSERT INTO notas_registros_formularios_nova (id_lista, documento, nombres, fecha_nacimiento, celular, correo, direccion, tipo_construccion, anio_construccion, numero_pisos) VALUES (?,?,?,?,?,?,?,?,?,?)", array($id_lista, $documento, $nombres, $fecha_nacimiento, $celular, $correo, $direccion, $tipo_construccion, $anio_construccion, $numero_pisos));
+                                                                $respuesta['id_formulario'] = $id_formulario;
+
                                                                 $respuesta['estado'] = true;
                                                             }else{
                                                                 $respuesta['error'] = "Debe ingresar el número de pisos de la construcción.";
