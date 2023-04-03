@@ -5865,7 +5865,7 @@ $app->group('/api', function() use ($app) {
                                                             if ((isset($data['num_pisos'])) && (!empty($data['num_pisos']))){
                                                                 $num_pisos = $data['num_pisos'];
                                 
-                                                                $id_formulario = $mysql->Ingreso("INSERT INTO notas_registros_formularios_nova (id_lista, documento, nombres, fecha_nacimiento, celular, correo, direccion, tipo_construccion, anio_construccion, numero_pisos) VALUES (?,?,?,?,?,?,?,?,?,?)", array($id_lista, $documento, $nombres, $fecha_nacimiento, $celular, $correo, $direccion, $tipo_construccion, $anio_construccion, $numero_pisos));
+                                                                $id_formulario = $mysql->Ingreso("INSERT INTO notas_registros_formularios_nova (id_lista, documento, nombres, fecha_nacimiento, celular, correo, direccion, tipo_construccion, anio_construccion, numero_pisos) VALUES (?,?,?,?,?,?,?,?,?,?)", array($id_lista, $documento, $nombres, $fecha_nacimiento, $telefono, $correo, $direccion, $tipo_construccion, $anio_construccion, $num_pisos));
                                                                 $respuesta['id_formulario'] = $id_formulario;
 
                                                                 $respuesta['estado'] = true;
