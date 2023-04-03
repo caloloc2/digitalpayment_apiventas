@@ -5818,7 +5818,34 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             }); 
 
+            $app->post("/formulario-nova/{id_lista}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $id_lista = $request->getAttribute('id_lista');
+                $data = $request->getParsedBody();
+                $respuesta['estado'] = false;
 
+                $respuesta['id_lista'] = $id_lista;
+                $respuesta['data'] = $data;
+            
+                try{
+
+                    if ($id_lista > 0){
+                        $mysql = new Database("vtgsa_ventas");
+
+                    
+                        $respuesta['estado'] = true;    
+                    }else{
+                        $respuesta['error'] = "No se puede iniciar el formulario.";
+                    }
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
 
 
         }); 
