@@ -5831,12 +5831,13 @@ $app->group('/api', function() use ($app) {
 
                     if ($id_lista > 0){
                         $mysql = new Database("vtgsa_ventas");
-
+                        $banco_nova = 30;
                         // verifica que el dato sea solamente de la base nova
-                        $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE id_lista=".$id_lista);
-                        $respuesta['consulta'] = $consulta;
+                        $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE (id_lista=".$id_lista.") AND (banco=".$banco_nova.")"); 
 
                         if (isset($consulta['id_lista'])){
+
+
 
                             if ((isset($data['documento'])) && (!empty($data['documento']))){
                                 $documento = $data['documento'];
@@ -5898,7 +5899,7 @@ $app->group('/api', function() use ($app) {
                             }
                              
                         }else{
-                            $respuesta['error'] = "No se encuentra información del contacto.";
+                            $respuesta['error'] = "No se encuentra información del contacto o éste no corresponde a SEGUROS NOVA";
                         }
 
                     }else{
