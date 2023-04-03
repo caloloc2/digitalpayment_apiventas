@@ -5838,8 +5838,62 @@ $app->group('/api', function() use ($app) {
 
                         if (isset($consulta['id_lista'])){
 
+                            if ((isset($data['documento'])) && (!empty($data['documento']))){
+                                $documento = $data['documento'];
+
+                                if ((isset($data['nombres'])) && (!empty($data['nombres']))){
+                                    $nombres = $data['nombres'];
+    
+                                    if ((isset($data['fecha_nacimiento'])) && (!empty($data['fecha_nacimiento']))){
+                                        $fecha_nacimiento = $data['fecha_nacimiento'];
+        
+                                        if ((isset($data['telefono'])) && (!empty($data['telefono']))){
+                                            $telefono = $data['telefono'];
+            
+                                            if ((isset($data['correo'])) && (!empty($data['correo']))){
+                                                $correo = $data['correo'];
+                
+                                                if ((isset($data['direccion'])) && (!empty($data['direccion']))){
+                                                    $direccion = $data['direccion'];
+                    
+                                                    if ((isset($data['tipo_construccion'])) && (!empty($data['tipo_construccion']))){
+                                                        $tipo_construccion = $data['tipo_construccion'];
+                        
+                                                        if ((isset($data['anio_construccion'])) && (!empty($data['anio_construccion']))){
+                                                            $anio_construccion = $data['anio_construccion'];
                             
-                            $respuesta['estado'] = true;    
+                                                            if ((isset($data['num_pisos'])) && (!empty($data['num_pisos']))){
+                                                                $num_pisos = $data['num_pisos'];
+                                
+                                                                $respuesta['estado'] = true;
+                                                            }else{
+                                                                $respuesta['error'] = "Debe ingresar el número de pisos de la construcción.";
+                                                            }
+                                                        }else{
+                                                            $respuesta['error'] = "Debe ingresar el a&ntilde;o de construcción.";
+                                                        }
+                                                    }else{
+                                                        $respuesta['error'] = "Debe ingresar un tipo de construcción.";
+                                                    }
+                                                }else{
+                                                    $respuesta['error'] = "Debe ingresar una dirección completa válida.";
+                                                }
+                                            }else{
+                                                $respuesta['error'] = "Debe ingresar un corre electrónico válido.";
+                                            }
+                                        }else{
+                                            $respuesta['error'] = "Debe ingresar un teléfono o celular válido.";
+                                        }
+                                    }else{
+                                        $respuesta['error'] = "Debe ingresar la fecha de nacimiento.";
+                                    }
+                                }else{
+                                    $respuesta['error'] = "Debe ingresar los nombres completos.";
+                                }
+                            }else{
+                                $respuesta['error'] = "Debe ingresar un documento válido.";
+                            }
+                             
                         }else{
                             $respuesta['error'] = "No se encuentra información del contacto.";
                         }
