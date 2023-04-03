@@ -5837,66 +5837,72 @@ $app->group('/api', function() use ($app) {
 
                         if (isset($consulta['id_lista'])){
 
+                            $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros_formularios_nova WHERE id_lista=".$id_lista);
 
+                            if (!isset($consulta['id_formulario'])){
+                                if ((isset($data['documento'])) && (!empty($data['documento']))){
+                                    $documento = $data['documento'];
 
-                            if ((isset($data['documento'])) && (!empty($data['documento']))){
-                                $documento = $data['documento'];
-
-                                if ((isset($data['nombres'])) && (!empty($data['nombres']))){
-                                    $nombres = strtoupper($data['nombres']);
-    
-                                    if ((isset($data['fecha_nacimiento'])) && (!empty($data['fecha_nacimiento']))){
-                                        $fecha_nacimiento = $data['fecha_nacimiento'];
+                                    if ((isset($data['nombres'])) && (!empty($data['nombres']))){
+                                        $nombres = strtoupper($data['nombres']);
         
-                                        if ((isset($data['telefono'])) && (!empty($data['telefono']))){
-                                            $telefono = $data['telefono'];
+                                        if ((isset($data['fecha_nacimiento'])) && (!empty($data['fecha_nacimiento']))){
+                                            $fecha_nacimiento = $data['fecha_nacimiento'];
             
-                                            if ((isset($data['correo'])) && (!empty($data['correo']))){
-                                                $correo = strtolower($data['correo']);
+                                            if ((isset($data['telefono'])) && (!empty($data['telefono']))){
+                                                $telefono = $data['telefono'];
                 
-                                                if ((isset($data['direccion'])) && (!empty($data['direccion']))){
-                                                    $direccion = strtoupper($data['direccion']);
+                                                if ((isset($data['correo'])) && (!empty($data['correo']))){
+                                                    $correo = strtolower($data['correo']);
                     
-                                                    if ((isset($data['tipo_construccion'])) && (!empty($data['tipo_construccion']))){
-                                                        $tipo_construccion = strtoupper($data['tipo_construccion']);
+                                                    if ((isset($data['direccion'])) && (!empty($data['direccion']))){
+                                                        $direccion = strtoupper($data['direccion']);
                         
-                                                        if ((isset($data['anio_construccion'])) && (!empty($data['anio_construccion']))){
-                                                            $anio_construccion = $data['anio_construccion'];
+                                                        if ((isset($data['tipo_construccion'])) && (!empty($data['tipo_construccion']))){
+                                                            $tipo_construccion = strtoupper($data['tipo_construccion']);
                             
-                                                            if ((isset($data['num_pisos'])) && (!empty($data['num_pisos']))){
-                                                                $num_pisos = $data['num_pisos'];
+                                                            if ((isset($data['anio_construccion'])) && (!empty($data['anio_construccion']))){
+                                                                $anio_construccion = $data['anio_construccion'];
                                 
-                                                                $id_formulario = $mysql->Ingreso("INSERT INTO notas_registros_formularios_nova (id_lista, documento, nombres, fecha_nacimiento, celular, correo, direccion, tipo_construccion, anio_construccion, numero_pisos) VALUES (?,?,?,?,?,?,?,?,?,?)", array($id_lista, $documento, $nombres, $fecha_nacimiento, $telefono, $correo, $direccion, $tipo_construccion, $anio_construccion, $num_pisos));
-                                                                $respuesta['id_formulario'] = $id_formulario;
+                                                                if ((isset($data['num_pisos'])) && (!empty($data['num_pisos']))){
+                                                                    $num_pisos = $data['num_pisos'];
+                                    
+                                                                    $id_formulario = $mysql->Ingreso("INSERT INTO notas_registros_formularios_nova (id_lista, documento, nombres, fecha_nacimiento, celular, correo, direccion, tipo_construccion, anio_construccion, numero_pisos) VALUES (?,?,?,?,?,?,?,?,?,?)", array($id_lista, $documento, $nombres, $fecha_nacimiento, $telefono, $correo, $direccion, $tipo_construccion, $anio_construccion, $num_pisos));
+                                                                    $respuesta['id_formulario'] = $id_formulario;
 
-                                                                $respuesta['estado'] = true;
+                                                                    $respuesta['estado'] = true;
+                                                                }else{
+                                                                    $respuesta['error'] = "Debe ingresar el número de pisos de la construcción.";
+                                                                }
                                                             }else{
-                                                                $respuesta['error'] = "Debe ingresar el número de pisos de la construcción.";
+                                                                $respuesta['error'] = "Debe ingresar el a&ntilde;o de construcción.";
                                                             }
                                                         }else{
-                                                            $respuesta['error'] = "Debe ingresar el a&ntilde;o de construcción.";
+                                                            $respuesta['error'] = "Debe ingresar un tipo de construcción.";
                                                         }
                                                     }else{
-                                                        $respuesta['error'] = "Debe ingresar un tipo de construcción.";
+                                                        $respuesta['error'] = "Debe ingresar una dirección completa válida.";
                                                     }
                                                 }else{
-                                                    $respuesta['error'] = "Debe ingresar una dirección completa válida.";
+                                                    $respuesta['error'] = "Debe ingresar un corre electrónico válido.";
                                                 }
                                             }else{
-                                                $respuesta['error'] = "Debe ingresar un corre electrónico válido.";
+                                                $respuesta['error'] = "Debe ingresar un teléfono o celular válido.";
                                             }
                                         }else{
-                                            $respuesta['error'] = "Debe ingresar un teléfono o celular válido.";
+                                            $respuesta['error'] = "Debe ingresar la fecha de nacimiento.";
                                         }
                                     }else{
-                                        $respuesta['error'] = "Debe ingresar la fecha de nacimiento.";
+                                        $respuesta['error'] = "Debe ingresar los nombres completos.";
                                     }
                                 }else{
-                                    $respuesta['error'] = "Debe ingresar los nombres completos.";
+                                    $respuesta['error'] = "Debe ingresar un documento válido.";
                                 }
                             }else{
-                                $respuesta['error'] = "Debe ingresar un documento válido.";
+                                $respuesta['error'] = "Ya existe un formulario lleno con éste cliente.";
                             }
+
+                           
                              
                         }else{
                             $respuesta['error'] = "No se encuentra información del contacto o éste no corresponde a SEGUROS NOVA";
