@@ -15589,6 +15589,50 @@ $app->group('/api', function() use ($app) {
         // GRUPO PARA DIFERENTES USOS
 
         $app->group('/funciones', function() use ($app) {
+
+            $app->get("/sendinblue", function(Request $request, Response $response){
+                $respuesta['estado'] = false;
+                try{              
+                    $sendinblue = new sendinblue();
+
+                     $data = array(
+                        "to" => [array(
+                            "email" => "calolomino@gmail.com",
+                            "name" => "Carlos Mino"
+                        )],
+                        // "cc" => [],
+                        // "bcc" => [],
+                        "templateId" => 1,
+                        // "params" => array(
+                        //     "nombre" => $nombres
+                        // ),
+                        // "replyTo" => array(
+                        //     "email" => "info@mvevip.com",
+                        //     "name" => "Marketing VIP"
+                        // ),
+                        // "attachment" => [
+                        //     array(
+                        //         "url" => "https://ventas.mvevip.com/php/contratos/56579-20230301112043.pdf",
+                        //         "name" => "Contrato.pdf"
+                        //     ),
+                        //     array(
+                        //         "url" => "https://ventas.mvevip.com/php/voucher/voucher_0_20230301131209.jpg",
+                        //         "name" => "Voucher.jpg"
+                        //     )
+                        // ]
+                    );
+
+                    $respuesta['correo'] = $sendinblue->envioMail($data);
+                    
+                    $respuesta['estado'] = true;
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
             
             $app->get("/testing", function(Request $request, Response $response){
                 $respuesta['estado'] = false;
