@@ -15607,7 +15607,7 @@ $app->group('/api', function() use ($app) {
                         "templateId" => 1,
                         "params" => array(
                             "fecha" => date("Y-m-d"),
-                            "hora" => date("H:i")
+                            "ciudad" => "<strong>QUITO</strong>"
                         ),
                         // "replyTo" => array(
                         //     "email" => "info@mvevip.com",
