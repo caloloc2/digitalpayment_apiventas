@@ -15591,14 +15591,16 @@ $app->group('/api', function() use ($app) {
         $app->group('/funciones', function() use ($app) {
 
             $app->get("/sendinblue", function(Request $request, Response $response){
+                $params = $request->getQueryParams();
                 $respuesta['estado'] = false;
+
                 try{              
                     $sendinblue = new sendinblue();
 
                      $data = array(
                         "to" => [array(
-                            "email" => "calolomino@gmail.com",
-                            "name" => "Carlos Mino"
+                            "email" => $params['email'],
+                            "name" => $params['nombre']
                         )],
                         // "cc" => [],
                         // "bcc" => [],
