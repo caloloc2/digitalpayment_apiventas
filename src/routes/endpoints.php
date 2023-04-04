@@ -15603,9 +15603,10 @@ $app->group('/api', function() use ($app) {
                         // "cc" => [],
                         // "bcc" => [],
                         "templateId" => 1,
-                        // "params" => array(
-                        //     "nombre" => $nombres
-                        // ),
+                        "params" => array(
+                            "fecha" => date("Y-m-d"),
+                            "hora" => date("H:i")
+                        ),
                         // "replyTo" => array(
                         //     "email" => "info@mvevip.com",
                         //     "name" => "Marketing VIP"
