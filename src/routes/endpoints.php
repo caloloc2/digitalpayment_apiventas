@@ -9823,20 +9823,36 @@ $app->group('/api', function() use ($app) {
                                         foreach ($listaEstablecimientos as $linea) {
                                             $id_lead = $linea['id_lead'];
 
+                                            $totalDocs = 0;
+                                            $totalValidados = 0;
                                             $verAdjuntos = $mysql->Consulta("SELECT
                                             E.id_estado, E.descripcion, 
                                             (SELECT COUNT(A.id_adjunto) FROM registros_internacional_adjuntos A WHERE (A.estado=E.id_estado) AND (A.id_lead=".$id_lead.")) AS total
                                             FROM registros_internacional_adjuntos_estado E");
 
+                                            if (is_array($verAdjuntos)){
+                                                if (count($verAdjuntos) > 0){
+                                                    foreach ($verAdjuntos as $lineaAdjunto) {
+                                                        $totalDocs += $lineaAdjunto['total'];
 
+                                                        if ($lineaAdjunto['id_estado'] == 2){
+                                                            $totalValidados += $lineaAdjunto['total'];
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            $pendientes = $totalDocs - $totalValidados;
+
+                                            $documentacion['series'][0]['data'] = (int) $pendientes;
+                                            $documentacion['series'][1]['data'] = (int) $pendientes;
+                                            $documentacion['series'][2]['data'] = (int) $totalValidados;
                                         }
                                     }
                                 }
 
-                                // array_push($documentacion['series'], array(
-                                //     "name" => "etado",
-                                //     "data" => $data
-                                // ));
+
+ 
                             }
                         }
                     }
