@@ -9833,10 +9833,10 @@ $app->group('/api', function() use ($app) {
                                     }
                                 }
 
-                                array_push($documentacion['series'], array(
-                                    "name" => "etado",
-                                    "data" => $data
-                                ));
+                                // array_push($documentacion['series'], array(
+                                //     "name" => "etado",
+                                //     "data" => $data
+                                // ));
                             }
                         }
                     }
