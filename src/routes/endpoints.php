@@ -5939,7 +5939,12 @@ $app->group('/api', function() use ($app) {
                 try{
                     $mysql = new Database("vtgsa_ventas");
 
-                    $bancos = $mysql->Consulta("SELECT * FROM notas_registros_bancos WHERE estado=0");
+                    $filtro = "";
+                    if ((isset($params['filtro'])) && (!empty($params['filtro']))){
+                        $filtro = "AND (banco LIKE '%".$params['filtro']."%')";
+                    }
+
+                    $bancos = $mysql->Consulta("SELECT * FROM notas_registros_bancos WHERE (estado=0) ".$filtro);
 
                     $listaBancos = [];
                     if (is_array($bancos)){
