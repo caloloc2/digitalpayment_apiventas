@@ -9708,6 +9708,44 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->get("/ciudades", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false;
+                
+                try{
+                    $mysql = new Database("vtgsa_ventas");
+
+                    $consulta = $mysql->Consulta("SELECT
+                    id_ciudad, ciudad, sector
+                    FROM registros_internacional_ciudades
+                    WHERE (estado=1)");
+
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($listado, array(
+                                    "id" => (int) $linea['id_ciudad'],
+                                    "ciudad" => $linea['ciudad'],
+                                    "sector" => $linea['sector']
+                                ));
+                            }
+                        }
+                    }
+
+                    $respuesta['consulta'] = $listado;
+                    $respuesta['estado'] = true;
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
             $app->get("/establecimientos", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
                 $params = $request->getQueryParams();
