@@ -9778,7 +9778,21 @@ $app->group('/api', function() use ($app) {
 
                     // con documentacion
                     $documentacion = array(
-                        "categories" => []
+                        "categories" => [],
+                        "series" => [
+                            array(
+                                "name" => "Pendientes",
+                                "data" => []
+                            ),
+                            array(
+                                "name" => "Parcialmente",
+                                "data" => []
+                            ),
+                            array(
+                                "name" => "Completo",
+                                "data" => []
+                            ),
+                        ]
                     );
 
                     $listaCiudades = $mysql->Consulta("SELECT
@@ -9789,12 +9803,40 @@ $app->group('/api', function() use ($app) {
                     LEFT JOIN registros_internacional_ciudades C
                     ON R.id_ciudad = C.id_ciudad
                     WHERE (A.archivo!='')
-                    GROUP BY R.id_ciudad");
+                    GROUP BY R.id_ciudad"); 
 
                     if (is_array($listaCiudades)){
                         if (count($listaCiudades) > 0){
                             foreach ($listaCiudades as $linea) {
+                                $id_ciudad = $linea['id_ciudad'];
+
                                 array_push($documentacion['categories'], $linea['ciudad']);
+
+                                $data = [];
+                                $listaEstablecimientos = $mysql->Consulta("SELECT
+                                *
+                                FROM registros_internacional R
+                                WHERE (R.id_ciudad = ".$id_ciudad.")");
+
+                                if (is_array($listaEstablecimientos)){
+                                    if (count($listaEstablecimientos) > 0){ 
+                                        foreach ($listaEstablecimientos as $linea) {
+                                            $id_lead = $linea['id_lead'];
+
+                                            $verAdjuntos = $mysql->Consulta("SELECT
+                                            E.id_estado, E.descripcion, 
+                                            (SELECT COUNT(A.id_adjunto) FROM registros_internacional_adjuntos A WHERE (A.estado=E.id_estado) AND (A.id_lead=".$id_lead.")) AS total
+                                            FROM registros_internacional_adjuntos_estado E");
+
+
+                                        }
+                                    }
+                                }
+
+                                array_push($documentacion['series'], array(
+                                    "name" => "etado",
+                                    "data" => $data
+                                ));
                             }
                         }
                     }
