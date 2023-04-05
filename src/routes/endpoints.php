@@ -9847,11 +9847,11 @@ $app->group('/api', function() use ($app) {
                         ON A.id_formulario = D.id_formulario
                         WHERE (A.id_lead=".$id.") AND (A.archivo!='')");
 
-                        $listaAdjunto = [];
+                        $listaAdjuntos = [];
                         if (is_array($adjuntos)){
                             if (count($adjuntos) > 0){
                                 foreach ($adjuntos as $linea) {
-                                    array_push($listaAdjunto, array(
+                                    array_push($listaAdjuntos, array(
                                         "id" => (int) $linea['id_adjunto'],
                                         "archivo" => array(
                                             "descripcion" => $linea['nombre'],
@@ -9887,6 +9887,7 @@ $app->group('/api', function() use ($app) {
                                 "color" => $consulta['color'],
                                 "icono" => $consulta['icono'],
                             ),
+                            "adjuntos" => $listaAdjuntos
                         );
 
                         $respuesta['estado'] = true;
