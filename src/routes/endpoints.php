@@ -9820,11 +9820,12 @@ $app->group('/api', function() use ($app) {
 
                                 if (is_array($listaEstablecimientos)){
                                     if (count($listaEstablecimientos) > 0){ 
-                                        foreach ($listaEstablecimientos as $linea) {
-                                            $id_lead = $linea['id_lead'];
+                                        $totalDocs = 0;
+                                        $totalValidados = 0;
 
-                                            $totalDocs = 0;
-                                            $totalValidados = 0;
+                                        foreach ($listaEstablecimientos as $linea) {
+                                            $id_lead = $linea['id_lead']; 
+                                            
                                             $verAdjuntos = $mysql->Consulta("SELECT
                                             E.id_estado, E.descripcion, 
                                             (SELECT COUNT(A.id_adjunto) FROM registros_internacional_adjuntos A WHERE (A.estado=E.id_estado) AND (A.id_lead=".$id_lead.")) AS total
@@ -9840,14 +9841,14 @@ $app->group('/api', function() use ($app) {
                                                         }
                                                     }
                                                 }
-                                            }
-
-                                            $pendientes = $totalDocs - $totalValidados;
-
-                                            array_push($documentacion['series'][0]['data'], (int) $pendientes );
-                                            array_push($documentacion['series'][1]['data'], (int) $pendientes );
-                                            array_push($documentacion['series'][2]['data'], (int) $totalValidados );
+                                            } 
                                         }
+
+                                        $pendientes = $totalDocs - $totalValidados;
+
+                                        array_push($documentacion['series'][0]['data'], (int) $pendientes );
+                                        array_push($documentacion['series'][1]['data'], (int) $pendientes );
+                                        array_push($documentacion['series'][2]['data'], (int) $totalValidados );
                                     }
                                 }
 
