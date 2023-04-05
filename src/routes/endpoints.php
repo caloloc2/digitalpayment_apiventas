@@ -6005,6 +6005,8 @@ $app->group('/api', function() use ($app) {
                 $identificador = $request->getAttribute('identificador');
                 $params = $request->getQueryParams();
                 $respuesta['estado'] = false; 
+
+                $respuesta['params'] = $params;
             
                 try{
                     $mysql = new Database("vtgsa_ventas");
@@ -6024,9 +6026,16 @@ $app->group('/api', function() use ($app) {
                         $identificadores = "AND (R.identificador='".$identificador."')";
                     } 
 
+                    $filtro = "";
+                    if ((isset($params['filtro'])) && (!empty($params['filtro']))){
+                        $identificadores = "AND (R.identificador='".$identificador."')";
+                    }
+
                     $sql = "SELECT
                     R.estado, E.descripcion, COUNT(R.estado) AS total
                     FROM notas_registros R
+                    LEFT JOIN notas_registros_bancos B
+                    ON R.banco = B.id_banco
                     LEFT JOIN notas_registros_estados E
                     ON R.estado = E.id_estados
                     WHERE (R.banco=".$idBanco.") ".$identificadores."
