@@ -9844,9 +9844,9 @@ $app->group('/api', function() use ($app) {
 
                                             $pendientes = $totalDocs - $totalValidados;
 
-                                            $documentacion['series'][0]['data'] = (int) $pendientes;
-                                            $documentacion['series'][1]['data'] = (int) $pendientes;
-                                            $documentacion['series'][2]['data'] = (int) $totalValidados;
+                                            array_push($documentacion['series'][0]['data'], (int) $pendientes );
+                                            array_push($documentacion['series'][1]['data'], (int) $pendientes );
+                                            array_push($documentacion['series'][2]['data'], (int) $totalValidados );
                                         }
                                     }
                                 }
