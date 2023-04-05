@@ -6112,7 +6112,7 @@ $app->group('/api', function() use ($app) {
                     }
 
                     $productos = $mysql->Consulta("SELECT
-                    R.id_banco, R.banco
+                    B.id_banco, B.banco
                     FROM notas_registros_bancos B
                     WHERE (B.estado=0) ".$filtro);
 
