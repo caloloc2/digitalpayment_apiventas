@@ -9850,6 +9850,14 @@ $app->group('/api', function() use ($app) {
                         ON A.estado = E.id_estado
                         WHERE (A.id_lead=".$id.") AND (A.archivo!='')");
 
+                        $logs = $mysql->Consulta("SELECT
+                        L.descripcion, L.fecha, UPPER(U.nombres) AS responsable
+                        FROM registros_internacional_logs L
+                        LEFT JOIN usuarios U
+                        ON L.id_usuario = U.id_usuario
+                        WHERE L.id_lead=".$id."
+                        ORDER BY L.fecha DESC");
+
                         $listaAdjuntos = [];
                         if (is_array($adjuntos)){
                             if (count($adjuntos) > 0){
@@ -9895,7 +9903,8 @@ $app->group('/api', function() use ($app) {
                                 "color" => $consulta['color'],
                                 "icono" => $consulta['icono'],
                             ),
-                            "adjuntos" => $listaAdjuntos
+                            "adjuntos" => $listaAdjuntos,
+                            "logs" => $logs
                         );
 
                         $respuesta['estado'] = true;
