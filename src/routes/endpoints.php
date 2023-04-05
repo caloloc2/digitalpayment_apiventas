@@ -9776,6 +9776,30 @@ $app->group('/api', function() use ($app) {
                         }
                     }
 
+                    // con documentacion
+                    $documentacion = array(
+                        "categories" => []
+                    );
+
+                    $listaCiudades = $mysql->Consulta("SELECT
+                    R.id_ciudad, C.ciudad, COUNT(A.id_adjunto) AS total
+                    FROM registros_internacional_adjuntos A
+                    LEFT JOIN registros_internacional R
+                    ON A.id_lead = R.id_lead
+                    LEFT JOIN registros_internacional_ciudades C
+                    ON R.id_ciudad = C.id_ciudad
+                    WHERE (A.archivo!='')
+                    GROUP BY R.id_ciudad");
+
+                    if (is_array($listaCiudades)){
+                        if (count($listaCiudades) > 0){
+                            foreach ($listaCiudades as $linea) {
+                                array_push($documentacion['categories'], $linea['ciudad']);
+                            }
+                        }
+                    }
+
+                    $respuesta['documentacion'] = $documentacion;
                     $respuesta['ciudades'] = $ciudades;
                     $respuesta['estado'] = true;
 
