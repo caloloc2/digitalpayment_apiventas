@@ -6088,7 +6088,9 @@ $app->group('/api', function() use ($app) {
                     $mesAnio = $mysql->Consulta("SELECT
                     MONTH(R.fecha_ultima_contacto) AS mes, YEAR(R.fecha_ultima_contacto) AS anio
                     FROM notas_registros R
-                    WHERE (R.banco=".$idBanco.") ".$identificadores."
+                    LEFT JOIN notas_registros_bancos B
+                    ON R.banco = B.id_banco
+                    WHERE (R.banco=".$idBanco.") ".$identificadores." ".$filtro."
                     GROUP BY MONTH(R.fecha_ultima_contacto), YEAR(R.fecha_ultima_contacto)
                     ORDER BY YEAR(R.fecha_ultima_contacto) ASC, MONTH(R.fecha_ultima_contacto) ASC");
 
@@ -6110,9 +6112,9 @@ $app->group('/api', function() use ($app) {
                     }
 
                     $productos = $mysql->Consulta("SELECT
-                    id_banco, banco
-                    FROM notas_registros_bancos
-                    WHERE estado=0");
+                    R.id_banco, R.banco
+                    FROM notas_registros_bancos B
+                    WHERE (B.estado=0) ".$filtro);
 
                     $seriesProductos = [];
 
@@ -6175,7 +6177,7 @@ $app->group('/api', function() use ($app) {
                     FROM notas_registros R
                     LEFT JOIN notas_registros_bancos B
                     ON R.banco = B.id_banco
-                    WHERE (B.estado=0)
+                    WHERE (B.estado=0) ".$filtro."
                     GROUP BY R.estado
                     ORDER BY COUNT(R.id_lista) DESC"); 
                     
