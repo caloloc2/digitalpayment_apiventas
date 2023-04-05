@@ -9679,10 +9679,26 @@ $app->group('/api', function() use ($app) {
                 try{
                     $mysql = new Database("vtgsa_ventas");
 
-                    $consulta = $mysql->Consulta("SELECT
-                    id_estado, UPPER(descripcion) AS descripcion
-                    FROM registros_internacional_estados
-                    WHERE (estado=1)");
+                    $filtro = "";
+                    $sql = "";
+                    if (isset($params['filtro'])){
+                        switch ($params['filtro']) {
+                            case 'visitas':
+                                $sql = "SELECT
+                                id_estado, UPPER(descripcion) AS descripcion
+                                FROM registros_internacional_visitas_estados
+                                WHERE (estado=1)";
+                                break; 
+                            default:
+                                $sql = "SELECT
+                                id_estado, UPPER(descripcion) AS descripcion
+                                FROM registros_internacional_estados
+                                WHERE (estado=1)";
+                                break;
+                        }
+                    }
+
+                    $consulta = $mysql->Consulta($sql);
 
                     $listado = [];
                     if (is_array($consulta)){
