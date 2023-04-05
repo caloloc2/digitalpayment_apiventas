@@ -9761,14 +9761,14 @@ $app->group('/api', function() use ($app) {
                     }
 
                     $ciudad = '';
-                    if ((isset($params['ciudad'])) && (!empty($params['ciudad']))){
+                    if ((isset($params['ciudad']))){
                         if ($params['ciudad'] >= 0){
                             $ciudad = "AND (C.id_ciudad = ".$params['ciudad'].")";
                         }
                     }
 
                     $estado = '';
-                    if ((isset($params['estado'])) && (!empty($params['estado']))){
+                    if ((isset($params['estado']))){
                         if ($params['estado'] >= 0){
                             $estado = "AND (R.estado = ".$params['estado'].")";
                         }
