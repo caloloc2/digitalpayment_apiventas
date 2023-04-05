@@ -1800,7 +1800,11 @@ $app->group('/api', function() use ($app) {
                     $username = $data['username'];
                     $password = $data['password'];
 
-                    $consulta = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE (correo='".$username."') AND (password='".$password."')");
+                    $consulta = $mysql->Consulta_Unico("SELECT 
+                    U.id_usuario, U.nombres, U.correo, T.url, U.estado
+                    FROM usuarios U 
+                    LEFT JOIN usuarios_tipos T
+                    ON U.tipo = T.id_usuario_tipo WHERE (U.correo='".$username."') AND (U.password='".$password."')");
 
                     if (isset($consulta['id_usuario'])){
                         if ($consulta['estado'] == 0){
@@ -1817,7 +1821,7 @@ $app->group('/api', function() use ($app) {
                             $actualiza = $mysql->Modificar("UPDATE usuarios SET hash=? WHERE id_usuario=?", array($hash, $id_usuario));
 
                             $respuesta['accessToken'] = $hash;
-                            // $respuesta['url'] = $consulta['path'];
+                            $respuesta['url'] = $consulta['url'];
                             $respuesta['estado'] = true; 
                         }else{
                             $respuesta['error'] = "Su usuario se encuentra deshabilitado.";
