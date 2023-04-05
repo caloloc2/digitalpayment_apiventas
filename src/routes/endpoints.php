@@ -6028,7 +6028,7 @@ $app->group('/api', function() use ($app) {
 
                     $filtro = "";
                     if ((isset($params['filtro'])) && (!empty($params['filtro']))){
-                        $identificadores = "AND (B.banco LIKE '%".$params['filtro']."%')";
+                        $filtro = "AND (B.banco LIKE '%".$params['filtro']."%')";
                     }
 
                     $sql = "SELECT
@@ -6038,7 +6038,7 @@ $app->group('/api', function() use ($app) {
                     ON R.banco = B.id_banco
                     LEFT JOIN notas_registros_estados E
                     ON R.estado = E.id_estados
-                    WHERE (R.banco=".$idBanco.") ".$identificadores."
+                    WHERE (R.banco=".$idBanco.") ".$identificadores." ".$filtro."
                     GROUP BY R.estado
                     ORDER BY COUNT(R.estado) DESC"; 
 
