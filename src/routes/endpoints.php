@@ -9840,6 +9840,32 @@ $app->group('/api', function() use ($app) {
 
                     if (isset($consulta['id_lead'])){ 
 
+                        $adjuntos = $mysql->Consulta("SELECT
+                        A.id_adjunto, A.archivo, A.extension, A.fechaAlta, A.fechaModificacion, D.nombre
+                        FROM registros_internacional_adjuntos A
+                        LEFT JOIN registros_internacional_documentacion D
+                        ON A.id_formulario = D.id_formulario
+                        WHERE (A.id_lead=".$id.") AND (A.archivo!='')");
+
+                        $listaAdjunto = [];
+                        if (is_array($adjuntos)){
+                            if (count($adjuntos) > 0){
+                                foreach ($adjuntos as $linea) {
+                                    array_push($listaAdjunto, array(
+                                        "id" => (int) $linea['id_adjunto'],
+                                        "archivo" => array(
+                                            "descripcion" => $linea['nombre'],
+                                            "nombre" => $linea['archivo'],
+                                            "extension" => $linea['extension'],
+                                            "link" => ""
+                                        ),
+                                        "fechaAlta" => $linea['fechaAlta'],
+                                        "fechaModificacion" => $linea['fechaModificacion']
+                                    ));
+                                }
+                            }
+                        }
+
                         $respuesta['consulta'] = array(
                             "id" => (int) $consulta['id_lead'],
                             "ruc" => $consulta['ruc'],
