@@ -9743,7 +9743,7 @@ $app->group('/api', function() use ($app) {
                         switch ($params['filtro']) {
                             case 'visitas':
                                 $sql = "SELECT
-                                id_estado, UPPER(descripcion) AS descripcion
+                                id_ciudad, ciudad, sector
                                 FROM registros_internacional_visitas_ciudades
                                 WHERE (estado=1)";
                                 break; 
