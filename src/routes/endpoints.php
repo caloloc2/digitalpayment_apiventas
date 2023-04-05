@@ -10058,8 +10058,10 @@ $app->group('/api', function() use ($app) {
                 
                 try{
                     $mysql = new Database("vtgsa_ventas");
+
+                    $modificar = $mysql->Modificar("UPDATE registros_internacional SET estado=? WHERE id_lead=?", array($data['estado'], $id));
                     
-                    $respuesta['mensaje'] = "Validado";
+                    $respuesta['mensaje'] = "Establecimiento actualizado correctamente.";
                     $respuesta['estado'] = true;
 
                 }catch(PDOException $e){
