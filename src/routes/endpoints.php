@@ -9746,6 +9746,48 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->get("/dashboard", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false;
+                
+                try{
+                    $mysql = new Database("vtgsa_ventas");
+
+                    $ciudades = [];
+
+                    $consulta = $mysql->Consulta("SELECT
+                    R.id_ciudad, C.ciudad, COUNT(R.id_ciudad) AS total
+                    FROM registros_internacional R
+                    LEFT JOIN registros_internacional_ciudades C
+                    ON R.id_ciudad = C.id_ciudad
+                    GROUP BY R.id_ciudad
+                    ORDER BY COUNT(R.id_ciudad) DESC");
+
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($ciudades, array(
+                                    "name" => $linea['ciudad'],
+                                    "y" => (int) $linea['total']
+                                ));
+                            }
+                        }
+                    }
+
+                    $respuesta['ciudades'] = $ciudades;
+                    $respuesta['estado'] = true;
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
             $app->get("/establecimientos", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
                 $params = $request->getQueryParams();
