@@ -5934,7 +5934,8 @@ $app->group('/api', function() use ($app) {
             $app->get("/informacion", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
                 $params = $request->getQueryParams();
-                $respuesta['estado'] = false; 
+                $respuesta['estado'] = false;
+                $respuesta['params'] = $params; 
             
                 try{
                     $mysql = new Database("vtgsa_ventas");
