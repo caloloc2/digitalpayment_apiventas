@@ -6028,7 +6028,7 @@ $app->group('/api', function() use ($app) {
 
                     $filtro = "";
                     if ((isset($params['filtro'])) && (!empty($params['filtro']))){
-                        $identificadores = "AND (R.identificador='".$identificador."')";
+                        $identificadores = "AND (B.banco LIKE '%".$params['filtro']."%')";
                     }
 
                     $sql = "SELECT
