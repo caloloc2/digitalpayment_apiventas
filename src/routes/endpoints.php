@@ -9696,6 +9696,11 @@ $app->group('/api', function() use ($app) {
                                 WHERE (estado=1)";
                                 break;
                         }
+                    }else{
+                        $sql = "SELECT
+                        id_estado, UPPER(descripcion) AS descripcion
+                        FROM registros_internacional_estados
+                        WHERE (estado=1)";
                     }
 
                     $consulta = $mysql->Consulta($sql);
