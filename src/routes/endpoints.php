@@ -9830,7 +9830,7 @@ $app->group('/api', function() use ($app) {
                     $mysql = new Database("vtgsa_ventas"); 
 
                     $consulta = $mysql->Consulta_Unico("SELECT
-                    R.id_lead, R.ruc, R.comercio, R.propietario, C.ciudad, R.direccion, R.telefono, R.celular, R.fechaAlta, R.fechaModificacion, R.estado, E.descripcion, E.color, E.icono
+                    R.id_lead, R.ruc, R.comercio, R.propietario, C.ciudad, R.direccion, R.telefono, R.celular, R.fechaAlta, R.fechaModificacion, R.estado, E.descripcion, E.color, E.icono, R.latitud, R.longitud
                     FROM registros_internacional R
                     LEFT JOIN registros_internacional_ciudades C
                     ON R.id_ciudad = C.id_ciudad
@@ -9847,6 +9847,10 @@ $app->group('/api', function() use ($app) {
                             "propietario" => $consulta['propietario'],
                             "ciudad" => $consulta['ciudad'],
                             "direccion" => $consulta['direccion'],
+                            "posicion" => array(
+                                "latitud" => $consulta['latitud'],
+                                "longitud" => $consulta['longitud'],
+                            ),
                             "telefono" => $consulta['telefono'],
                             "celular" => $consulta['celular'],
                             "fechaAlta" => $consulta['fechaAlta'],
