@@ -9761,7 +9761,7 @@ $app->group('/api', function() use ($app) {
                         WHERE (estado=1)";
                     }
 
-                    $consulta = $mysql->Consulta("");
+                    $consulta = $mysql->Consulta($sql);
 
                     $listado = [];
                     if (is_array($consulta)){
