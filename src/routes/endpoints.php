@@ -9821,6 +9821,59 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->get("/establecimientos/{id}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $id = $request->getAttribute('id');
+                $respuesta['estado'] = false; 
+                
+                try{
+                    $mysql = new Database("vtgsa_ventas"); 
+
+                    $consulta = $mysql->Consulta_Unico("SELECT
+                    R.id_lead, R.ruc, R.comercio, R.propietario, C.ciudad, R.direccion, R.telefono, R.celular, R.fechaAlta, R.fechaModificacion, R.estado, E.descripcion, E.color, E.icono
+                    FROM registros_internacional R
+                    LEFT JOIN registros_internacional_ciudades C
+                    ON R.id_ciudad = C.id_ciudad
+                    LEFT JOIN registros_internacional_estados E
+                    ON R.estado = E.id_estado
+                    WHERE (R.id_lead=".$id.")");
+
+                    if (isset($consulta['id_lead'])){ 
+
+                        $respuesta['consulta'] = array(
+                            "id" => (int) $consulta['id_lead'],
+                            "ruc" => $consulta['ruc'],
+                            "comercio" => $consulta['comercio'],
+                            "propietario" => $consulta['propietario'],
+                            "ciudad" => $consulta['ciudad'],
+                            "direccion" => $consulta['direccion'],
+                            "telefono" => $consulta['telefono'],
+                            "celular" => $consulta['celular'],
+                            "fechaAlta" => $consulta['fechaAlta'],
+                            "fechaModificacion" => $consulta['fechaModificacion'],
+                            "estado" => array(
+                                "valor" => (int) $consulta['estado'],
+                                "descripcion" => $consulta['descripcion'],
+                                "color" => $consulta['color'],
+                                "icono" => $consulta['icono'],
+                            ),
+                        );
+
+                        $respuesta['estado'] = true;
+
+                    }else{
+                        $respuesta['error'] = "No se encuentra información del establecimiento.";
+                    } 
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
         });
 
     });
