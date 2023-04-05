@@ -19150,5 +19150,51 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
         });
+
+
+
+
+        /// BANCO INTERNACIONAL
+        $app->group('/internacional', function() use ($app) {
+    
+            $app->get("/estados", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false;
+                
+                try{
+                    $mysql = new Database("vtgsa_ventas");
+
+                    $consulta = $mysql->Consulta("SELECT
+                    id_estado, UPPER(descripcion) AS descripcion
+                    FROM registros_internacional_estados
+                    WHERE (estado=1)");
+
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($listado, array(
+                                    "id" => (int) $linea['id_estado'],
+                                    "descripcion" => $linea['descripcion']
+                                ));
+                            }
+                        }
+                    }
+
+                    $respuesta['consulta'] = $listado;
+                    $respuesta['estado'] = true;
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
+        });
+
     });
 });
