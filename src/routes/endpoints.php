@@ -10048,6 +10048,29 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->put("/establecimientos/{id}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $id = $request->getAttribute('id');
+                $data = $request->getParsedBody();
+                $respuesta['estado'] = false; 
+
+                $respuesta['data'] = $data;
+                
+                try{
+                    $mysql = new Database("vtgsa_ventas");
+                    
+                    $respuesta['mensaje'] = "Validado";
+                    $respuesta['estado'] = true;
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
         });
 
     });
