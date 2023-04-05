@@ -9760,6 +9760,20 @@ $app->group('/api', function() use ($app) {
                         $buscador = $params['buscador'];
                     }
 
+                    $ciudad = '';
+                    if ((isset($params['ciudad'])) && (!empty($params['ciudad']))){
+                        if ($params['ciudad'] >= 0){
+                            $ciudad = "AND (C.id_ciudad = ".$params['ciudad'].")";
+                        }
+                    }
+
+                    $estado = '';
+                    if ((isset($params['estado'])) && (!empty($params['estado']))){
+                        if ($params['estado'] >= 0){
+                            $estado = "AND (R.estado = ".$params['estado'].")";
+                        }
+                    }
+
                     $consulta = $mysql->Consulta("SELECT
                     R.id_lead, R.ruc, R.comercio, R.propietario, C.ciudad, R.direccion, R.telefono, R.celular, R.fechaAlta, R.fechaModificacion, R.estado, E.descripcion, E.color, E.icono
                     FROM registros_internacional R
@@ -9767,7 +9781,7 @@ $app->group('/api', function() use ($app) {
                     ON R.id_ciudad = C.id_ciudad
                     LEFT JOIN registros_internacional_estados E
                     ON R.estado = E.id_estado
-                    WHERE (R.comercio LIKE '%".$buscador."%') OR (R.propietario LIKE '%".$buscador."%') OR (R.ruc LIKE '%".$buscador."%')");
+                    WHERE ((R.comercio LIKE '%".$buscador."%') OR (R.propietario LIKE '%".$buscador."%') OR (R.ruc LIKE '%".$buscador."%')) ".$ciudad." ".$estado);
 
                     $listado = [];
                     if (is_array($consulta)){
