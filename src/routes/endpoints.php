@@ -9827,7 +9827,8 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false; 
                 
                 try{
-                    $mysql = new Database("vtgsa_ventas"); 
+                    $mysql = new Database("vtgsa_ventas");
+                    $carpeta = "https://api.digitalpaymentnow.com/tmp/"; 
 
                     $consulta = $mysql->Consulta_Unico("SELECT
                     R.id_lead, R.ruc, R.comercio, R.propietario, C.ciudad, R.direccion, R.telefono, R.celular, R.fechaAlta, R.fechaModificacion, R.estado, E.descripcion, E.color, E.icono, R.latitud, R.longitud
@@ -9857,7 +9858,7 @@ $app->group('/api', function() use ($app) {
                                             "descripcion" => $linea['nombre'],
                                             "nombre" => $linea['archivo'],
                                             "extension" => $linea['extension'],
-                                            "link" => ""
+                                            "link" => $carpeta.$linea['archivo'].".".$linea['extension']
                                         ),
                                         "fechaAlta" => $linea['fechaAlta'],
                                         "fechaModificacion" => $linea['fechaModificacion']
