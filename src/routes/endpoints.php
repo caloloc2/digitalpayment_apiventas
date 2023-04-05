@@ -9842,10 +9842,12 @@ $app->group('/api', function() use ($app) {
                     if (isset($consulta['id_lead'])){ 
 
                         $adjuntos = $mysql->Consulta("SELECT
-                        A.id_adjunto, A.archivo, A.extension, A.fechaAlta, A.fechaModificacion, D.nombre
+                        A.id_adjunto, A.archivo, A.extension, A.fechaAlta, A.fechaModificacion, D.nombre, A.estado, E.descripcion, E.color
                         FROM registros_internacional_adjuntos A
                         LEFT JOIN registros_internacional_documentacion D
                         ON A.id_formulario = D.id_formulario
+                        LEFT OUTER JOIN registros_internacional_adjuntos_estado E
+                        ON A.estado = E.id_estado
                         WHERE (A.id_lead=".$id.") AND (A.archivo!='')");
 
                         $listaAdjuntos = [];
@@ -9861,7 +9863,12 @@ $app->group('/api', function() use ($app) {
                                             "link" => $carpeta.$linea['archivo'].".".$linea['extension']
                                         ),
                                         "fechaAlta" => $linea['fechaAlta'],
-                                        "fechaModificacion" => $linea['fechaModificacion']
+                                        "fechaModificacion" => $linea['fechaModificacion'],
+                                        "estado" => array(
+                                            "valor" => (int) $linea['estado'],
+                                            "descripcion" => $linea['descripcion'],
+                                            "color" => $linea['color']
+                                        )
                                     ));
                                 }
                             }
