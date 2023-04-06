@@ -520,7 +520,7 @@ $app->group('/api', function() use ($app) {
 
                                                     $respuesta['mail'] = $envioMail;
 
-                                                    $modificar = $mysql->Modificar("UPDATE usuarios SET `password`=?, reseteo=? WHERE id_usuario=?", array($confirmacion, 1, $id_usuario));
+                                                    $modificar = $mysql->Modificar("UPDATE usuarios SET `password`=?, reseteo=?, fecha_modificacion=? WHERE id_usuario=?", array($confirmacion, 1, date("Y-m-d H:i:s"), $id_usuario));
 
                                                     $respuesta['estado'] = true;
                                                 }else{
