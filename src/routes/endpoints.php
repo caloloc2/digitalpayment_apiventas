@@ -406,6 +406,8 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{                
+                    $mysql = new Database("vtgsa_ventas");
+                    
                     $correo = strtolower($data['correo']);
                     $nombres = strtoupper($data['nombres']);
                     $tipo = $data['tipo'];
