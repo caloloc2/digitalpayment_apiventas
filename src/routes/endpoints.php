@@ -397,6 +397,32 @@ $app->group('/api', function() use ($app) {
             return $newResponse;
         });
 
+        $app->group('/admin', function() use ($app) {
+
+            $app->post("/nuevo-usuario", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $data = $request->getParsedBody();
+                
+                $respuesta['estado'] = false;
+            
+                try{                
+                    $correo = strtolower($data['correo']);
+                    $nombres = strtoupper($data['nombres']);
+                    $tipo = $data['tipo'];
+
+                    $respuesta['estado'] = true;
+
+                    $newResponse = $response->withJson($respuesta);
+            
+                    return $newResponse;
+            
+                }catch(PDOException $e){
+                    echo "Error: ".$e->getMessage();
+                }
+            });
+
+        });
+
         $app->group('/ventas', function() use ($app) {
 
             // LOGIN
