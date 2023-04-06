@@ -407,7 +407,8 @@ $app->group('/api', function() use ($app) {
             
                 try{                
                     $mysql = new Database("vtgsa_ventas");
-                    
+                    $Functions = new Functions();
+
                     $correo = strtolower($data['correo']);
                     $nombres = strtoupper($data['nombres']);
                     $tipo = $data['tipo'];
@@ -415,6 +416,9 @@ $app->group('/api', function() use ($app) {
                     $consulta = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE correo='".$correo."'");
 
                     if (!isset($consulta['id_usuario'])){
+                        $temp_pass = $Functions->number_random(8);
+
+                        $respuesta['pass'] = $temp_pass;
                         $respuesta['estado'] = true;
                     }else{
                         $respuesta['error'] = "Ya existe un usuario registrado con el correo electrónico.";
