@@ -469,9 +469,47 @@ $app->group('/api', function() use ($app) {
                         $session = $autenticacion->Valida_Sesion($authorization[0]); 
     
                         if ($session['estado']){
-                            $respuesta['usuario'] = $session['usuario'];
-    
-                            // $respuesta['estado'] = true;
+                            $id_usuario = $session['usuario']['id_usuario'];
+
+                            if ((isset($data['temporal'])) && (!empty($data['temporal']))){
+                                $temporal = $data['temporal'];
+
+                                $consulta = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE (`password`='".$temporal."') AND (id_usuario=".$id_usuario.")");
+
+                                if (isset($consulta['id_usuario'])){
+
+                                    if ((isset($data['nueva'])) && (!empty($data['nueva']))){
+                                        $nueva = $data['nueva'];
+
+                                        if (strlen($nueva) >= 8){
+                                            if ((isset($data['confirmacion'])) && (!empty($data['confirmacion']))){
+                                                $confirmacion = $data['confirmacion'];
+
+                                                if ($nueva == $confirmacion){
+                                                    $respuesta['mensaje'] = "ok";
+
+                                                    // $respuesta['estado'] = true;
+                                                }else{
+                                                    $respuesta['error'] = "Las claves no coinciden. Favor verifique.";
+                                                }
+
+                                            }else{
+                                                $respuesta['error'] = "Ingrese nuevamente la clave a registrar.";
+                                            }
+                                        }else{
+                                            $respuesta['error'] = "La nueva clave debe tener más de 8 dígitos o carácteres.";
+                                        }
+                                    }else{
+                                        $respuesta['error'] = "Ingrese una nueva clave para su usuario.";
+                                    }
+                                
+                                }else{
+                                    $respuesta['error'] = "La clave temporal no pertenece a su usuario o es incorrecta.";
+                                }
+                            }else{
+                                $respuesta['error'] = "Ingrese la clave temporal enviada a su correo electrónico.";
+                            }
+ 
                         }else{
                             $respuesta['error'] = $session['error'];
                         }
