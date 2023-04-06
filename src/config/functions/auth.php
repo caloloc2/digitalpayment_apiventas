@@ -130,7 +130,7 @@ class Authentication{
 
         $info = explode("|", $decrypt);
         if (isset($info[0])){
-            $verifica = $mysql->Consulta_Unico("SELECT id_usuario, id_usuario_crm, nombres, correo, estado FROM usuarios WHERE (id_usuario=".$info[0].") AND (hash='".$hash."')");
+            $verifica = $mysql->Consulta_Unico("SELECT id_usuario, id_usuario_crm, nombres, correo, estado, reseteo FROM usuarios WHERE (id_usuario=".$info[0].") AND (hash='".$hash."')");
 
             if (isset($verifica['id_usuario'])){
                 if ($verifica['estado'] == 0){
@@ -139,7 +139,8 @@ class Authentication{
                         "id_usuario" => (int) $verifica['id_usuario'],
                         "id_usuario_crm" => (int) $verifica['id_usuario_crm'],
                         "nombres" => $verifica['nombres'],
-                        "correo" => $verifica['correo']
+                        "correo" => $verifica['correo'],
+                        "reseteo" => (bool) $verifica['reseteo']
                     );
 
                     $retorno['estado'] = true;
