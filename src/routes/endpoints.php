@@ -471,7 +471,7 @@ $app->group('/api', function() use ($app) {
                         if ($session['estado']){
                             $respuesta['usuario'] = $session['usuario'];
     
-                            $respuesta['estado'] = true;
+                            // $respuesta['estado'] = true;
                         }else{
                             $respuesta['error'] = $session['error'];
                         }
