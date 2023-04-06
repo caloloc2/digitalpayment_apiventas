@@ -488,7 +488,9 @@ $app->group('/api', function() use ($app) {
                                                 if ($nueva == $confirmacion){
                                                     $respuesta['mensaje'] = "ok";
 
-                                                    // $respuesta['estado'] = true;
+                                                    $modificar = $mysql->Modificar("UPDATE usuarios SET `password`=?, reseteo=? WHERE id_usuario=?", array($confirmacion, 1, $id_usuario));
+
+                                                    $respuesta['estado'] = true;
                                                 }else{
                                                     $respuesta['error'] = "Las claves no coinciden. Favor verifique.";
                                                 }
