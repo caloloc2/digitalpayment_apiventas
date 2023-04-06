@@ -418,7 +418,9 @@ $app->group('/api', function() use ($app) {
                     if (!isset($consulta['id_usuario'])){
                         $temp_pass = $Functions->number_random(8);
 
-                        $respuesta['pass'] = $temp_pass;
+                        $id_usuario = $mysql->Ingreso("INSERT INTO usuarios (nombres, correo, tipo, `password`) VALUES (?,?,?,?)", array($nombres, $correo, $tipo, $temp_pass));
+
+                        $respuesta['id'] = $id_usuario;
                         $respuesta['estado'] = true;
                     }else{
                         $respuesta['error'] = "Ya existe un usuario registrado con el correo electrónico.";
