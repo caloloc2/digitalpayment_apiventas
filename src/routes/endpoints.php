@@ -455,6 +455,41 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->put("/actualizar-password", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $data = $request->getParsedBody();
+                $respuesta['data'] = $data;
+                $respuesta['estado'] = false;
+            
+                try{                
+                    $mysql = new Database("vtgsa_ventas");
+
+                    if (isset($authorization[0])){
+                        $autenticacion = new Authentication();
+                        $session = $autenticacion->Valida_Sesion($authorization[0]); 
+    
+                        if ($session['estado']){
+                            $respuesta['usuario'] = $session['usuario'];
+    
+                            $respuesta['estado'] = true;
+                        }else{
+                            $respuesta['error'] = $session['error'];
+                        }
+    
+                        
+                    }else{
+                        $respuesta['error'] = "Su token de acceso no se encuentra.";
+                    }
+            
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
         });
 
         $app->group('/ventas', function() use ($app) {
