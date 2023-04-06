@@ -313,6 +313,7 @@ $app->group('/api', function() use ($app) {
         
             try{                
                 $mysql = new Database("vtgsa_ventas");
+                $sendinblue = new sendinblue();
 
                 if (((isset($data['username'])) && (!empty($data['username']))) && ((isset($data['password'])) && (!empty($data['password'])))){
                     $username = $data['username'];
@@ -337,6 +338,20 @@ $app->group('/api', function() use ($app) {
                             $hash = $autenticacion->encrypt_decrypt("encrypt", $cadena);
 
                             $actualiza = $mysql->Modificar("UPDATE usuarios SET hash=? WHERE id_usuario=?", array($hash, $id_usuario));
+
+                            $envioMail = $sendinblue->envioMail(array(
+                                "to" => [array(
+                                    "email" => $correo,
+                                    "name" => $nombres
+                                )], 
+                                "templateId" => 5,
+                                "params" => array(
+                                    "fecha" => date("Y-m-d"),
+                                    "hora" => date("H:i")
+                                ),
+                            ));
+
+                            $respuesta['mail'] = $envioMail;
                             
                             $respuesta['accessToken'] = $hash;
                             $respuesta['url'] = $consulta['url'];
