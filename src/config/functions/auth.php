@@ -140,7 +140,7 @@ class Authentication{
                         "id_usuario_crm" => (int) $verifica['id_usuario_crm'],
                         "nombres" => $verifica['nombres'],
                         "correo" => $verifica['correo'],
-                        "reseteo" => (bool) $verifica['reseteo']
+                        "reseteo" => (bool) !$verifica['reseteo']
                     );
 
                     $retorno['estado'] = true;
