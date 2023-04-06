@@ -373,7 +373,7 @@ $app->group('/api', function() use ($app) {
                     $autenticacion = new Authentication();
                     $session = $autenticacion->Valida_Sesion($authorization[0]);
 
-                    $respuesta['asdf'] = $authorization[0];
+                    // $respuesta['asdf'] = $authorization[0];
 
                     if ($session['estado']){
                         $respuesta['usuario'] = $session['usuario'];
