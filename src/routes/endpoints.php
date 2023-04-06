@@ -408,6 +408,7 @@ $app->group('/api', function() use ($app) {
                 try{                
                     $mysql = new Database("vtgsa_ventas");
                     $Functions = new Functions();
+                    $sendinblue = new sendinblue();
 
                     $correo = strtolower($data['correo']);
                     $nombres = strtoupper($data['nombres']);
@@ -426,6 +427,19 @@ $app->group('/api', function() use ($app) {
 
                         $id_usuario = $mysql->Ingreso("INSERT INTO usuarios (nombres, correo, tipo, `password`, id_referencia) VALUES (?,?,?,?,?)", array($nombres, $correo, $tipo, $temp_pass, $id_referencia));
 
+                        $envioMail = $sendinblue->envioMail(array(
+                            "to" => [array(
+                                "email" => $correo,
+                                "name" => $nombres
+                            )], 
+                            "templateId" => 3,
+                            "params" => array(
+                                "correo" => $correo,
+                                "password" => $temp_pass
+                            ),
+                        ));
+
+                        $respuesta['mail'] = $envioMail;
                         $respuesta['id'] = $id_usuario;
                         $respuesta['estado'] = true;
                     }else{
