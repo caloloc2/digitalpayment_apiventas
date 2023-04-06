@@ -339,7 +339,7 @@ $app->group('/api', function() use ($app) {
 
                             $actualiza = $mysql->Modificar("UPDATE usuarios SET hash=? WHERE id_usuario=?", array($hash, $id_usuario));
 
-                            if (!$consulta['reseteo']){
+                            if ($consulta['reseteo'] == 1){
                                 $envioMail = $sendinblue->envioMail(array(
                                     "to" => [array(
                                         "email" => $correo,
