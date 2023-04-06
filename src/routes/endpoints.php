@@ -320,7 +320,7 @@ $app->group('/api', function() use ($app) {
                     $password = $data['password'];
 
                     $consulta = $mysql->Consulta_Unico("SELECT 
-                    U.id_usuario, U.nombres, U.correo, T.url, U.estado
+                    U.id_usuario, U.nombres, U.correo, T.url, U.estado, U.reseteo
                     FROM usuarios U 
                     LEFT JOIN usuarios_tipos T
                     ON U.tipo = T.id_usuario_tipo WHERE (U.correo='".$username."') AND (U.password='".$password."')");
@@ -339,19 +339,20 @@ $app->group('/api', function() use ($app) {
 
                             $actualiza = $mysql->Modificar("UPDATE usuarios SET hash=? WHERE id_usuario=?", array($hash, $id_usuario));
 
-                            $envioMail = $sendinblue->envioMail(array(
-                                "to" => [array(
-                                    "email" => $correo,
-                                    "name" => $nombres
-                                )], 
-                                "templateId" => 5,
-                                "params" => array(
-                                    "fecha" => date("Y-m-d"),
-                                    "hora" => date("H:i")
-                                ),
-                            ));
-
-                            $respuesta['mail'] = $envioMail;
+                            if (!$consulta['reseteo']){
+                                $envioMail = $sendinblue->envioMail(array(
+                                    "to" => [array(
+                                        "email" => $correo,
+                                        "name" => $nombres
+                                    )], 
+                                    "templateId" => 5,
+                                    "params" => array(
+                                        "fecha" => date("Y-m-d"),
+                                        "hora" => date("H:i")
+                                    ),
+                                ));
+                                $respuesta['mail'] = $envioMail;
+                            } 
                             
                             $respuesta['accessToken'] = $hash;
                             $respuesta['url'] = $consulta['url'];
