@@ -410,15 +410,21 @@ $app->group('/api', function() use ($app) {
                     $nombres = strtoupper($data['nombres']);
                     $tipo = $data['tipo'];
 
-                    $respuesta['estado'] = true;
+                    $consulta = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE correo='".$correo."'");
 
-                    $newResponse = $response->withJson($respuesta);
-            
-                    return $newResponse;
+                    if (!isset($consulta['id_usuario'])){
+                        $respuesta['estado'] = true;
+                    }else{
+                        $respuesta['error'] = "Ya existe un usuario registrado con el correo electrónico.";
+                    }
             
                 }catch(PDOException $e){
-                    echo "Error: ".$e->getMessage();
+                    $respuesta['error'] = $e->getMessage();
                 }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
             });
 
         });
