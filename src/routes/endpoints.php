@@ -471,12 +471,16 @@ $app->group('/api', function() use ($app) {
                         if ($session['estado']){
                             $id_usuario = $session['usuario']['id_usuario'];
 
+                            $sendinblue = new sendinblue();
+
                             if ((isset($data['temporal'])) && (!empty($data['temporal']))){
                                 $temporal = $data['temporal'];
 
                                 $consulta = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE (`password`='".$temporal."') AND (id_usuario=".$id_usuario.")");
 
                                 if (isset($consulta['id_usuario'])){
+                                    $correo = $consulta['correo'];
+                                    $nombres = $consulta['nombres'];
 
                                     if ((isset($data['nueva'])) && (!empty($data['nueva']))){
                                         $nueva = $data['nueva'];
@@ -486,7 +490,19 @@ $app->group('/api', function() use ($app) {
                                                 $confirmacion = $data['confirmacion'];
 
                                                 if ($nueva == $confirmacion){
-                                                    $respuesta['mensaje'] = "ok";
+                                                    $envioMail = $sendinblue->envioMail(array(
+                                                        "to" => [array(
+                                                            "email" => $correo,
+                                                            "name" => $nombres
+                                                        )], 
+                                                        "templateId" => 4,
+                                                        "params" => array(
+                                                            "fecha" => date("Y-m-d"),
+                                                            "hora" => date("H:i")
+                                                        ),
+                                                    ));
+
+                                                    $respuesta['mail'] = $envioMail;
 
                                                     $modificar = $mysql->Modificar("UPDATE usuarios SET `password`=?, reseteo=? WHERE id_usuario=?", array($confirmacion, 1, $id_usuario));
 
