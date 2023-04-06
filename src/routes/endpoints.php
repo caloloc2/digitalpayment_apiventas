@@ -319,7 +319,7 @@ $app->group('/api', function() use ($app) {
                     $password = $data['password'];
 
                     $consulta = $mysql->Consulta_Unico("SELECT 
-                    U.id_usuario, U.nombres, U.correo, T.url, U.estado
+                    U.id_usuario, U.nombres, U.correo, T.url, U.estado, U.reseteo
                     FROM usuarios U 
                     LEFT JOIN usuarios_tipos T
                     ON U.tipo = T.id_usuario_tipo WHERE (U.correo='".$username."') AND (U.password='".$password."')");
@@ -338,6 +338,7 @@ $app->group('/api', function() use ($app) {
 
                             $actualiza = $mysql->Modificar("UPDATE usuarios SET hash=? WHERE id_usuario=?", array($hash, $id_usuario));
 
+                            $respuesta['reseteo'] = (bool) $consulta['reseteo'];
                             $respuesta['accessToken'] = $hash;
                             $respuesta['url'] = $consulta['url'];
                             $respuesta['estado'] = true; 
