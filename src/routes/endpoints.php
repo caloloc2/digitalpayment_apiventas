@@ -4960,7 +4960,7 @@ $app->group('/api', function() use ($app) {
                                         'sliced' => true,
                                         'selected' => true
                                     ));
-                                }else if (($i>=1) && ($i<=5)){
+                                }else if (($i>=1) && ($i<=20)){
                                     array_push($listadoporCiudad, array(
                                         'name' => $linea['ciudad'],
                                         'y' => (float) $linea['total']
