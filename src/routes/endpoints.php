@@ -4947,14 +4947,38 @@ $app->group('/api', function() use ($app) {
                     GROUP BY R.ciudad
                     ORDER BY COUNT(R.id_lista) DESC");
 
-                    $respuesta['sql'] = "SELECT
-                    R.ciudad, COUNT(R.id_lista) AS total
-                    FROM notas_registros R
-                    LEFT JOIN notas_registros_bancos B
-                    ON R.banco = B.id_banco
-                    WHERE (R.banco=".$idBanco.") ".$identificadores." ".$filtro."
-                    GROUP BY R.ciudad
-                    ORDER BY COUNT(R.id_lista) DESC";
+                    $listadoporCiudad = [];
+                    if (isset($registros)){
+                        if (count($registros) > 0){
+                            $i = 0;
+                            $otros = 0;
+                            foreach ($registros as $linea) {
+                                if ($i == 0){
+                                    array_push($listadoporCiudad, array(
+                                        'name' => $linea['ciudad'],
+                                        'y' => (float) $linea['total'],
+                                        'sliced' => true,
+                                        'selected' => true
+                                    ));
+                                }else if (($i>=1) && ($i<=5)){
+                                    array_push($listadoporCiudad, array(
+                                        'name' => $linea['ciudad'],
+                                        'y' => (float) $linea['total']
+                                    ));
+                                }else{
+                                    $otros += $linea['total'];
+                                }
+
+
+                                $i+=1;
+                            }
+
+                            array_push($listadoporCiudad, array(
+                                'name' => "Otros",
+                                'y' => (float) $otros
+                            ));
+                        }
+                    }
                    
                     $respuesta['widgets'] = $widgets;
 
@@ -4965,6 +4989,7 @@ $app->group('/api', function() use ($app) {
  
                     $respuesta['efectividad'] = (float) $efectividad;
                     $respuesta['porEstado'] = $listaporEstado;  
+                    $respuesta['porCiudad'] = $listadoporCiudad;
                     $respuesta['estado'] = true;
                     
                 }catch(PDOException $e){
