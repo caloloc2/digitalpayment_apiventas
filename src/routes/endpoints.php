@@ -4937,9 +4937,24 @@ $app->group('/api', function() use ($app) {
                         ));
                     } 
 
-                    // Obtiene las ventas efectivas en general 
+                    // Obtiene registros por ciudad
+                    $registros = $mysql->Consulta("SELECT
+                    R.ciudad, COUNT(R.id_lista) AS total
+                    FROM notas_registros R
+                    LEFT JOIN notas_registros_bancos B
+                    ON R.banco = B.id_banco
+                    WHERE (R.banco=".$idBanco.") ".$identificadores." ".$filtro."
+                    GROUP BY R.ciudad
+                    ORDER BY COUNT(R.id_lista) DESC");
 
-
+                    $respuesta['sql'] = "SELECT
+                    R.ciudad, COUNT(R.id_lista) AS total
+                    FROM notas_registros R
+                    LEFT JOIN notas_registros_bancos B
+                    ON R.banco = B.id_banco
+                    WHERE (R.banco=".$idBanco.") ".$identificadores." ".$filtro."
+                    GROUP BY R.ciudad
+                    ORDER BY COUNT(R.id_lista) DESC";
                    
                     $respuesta['widgets'] = $widgets;
 
