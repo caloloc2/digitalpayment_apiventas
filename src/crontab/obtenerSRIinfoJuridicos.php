@@ -72,7 +72,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
     $banco = 29;
     $identificador = "2023-03-27";
 
-    $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') ORDER BY id_lista ASC");
+    $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') AND (estado!=10) ORDER BY id_lista ASC");
 
     if (is_array($consulta)){
         if (count($consulta) > 0){
@@ -101,6 +101,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                         "ruc" => $infoRuc[0]['numeroRuc'],
                         "cedula" => substr($infoRuc[0]['numeroRuc'], 0, 10),
                         "razonSocial" => $infoRuc[0]['razonSocial'],
+                        "estadoContribuyenteRuc" => $infoRuc[0]['estadoContribuyenteRuc'],
                         "actividadContribuyente" => $infoRuc[0]['actividadEconomicaPrincipal'],
                         "fechaInicioActividades" => $infoRuc[0]['informacionFechasContribuyente']['fechaInicioActividades'],  
                         "representantesLegales" => $infoRuc[0]['representantesLegales'][0],
