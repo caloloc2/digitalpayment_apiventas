@@ -5022,6 +5022,7 @@ $app->group('/api', function() use ($app) {
                             "data" => []
                         ),
                     ];
+                    $totalNuevo = 0;
 
                     if (is_array($registros)){
                         if (count($registros) > 0){
@@ -5030,6 +5031,8 @@ $app->group('/api', function() use ($app) {
                                     array_push($listado[0]['data'], [ $linea['descripcion'], (int) $linea['total'] ]);
 
                                     $data[0]['y'] += $linea['total'];
+
+                                    $totalNuevo += $linea['total'];
                                 }
                                 if ($linea['diners_agrupacion'] == 2){ // CONTACTOS
                                     $total = $linea['total'];
@@ -5040,6 +5043,8 @@ $app->group('/api', function() use ($app) {
                                     array_push($listado[1]['data'], [ $linea['descripcion'], (int) $total ]);
 
                                     $data[1]['y'] += (int) $total;
+
+                                    $totalNuevo = $total;
                                 }
                             }
                         }
@@ -5050,7 +5055,8 @@ $app->group('/api', function() use ($app) {
                     $respuesta['porCiudad'] = $listadoporCiudad;
                     $respuesta['diners'] = array(
                         "data" => $data,
-                        "series" => $listado
+                        "series" => $listado,
+                        "total" => (int) $totalNuevo
                     );
                     $respuesta['estado'] = true;
                     
