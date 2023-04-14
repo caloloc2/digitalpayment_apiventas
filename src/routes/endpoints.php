@@ -5044,7 +5044,7 @@ $app->group('/api', function() use ($app) {
 
                                     $data[1]['y'] += (int) $total;
 
-                                    $totalNuevo = $total;
+                                    $totalNuevo += $total;
                                 }
                             }
                         }
