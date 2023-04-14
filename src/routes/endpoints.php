@@ -5038,7 +5038,7 @@ $app->group('/api', function() use ($app) {
                                     $total = $linea['total'];
 
                                     if (($linea['estado'] == 6) && ($idBanco == 29)){
-                                        $total += 242; // REGISTROS QUE SE DUPLICARON Y NO ENTRARON A LA BASE ( VER ARCHIVO )
+                                        $total += 242; // REGISTROS QUE SE DUPLICARON Y NO ENTRARON A LA BASE ( VER ARCHIVO de actualizacion)
                                     }
                                     array_push($listado[1]['data'], [ $linea['descripcion'], (int) $total ]);
 
