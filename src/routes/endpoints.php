@@ -5027,14 +5027,14 @@ $app->group('/api', function() use ($app) {
                         if (count($registros) > 0){
                             foreach ($registros as $linea) {
                                 if ($linea['diners_agrupacion'] == 1){ // POR GESTIONAR
-                                    array_push($listado[0]['data'], [ $linea['descripcion'], $linea['total'] ]);
+                                    array_push($listado[0]['data'], [ $linea['descripcion'], (int) $linea['total'] ]);
 
                                     $data[0]['y'] += $linea['total'];
                                 }
                                 if ($linea['diners_agrupacion'] == 2){ // CONTACTOS
-                                    array_push($listado[1]['data'], [ $linea['descripcion'], $linea['total'] ]);
+                                    array_push($listado[1]['data'], [ $linea['descripcion'], (int) $linea['total'] ]);
 
-                                    $data[1]['y'] += $linea['total'];
+                                    $data[1]['y'] += (int) $linea['total'];
                                 }
                             }
                         }
