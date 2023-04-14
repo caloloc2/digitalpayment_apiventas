@@ -4986,10 +4986,67 @@ $app->group('/api', function() use ($app) {
                         "categorias" => $categoriasProductos,
                         "series" => $seriesProductos
                     );
+
+
+                    $registros = $mysql->Consulta("SELECT
+                    R.estado, E.descripcion, E.diners_agrupacion, COUNT(R.estado) AS total
+                    FROM notas_registros R
+                    LEFT JOIN notas_registros_estados E
+                    ON R.estado = E.id_estados
+                    WHERE (R.banco=29)
+                    GROUP BY R.estado
+                    ORDER BY R.estado ASC");
+
+                    $data = [
+                        array(
+                            "name" => "Por Gestionar",
+                            "drilldown" => "por_gestionar",
+                            "y" => 0
+                        ),
+                        array(
+                            "name" => "Contactados",
+                            "drilldown" => "contactados",
+                            "y" => 0
+                        )
+                    ];
+
+                    $listado = [
+                        array(
+                            "name" => "Por Gestionar",
+                            "id" => "por_gestionar",
+                            "data" => []
+                        ),
+                        array(
+                            "name" => "Contactados",
+                            "id" => "contactados",
+                            "data" => []
+                        ),
+                    ];
+
+                    if (is_array($registros)){
+                        if (count($registros) > 0){
+                            foreach ($registros as $linea) {
+                                if ($linea['diners_agrupacion'] == 1){ // POR GESTIONAR
+                                    array_push($listado[0]['data'], [ $linea['descripcion'], $linea['total'] ]);
+
+                                    $data[0]['y'] += $linea['total'];
+                                }
+                                if ($linea['diners_agrupacion'] == 2){ // CONTACTOS
+                                    array_push($listado[1]['data'], [ $linea['descripcion'], $linea['total'] ]);
+
+                                    $data[1]['y'] += $linea['total'];
+                                }
+                            }
+                        }
+                    }
  
                     $respuesta['efectividad'] = (float) $efectividad;
                     $respuesta['porEstado'] = $listaporEstado;  
                     $respuesta['porCiudad'] = $listadoporCiudad;
+                    $respuesta['diners'] = array(
+                        "data" => $data,
+                        "series" => $listado
+                    );
                     $respuesta['estado'] = true;
                     
                 }catch(PDOException $e){
