@@ -5039,7 +5039,7 @@ $app->group('/api', function() use ($app) {
                                     }
                                     array_push($listado[1]['data'], [ $linea['descripcion'], (int) $total ]);
 
-                                    $data[1]['y'] += (int) $linea['total'];
+                                    $data[1]['y'] += (int) $total;
                                 }
                             }
                         }
