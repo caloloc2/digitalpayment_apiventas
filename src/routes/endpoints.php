@@ -4993,7 +4993,7 @@ $app->group('/api', function() use ($app) {
                     FROM notas_registros R
                     LEFT JOIN notas_registros_estados E
                     ON R.estado = E.id_estados
-                    WHERE (R.banco=29)
+                    WHERE (R.banco=".$idBanco.")
                     GROUP BY R.estado
                     ORDER BY R.estado ASC");
 
@@ -5037,7 +5037,7 @@ $app->group('/api', function() use ($app) {
                                 if ($linea['diners_agrupacion'] == 2){ // CONTACTOS
                                     $total = $linea['total'];
 
-                                    if ($linea['estado'] == 6){
+                                    if (($linea['estado'] == 6) && ($idBanco == 29)){
                                         $total += 242; // REGISTROS QUE SE DUPLICARON Y NO ENTRARON A LA BASE ( VER ARCHIVO )
                                     }
                                     array_push($listado[1]['data'], [ $linea['descripcion'], (int) $total ]);
