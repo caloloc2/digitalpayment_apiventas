@@ -5032,7 +5032,12 @@ $app->group('/api', function() use ($app) {
                                     $data[0]['y'] += $linea['total'];
                                 }
                                 if ($linea['diners_agrupacion'] == 2){ // CONTACTOS
-                                    array_push($listado[1]['data'], [ $linea['descripcion'], (int) $linea['total'] ]);
+                                    $total = $linea['total'];
+
+                                    if ($linea['total'] == 6){
+                                        $total += 242; // REGISTROS QUE SE DUPLICARON Y NO ENTRARON A LA BASE ( VER ARCHIVO )
+                                    }
+                                    array_push($listado[1]['data'], [ $linea['descripcion'], (int) $total ]);
 
                                     $data[1]['y'] += (int) $linea['total'];
                                 }
