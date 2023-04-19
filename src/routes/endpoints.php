@@ -28,7 +28,7 @@ $app->group('/api', function() use ($app) {
     
                 try{
                     // $auth = new Authentication();
-                    // $autenticacion = $auth->Verifica_Comercio($authorization[0]);
+                    // $autenticacion = $auth->Verifica_Comercio($authorization[0]); s
     
                     // if ($autenticacion['estado']){
                     //     $id_usuario = $autenticacion['id_usuario'];
