@@ -312,7 +312,7 @@ $app->group('/api', function() use ($app) {
             $respuesta['estado'] = false;
         
             try{                
-                $mysql = new Database("vtgsa_ventas");
+                $mysql = new Database(DATABASE);
                 $sendinblue = new sendinblue();
 
                 if (((isset($data['username'])) && (!empty($data['username']))) && ((isset($data['password'])) && (!empty($data['password'])))){
@@ -383,7 +383,7 @@ $app->group('/api', function() use ($app) {
             $respuesta['estado'] = false;
         
             try{                
-                $mysql = new Database("vtgsa_ventas");
+                $mysql = new Database(DATABASE);
 
                 if (isset($authorization[0])){
                     $autenticacion = new Authentication();
@@ -422,7 +422,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{                
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $Functions = new Functions();
                     $sendinblue = new sendinblue();
 
@@ -478,7 +478,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{                
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     if (isset($authorization[0])){
                         $autenticacion = new Authentication();
@@ -1542,7 +1542,7 @@ $app->group('/api', function() use ($app) {
                 try{
                     $son_urgente = false;
 
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $carpeta = __DIR__."/../../public/tmp/";
 
                     $archivo_temporal = "basecargar.csv";
@@ -3123,7 +3123,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
 
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     if (isset($authorization[0])){
                         $autenticacion = new Authentication();
@@ -3229,7 +3229,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
 
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $buscar = $mysql->Consulta_Unico("SELECT * FROM lideres WHERE (password='".$clave."')");
 
@@ -3258,7 +3258,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['data'] = $data;
 
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     if (isset($authorization[0])){
                         $autenticacion = new Authentication();
@@ -3456,7 +3456,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $funciones = new Functions();
 
                     $por_identificador = "";
@@ -3527,7 +3527,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $fecha = date("Y-m-d H:i:s");
                     $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=?, fecha_modificacion=? WHERE id_lista=?", array($estado, $fecha, $id_lista));
 
@@ -3548,7 +3548,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $funciones = new Functions();
 
                     $consulta = $mysql->Consulta_Unico("SELECT R.id_lista, R.banco AS id_banco, B.banco, R.identificador, R.documento, R.nombres, R.telefono, R.direccion, R.ciudad, R.direccion_confirmada, R.ciudad_confirmada, R.correo, R.observaciones, R.llamado, R.fecha_asignacion, R.fecha_ultima_contacto, R.fecha_alta, R.fecha_modificacion, R.estado FROM notas_registros R, notas_registros_bancos B WHERE R.id_lista=".$id_lista);
@@ -3606,7 +3606,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     if ((isset($params['identificador'])) && (!empty($params['identificador']))){
                         
@@ -3642,7 +3642,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     if ((isset($params['identificador'])) && (!empty($params['identificador']))){
                         if ((isset($params['limite'])) && (!empty($params['limite']))){
@@ -4021,7 +4021,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                    
                     $buscador = "";
                     if (isset($params['buscador'])){
@@ -4097,7 +4097,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                    
                     $buscador = "";
                     if (isset($params['buscador'])){
@@ -4202,7 +4202,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $valor = 0;
                     if ((isset($data['estado'])) && (!empty($data['estado']))){
@@ -4231,7 +4231,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['params'] = $params;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $from = date("Y-m-01");
                     if (isset($params['from'])){
@@ -4324,7 +4324,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['params'] = $params;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $funciones = new Functions();
 
                     $from = date("Y-m-01");
@@ -4398,7 +4398,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['params'] = $params;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $funciones = new Functions();
 
                     $from = date("Y-m-01");
@@ -4455,7 +4455,7 @@ $app->group('/api', function() use ($app) {
                 try{
 
                     if ($id_lista > 0){
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
 
                         $consulta = $mysql->Consulta_Unico("SELECT
                         R.id_lista, R.documento, R.ruc, R.cedula, R.razonSocial, R.formulario, U.nombres, U.celular
@@ -4519,7 +4519,7 @@ $app->group('/api', function() use ($app) {
                 try{
 
                     if ($id_lista > 0){
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
                         $banco_nova = 30;
                         // verifica que el dato sea solamente de la base nova
                         $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE (id_lista=".$id_lista.") AND (banco=".$banco_nova.")"); 
@@ -4623,7 +4623,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['params'] = $params; 
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $filtro = "";
                     if ((isset($params['filtro'])) && (!empty($params['filtro']))){
@@ -4663,7 +4663,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false; 
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $identificadores = $mysql->Consulta("SELECT
                     identificador
@@ -4694,7 +4694,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['params'] = $params;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $from = date("Y-m-01");
                     if ((isset($params['from'])) && (!empty($params['from']))){
@@ -5049,6 +5049,71 @@ $app->group('/api', function() use ($app) {
                             }
                         }
                     }
+
+
+
+                    // PASTEL POR DOS ESTADOS GENERALES
+                    $consulta = $mysql->Consulta("SELECT 
+                    R.estado, E.descripcion, E.diners_agrupacion, COUNT(R.estado) AS total
+                    FROM notas_registros R
+                    LEFT JOIN notas_registros_estados E
+                    ON R.estado = E.id_estados
+                    WHERE (R.banco=".$idBanco.")
+                    GROUP BY R.estado");
+
+                    $pastelEstados = [
+                        array(
+                            "name" => "Por Gestionar",
+                            "y" => 0
+                        ),
+                        array(
+                            "name" => "Contactos no Efectivos",
+                            "y" => 0
+                        ),
+                    ];
+
+                    $barrasEstados = [
+                        array("Por Gestionar", 0),
+                        array("Contactados", 0),
+                        array("Establecimiento ya no existe", 0),
+                        array("En Espera de Documentos", 0),
+                        array("Documentos Entregados para Regularizacion", 0),
+                        array("Casos Ingresados", 0)
+                    ];
+
+                    $totalEstados = 0;
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                $totalEstados += $linea['total'];
+                            }
+                        }
+                    }
+
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                if (($linea['estado'] == 6) || ($linea['estado'] == 2) || ($linea['estado'] == 3)){
+                                    $pastelEstados[1]["y"] += (int) $linea['total'];
+                                }
+
+                                if (($linea['estado'] == 0) || ($linea['estado'] == 10) || ($linea['estado'] == 5) || ($linea['estado'] == 4) || ($linea['estado'] == 1)){
+                                    $pastelEstados[0]["y"] += (int) $linea['total'];
+                                }
+
+
+                                if (($linea['estado'] == 1) || ($linea['estado'] == 0) || ($linea['estado'] == 10)){
+                                    $barrasEstados[0][1] += (int) $linea['total'];
+                                }
+                                if (($linea['estado'] == 4) || ($linea['estado'] == 5)){
+                                    $barrasEstados[1][1] += (int) $linea['total'];
+                                }
+                                if (($linea['estado'] == 7)){
+                                    $barrasEstados[3][1] += (int) $linea['total'];
+                                }
+                            }
+                        }
+                    }
  
                     $respuesta['efectividad'] = (float) $efectividad;
                     $respuesta['porEstado'] = $listaporEstado;  
@@ -5058,6 +5123,8 @@ $app->group('/api', function() use ($app) {
                         "series" => $listado,
                         "total" => (int) $totalNuevo
                     );
+                    $respuesta['pastelEstados'] = $pastelEstados;
+                    $respuesta['barrasEstados'] = $barrasEstados;
                     $respuesta['estado'] = true;
                     
                 }catch(PDOException $e){
@@ -5075,7 +5142,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false; 
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $from = date("Y-m-01");
                     if ((isset($params['from'])) && (!empty($params['from']))){
@@ -5232,7 +5299,7 @@ $app->group('/api', function() use ($app) {
                     if ($usuario['estado']){                                                
                         $id_usuario = $usuario['usuario']['id_usuario'];
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
 
                         $departamentos = $mysql->Consulta("SELECT * FROM departamentos WHERE (estado=0) ORDER BY departamento ASC");
                         $canales = $mysql->Consulta("SELECT * FROM canales_lista WHERE (estado=0) ORDER BY canal ASC");
@@ -5265,7 +5332,7 @@ $app->group('/api', function() use ($app) {
                     if ($usuario['estado']){                                                
                         $id_usuario = $usuario['usuario']['id_usuario'];
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
 
                         $asesores = $mysql->Consulta("SELECT * FROM usuarios WHERE (id_departamento=".$id_departamento.") AND (estado=0) ORDER BY nombres ASC");
 
@@ -5296,7 +5363,7 @@ $app->group('/api', function() use ($app) {
                     if ($usuario['estado']){                                                
                         $id_usuario = $usuario['usuario']['id_usuario'];
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
 
                         $buscador = "";
                         if (isset($params['buscador'])){
@@ -5346,7 +5413,7 @@ $app->group('/api', function() use ($app) {
                     if ($usuario['estado']){                                                
                         $id_usuario = $usuario['usuario']['id_usuario'];
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
 
                         $consulta = $mysql->Consulta_Unico("SELECT 
                         C.id_caso, C.id_canal, L.canal, C.id_asesor, U.nombres AS nombres_asesor, C.id_usuario, A.nombres AS nombres_usuario, C.documento, C.nombres AS nombres_cliente,
@@ -5389,7 +5456,7 @@ $app->group('/api', function() use ($app) {
                     if ($usuario['estado']){                                                
                         $id_usuario = $usuario['usuario']['id_usuario'];
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
 
                         if ((isset($data['departamento'])) && (!empty($data['departamento']))){
                             
@@ -7200,7 +7267,7 @@ $app->group('/api', function() use ($app) {
                         $autenticacion = new Authentication();
                         $session = $autenticacion->Valida_Sesion($authorization[0]);
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
                         $funciones = new Functions();
     
                         if ($session['estado']){
@@ -7414,7 +7481,7 @@ $app->group('/api', function() use ($app) {
                         $autenticacion = new Authentication();
                         $session = $autenticacion->Valida_Sesion($authorization[0]);
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
                         $crm = new CRM_API();
     
                         if ($session['estado']){
@@ -7504,7 +7571,7 @@ $app->group('/api', function() use ($app) {
                         $autenticacion = new Authentication();
                         $session = $autenticacion->Valida_Sesion($authorization[0]);
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
                         $crm = new CRM_API();
     
                         if ($session['estado']){
@@ -7562,7 +7629,7 @@ $app->group('/api', function() use ($app) {
                         $autenticacion = new Authentication();
                         $session = $autenticacion->Valida_Sesion($authorization[0]);
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
                         $funciones = new Functions();
     
                         if ($session['estado']){
@@ -7631,7 +7698,7 @@ $app->group('/api', function() use ($app) {
                         $autenticacion = new Authentication();
                         $session = $autenticacion->Valida_Sesion($authorization[0]);
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
     
                         if ($session['estado']){
 
@@ -7715,7 +7782,7 @@ $app->group('/api', function() use ($app) {
                         $autenticacion = new Authentication();
                         $session = $autenticacion->Valida_Sesion($authorization[0]);
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
                         $funciones = new Functions();
     
                         if ($session['estado']){
@@ -7852,7 +7919,7 @@ $app->group('/api', function() use ($app) {
                         $autenticacion = new Authentication();
                         $session = $autenticacion->Valida_Sesion($authorization[0]);
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
                         $funciones = new Functions();
     
                         if ($session['estado']){
@@ -8039,7 +8106,7 @@ $app->group('/api', function() use ($app) {
                         $autenticacion = new Authentication();
                         $session = $autenticacion->Valida_Sesion($authorization[0]);
 
-                        $mysql = new Database("vtgsa_ventas");
+                        $mysql = new Database(DATABASE);
                         $funciones = new Functions();
     
                         if ($session['estado']){
@@ -8645,7 +8712,7 @@ $app->group('/api', function() use ($app) {
 
                     $crm = new CRM_API();
                     $mysql = new Database("mvevip_tarjetas");
-                    $mysql_p2p = new Database("vtgsa_ventas");
+                    $mysql_p2p = new Database(DATABASE);
                     
                     // guarda el archivo csv de manera temporal
                     $archivo_temporal = $files['archivo']->file;
@@ -9363,7 +9430,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $call = new CRM_API();
 
                     $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE (comprobacion_llamada=0) AND (banco=2) AND ((identificador='30-05-2022-TIT') OR (identificador='30-05-2022-diners')) ORDER BY id_lista ASC LIMIT 1");
@@ -9418,7 +9485,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $call = new CRM_API();
 
                     $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=4) AND (identificador='CRM-2019-2020') AND (asignado=0) AND (observaciones='') ORDER BY id_lista ASC LIMIT 1000");
@@ -9494,7 +9561,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
             
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     
                     $documentos = [
                         "1714341193",
@@ -9952,7 +10019,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
                 
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $filtro = "";
                     $sql = "";
@@ -10010,7 +10077,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
                 
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $filtro = "";
                     $sql = "";
@@ -10069,7 +10136,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
                 
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $ciudades = [];
 
@@ -10196,7 +10263,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['params'] = $params;
                 
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $buscador = '';
                     if ((isset($params['buscador'])) && (!empty($params['buscador']))){
@@ -10271,7 +10338,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false; 
                 
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
                     $carpeta = "https://api.digitalpaymentnow.com/tmp/"; 
 
                     $consulta = $mysql->Consulta_Unico("SELECT
@@ -10375,7 +10442,7 @@ $app->group('/api', function() use ($app) {
                 $respuesta['data'] = $data;
                 
                 try{
-                    $mysql = new Database("vtgsa_ventas");
+                    $mysql = new Database(DATABASE);
 
                     $modificar = $mysql->Modificar("UPDATE registros_internacional SET estado=? WHERE id_lead=?", array($data['estado'], $id));
                     
