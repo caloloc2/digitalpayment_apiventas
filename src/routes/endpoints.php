@@ -5076,8 +5076,8 @@ $app->group('/api', function() use ($app) {
                         array("Por Gestionar", 0),
                         array("Contactados", 0),
                         array("Establecimiento ya no existe", 0),
-                        array("En Espera de Documentos", 133),
-                        array("Documentos Entregados para Regularizacion", 18),
+                        array("En Espera de Documentos", 0),
+                        array("Documentos Entregados para Regularizacion", 0),
                         array("Casos Ingresados", 0)
                     ];
 
