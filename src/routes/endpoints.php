@@ -5111,6 +5111,14 @@ $app->group('/api', function() use ($app) {
                                 if (($linea['estado'] == 7)){
                                     $barrasEstados[3][1] += (int) $linea['total'];
                                 }
+
+                                if (($linea['estado'] == 34)){
+                                    $barrasEstados[3][1] += (int) $linea['total'];
+                                }
+
+                                if (($linea['estado'] == 35)){
+                                    $barrasEstados[4][1] += (int) $linea['total'];
+                                }
                             }
                         }
                     }
