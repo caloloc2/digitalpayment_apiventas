@@ -4655,6 +4655,44 @@ $app->group('/api', function() use ($app) {
                 
                 return $newResponse;
             });
+
+            $app->get("/estados", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false;
+                $respuesta['params'] = $params; 
+            
+                try{
+                    $mysql = new Database(DATABASE);
+
+
+ 
+
+                    $consulta = $mysql->Consulta("SELECT * FROM notas_registros_estados WHERE (estado=0) ORDER BY es_venta DESC");
+
+                    $listaEstados = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($listaEstados, array(
+                                    "id" => (int) $linea['id_estados'],
+                                    "descripcion" => strtoupper($linea['descripcion'])
+                                ));
+                            }
+                        }
+                    }
+                    
+                    $respuesta['consulta'] = $listaEstados;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
             
             
             $app->get("/identificadores/{idBanco}", function(Request $request, Response $response){
@@ -5122,6 +5160,66 @@ $app->group('/api', function() use ($app) {
                             }
                         }
                     }
+
+
+                    /// AGRUPACION GLOBAL
+                    $consulta = $mysql->Consulta("SELECT
+                    R.estado, E.descripcion, E.general_agrupacion, COUNT(*) AS total
+                    FROM notas_registros R
+                    LEFT JOIN notas_registros_estados E
+                    ON R.estado = E.id_estados
+                    WHERE (R.banco=".$idBanco.") ".$identificadores." AND (E.general_agrupacion>0)
+                    GROUP BY R.estado");
+
+                    $agrupacionGeneral['series'] = [
+                        array(
+                            "name" => "Resumen Contactabilidad",
+                            "colorByPoint" => true,
+                            "data" => [
+                                array(
+                                    "name" => "Contacto Efectivo",
+                                    "y" => 0,
+                                    "drilldown" => "contacto_efectivo"
+                                ),
+                                array(
+                                    "name" => "Contacto No Efectivo",
+                                    "y" => 0,
+                                    "drilldown" => "contacto_no_efectivo"
+                                )
+                            ]
+                        )
+                    ];
+
+                    $agrupacionGeneral['drilldown'] = [
+                        array(
+                            "name" => "Contacto Efectivo",
+                            "id" => "contacto_efectivo",
+                            "data" => []
+                        ),
+                        array(
+                            "name" => "Contacto No Efectivo",
+                            "id" => "contacto_no_efectivo",
+                            "data" => []
+                        )
+                    ];
+
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                if ($linea['general_agrupacion'] == 1){ // contacto efectivo
+                                    $agrupacionGeneral['series'][0]['data'][0]["y"] += (int)  $linea['total'];
+                                    array_push($agrupacionGeneral['drilldown'][0]["data"], [$linea['descripcion'], (int) $linea['total']]);
+                                }
+
+                                if ($linea['general_agrupacion'] == 2){ // contacto no efectivo
+                                    $agrupacionGeneral['series'][0]['data'][1]["y"] += (int)  $linea['total'];
+                                    array_push($agrupacionGeneral['drilldown'][1]["data"], [$linea['descripcion'], (int)  $linea['total']]);
+                                }
+                            }
+                        }
+                    }
+
+                    $respuesta['agrupacionGeneral'] = $agrupacionGeneral;
  
                     $respuesta['efectividad'] = (float) $efectividad;
                     $respuesta['porEstado'] = $listaporEstado;  
@@ -5133,6 +5231,83 @@ $app->group('/api', function() use ($app) {
                     );
                     $respuesta['pastelEstados'] = $pastelEstados;
                     $respuesta['barrasEstados'] = $barrasEstados;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
+            $app->get("/registros-detalle/{idBanco}/{identificador}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $idBanco = $request->getAttribute('idBanco');
+                $identificador = $request->getAttribute('identificador');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false; 
+
+                $respuesta['params'] = $params;
+            
+                try{
+                    $mysql = new Database(DATABASE);
+
+                    $from = date("Y-m-01");
+                    if ((isset($params['from'])) && (!empty($params['from']))){
+                        $from = $params['from'];
+                    } 
+
+                    $to = date("Y-m-d");
+                    if ((isset($params['to'])) && (!empty($params['to']))){
+                        $to = $params['to'];
+                    } 
+
+                    $identificadores = "";
+                    if ((isset($identificador)) && (!empty($identificador))){
+                        $identificadores = "AND (R.identificador='".$identificador."')";
+                    } 
+
+                    $estados = "";
+                    if (isset($params['estados'])){
+                        $estados = "AND (R.estado='".$params['estados']."')";
+                    }  
+
+                    $consulta = $mysql->Consulta("SELECT
+                    R.identificador, R.documento, R.nombres, R.ciudad_confirmada, R.direccion_confirmada, R.fecha_alta, R.fecha_ultima_contacto, R.observaciones,
+                    R.estado, E.descripcion, R.actividadContribuyente, E.color
+                    FROM notas_registros R
+                    LEFT JOIN notas_registros_estados E
+                    ON R.estado = E.id_estados
+                    WHERE (banco=".$idBanco.") ".$identificadores." ".$estados." AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$from."' AND '".$to."')"); 
+
+                    $listado = [];
+
+                    if (is_array($consulta)){
+                        if (count($consulta)>0){
+                            foreach ($consulta as $linea) {
+                                array_push($listado, array(
+                                    "identificador" => $linea['identificador'],
+                                    "documento" => $linea['documento'],
+                                    "nombres" => $linea['nombres'],
+                                    "ciudad" => $linea['ciudad_confirmada'],
+                                    "direccion" => $linea['direccion_confirmada'],
+                                    "fechaAlta" => $linea['fecha_alta'],
+                                    "fechaUltimoContacto" => $linea['fecha_ultima_contacto'],
+                                    "observaciones" => $linea['observaciones'],
+                                    "estado" => array(
+                                        "valor" => (int) $linea['estado'],
+                                        "color" => $linea['color'],
+                                        "descripcion" => $linea['descripcion']
+                                    ),
+                                    "actividad" => $linea['actividadContribuyente']
+                                ));
+                            }
+                        }
+                    }
+
+                    $respuesta['consulta'] = $listado;
                     $respuesta['estado'] = true;
                     
                 }catch(PDOException $e){
