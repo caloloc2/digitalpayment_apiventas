@@ -5220,7 +5220,33 @@ $app->group('/api', function() use ($app) {
                     }
 
                     $respuesta['agrupacionGeneral'] = $agrupacionGeneral;
- 
+
+
+
+                    /// CUADRO DE VENTAS --- C=PARA NOVA
+                    $consulta = $mysql->Consulta("SELECT
+                    R.plan_usado, N.actividad, N.precio, COUNT(R.plan_usado) AS cantidad, (COUNT(R.plan_usado) * N.precio) AS total 
+                    FROM notas_registros R
+                    LEFT JOIN notas_registros_nova_valores N
+                    ON R.plan_usado = N.id_valor
+                    WHERE (R.banco=30) AND (R.estado=7)
+                    GROUP BY R.plan_usado
+                    ORDER BY COUNT(R.plan_usado) DESC");
+
+                    $ventasNova = [];
+
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($ventasNova, array(
+                                    "name" => $linea['actividad'],
+                                    "y" => (float) $linea['total']
+                                ));
+                            }
+                        }
+                    }
+                    
+                    $respuesta['ventasNova'] = $ventasNova;
                     $respuesta['efectividad'] = (float) $efectividad;
                     $respuesta['porEstado'] = $listaporEstado;  
                     $respuesta['porCiudad'] = $listadoporCiudad;

@@ -47,7 +47,7 @@ define("BUCKET_FOLDER_FIRMADOS", "PRODUCCION/FIRMADOS/"); // CARPETA PARA ARCHIV
 define("BUCKET_FOLDER_VOUCHERS", "PRODUCCION/VOUCHERS/"); // CARPETA PARA VOUCHERS FIRMADOS PRUEBAS/PRODUCCION
 define("BUCKET_MVEVIP", "mvevip");
 
-define("DATABASE", "vtgsa_ventas");
+define("DATABASE", "digitalpayment");
 define("CRM", "mve");
 
 $app = new \Slim\App;
