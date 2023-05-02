@@ -102,6 +102,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                         "ruc" => $infoRuc[0]['numeroRuc'],
                         "cedula" => substr($infoRuc[0]['numeroRuc'], 0, 10),
                         "razonSocial" => $infoRuc[0]['razonSocial'],
+                        "estadoContribuyenteRuc" => $infoRuc[0]['estadoContribuyenteRuc'],
                         "actividadContribuyente" => $infoRuc[0]['actividadEconomicaPrincipal'],
                         "fechaInicioActividades" => $infoRuc[0]['informacionFechasContribuyente']['fechaInicioActividades'], 
                         "clasificacionMiPyme" => $contribuyente['clasificacionMiPyme'],
@@ -113,10 +114,11 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                         $id_lista
                     ));
 
-                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, actividadContribuyente=?, fechaInicioActividades=?, clasificacionMiPyme=? WHERE id_lista=?", array(
+                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, estadoContribuyenteRuc=?, actividadContribuyente=?, fechaInicioActividades=?, clasificacionMiPyme=? WHERE id_lista=?", array(
                         $guardar['ruc'],
                         $guardar['cedula'],
                         $guardar['razonSocial'],
+                        $guardar['estadoContribuyenteRuc'],
                         $guardar['actividadContribuyente'],
                         $guardar['fechaInicioActividades'],
                         $guardar['clasificacionMiPyme'],
