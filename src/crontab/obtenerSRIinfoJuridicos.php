@@ -72,7 +72,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
     $banco = 30;
     $identificador = "2023-05-02";
 
-    $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') AND (estado!=10) ORDER BY id_lista ASC");
+    $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') AND (estado=10) ORDER BY id_lista ASC");
 
     if (is_array($consulta)){
         if (count($consulta) > 0){
