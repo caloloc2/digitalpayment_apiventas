@@ -4764,9 +4764,103 @@ $app->group('/api', function() use ($app) {
                                 }
                             }
                         }
-                    }
+                    } 
 
                     $respuesta['consulta'] = $reporte;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
+            $app->get("/estadisticas-actualizacion-rangos", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false; 
+
+                $respuesta['params'] = $params;
+            
+                try{
+                    $mysql = new Database(DATABASE); 
+                    $Functions = new Functions();
+                    
+                    /// COMPARATICA POR MES, SEMANA Y DIA
+                    $tipoRango = "week";
+                    $tituloComparativa = "Comparativa Gestión ";
+                    if ((isset($params['tipoRango'])) && (!empty($params['tipoRango']))){
+                        $tipoRango = $params['tipoRango'];
+                        switch ($tipoRango) {
+                            case 'week':
+                                $tituloComparativa .= 'Semanal';
+                                break;
+                            case 'days':
+                                $tituloComparativa .= 'Diaria';
+                                break;
+                            case 'month':
+                                $tituloComparativa .= 'Mensual';
+                                break;
+                        }
+                    }
+
+                    $rangoFechas = $Functions->getRangeDates(date("Y-m-d"), $tipoRango, 5); 
+                    $comparativa = array(
+                        "title" => $tituloComparativa,
+                        "data" => [],
+                        "drilldown" => [],
+                        "range" => $rangoFechas
+                    );  
+
+                    if (is_array($rangoFechas)){
+                        if (count($rangoFechas) > 0){
+                            $index = 0;
+                            foreach ($rangoFechas as $rango) {
+                                $rangeFrom = $rango['from'];
+                                $rangeTo = $rango['to'];
+
+                                $consulta = $mysql->Consulta("SELECT
+                                R.estado, E.descripcion, COUNT(*) AS total
+                                FROM notas_registros R
+                                LEFT JOIN notas_registros_estados E
+                                ON R.estado = E.id_estados
+                                WHERE (R.banco=29) AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$rangeFrom."' AND '".$rangeTo."')
+                                GROUP BY R.estado");
+ 
+                                if (is_array($consulta)){
+                                    if (count($consulta) > 0){
+                                        $total = 0; 
+
+                                        $detalle = [];
+                                        foreach ($consulta as $linea) {
+                                            $total += $linea['total'];
+
+                                            array_push($detalle, [$linea['descripcion'], (int) $linea['total']]);
+                                        }
+
+                                        array_push($comparativa['drilldown'], array(
+                                            "name" => $rangeFrom." al ".$rangeTo,
+                                            "id" => "estado_".$index,
+                                            "data" => $detalle
+                                        ));
+
+                                        array_push($comparativa['data'], array(
+                                            "name" => $rangeFrom." al ".$rangeTo,
+                                            "y" => (int) $total,
+                                            "drilldown" => "estado_".$index
+                                        ));
+                                    }
+                                }
+                                $index += 1;
+                            }
+                            
+                        }
+                    }
+
+                    $respuesta['comparativa'] = $comparativa;
                     $respuesta['estado'] = true;
                     
                 }catch(PDOException $e){
