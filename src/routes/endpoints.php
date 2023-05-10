@@ -4656,6 +4656,128 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->get("/zonas", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false; 
+            
+                try{
+                    $mysql = new Database(DATABASE);
+  
+                    $bancos = $mysql->Consulta("SELECT
+                    *
+                    FROM notas_registros_zonas
+                    WHERE (id_banco=29) AND (estado=1)
+                    ORDER BY zona ASC");
+
+                    $listaZonas = [];
+                    if (is_array($bancos)){
+                        if (count($bancos) > 0){
+                            foreach ($bancos as $linea) {
+                                array_push($listaZonas, array(
+                                    "id" => (int) $linea['id'],
+                                    "zona" => strtoupper($linea['zona'])
+                                ));
+                            }
+                        }
+                    }
+                    
+                    $respuesta['consulta'] = $listaZonas;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
+            $app->get("/estadisticas-actualizacion", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false; 
+
+                $respuesta['params'] = $params;
+            
+                try{
+                    $mysql = new Database(DATABASE);
+
+                    $porZonas = "";
+                    if ((isset($params['zonas'])) && (!empty($params['zonas']))){
+                        $porZonas = " AND (R.id_zona=".$params['zonas'].")";
+                    }
+  
+                    $consulta = $mysql->Consulta("SELECT
+                    *
+                    FROM notas_registros_agrupacion_actualizacion
+                    WHERE (estado=1)
+                    ORDER BY descripcion ASC");
+
+                    $reporte = array(
+                        "data" => [],
+                        "series" => []
+                    );
+
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                $id_grupo = $linea['id'];
+                                $descripcion = $linea['descripcion'];
+
+                                $subconsulta = $mysql->Consulta("SELECT
+                                R.estado, E.descripcion, COUNT(*) AS total
+                                FROM notas_registros R
+                                LEFT JOIN notas_registros_estados E
+                                ON R.estado = E.id_estados
+                                LEFT JOIN notas_registros_agrupacion_actualizacion A
+                                ON E.diners_agrupacion = A.id
+                                LEFT JOIN notas_registros_zonas Z
+                                ON R.id_zona = Z.id
+                                WHERE (banco=29) AND (A.id=".$id_grupo.") ".$porZonas."
+                                GROUP BY R.estado");
+
+                                if (is_array($subconsulta)){
+                                    if (count($subconsulta) > 0){
+                                        $total = 0;
+
+                                        $detalle = [];
+                                        foreach ($subconsulta as $linea_estado) {
+                                            $total += $linea_estado['total'];
+
+                                            array_push($detalle, [$linea_estado['descripcion'], (int) $linea_estado['total']]);
+                                        }
+
+                                        array_push($reporte['series'], array(
+                                            "name" => $descripcion,
+                                            "id" => 'grupo_'.$id_grupo,
+                                            "data" => $detalle
+                                        ));
+
+                                        array_push($reporte['data'], array(
+                                            "name" => $descripcion,
+                                            "y" => (int) $total,
+                                            "drilldown" => 'grupo_'.$id_grupo
+                                        ));
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $respuesta['consulta'] = $reporte;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
             $app->get("/estados", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
                 $params = $request->getQueryParams();
