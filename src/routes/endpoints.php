@@ -4733,6 +4733,7 @@ $app->group('/api', function() use ($app) {
             
                 try{
                     $mysql = new Database(DATABASE);
+                    $Functions = new Functions();
 
                     $from = date("Y-m-01");
                     if ((isset($params['from'])) && (!empty($params['from']))){
@@ -5224,29 +5225,161 @@ $app->group('/api', function() use ($app) {
 
 
                     /// CUADRO DE VENTAS --- C=PARA NOVA
+                    // $consulta = $mysql->Consulta("SELECT
+                    // R.plan_usado, N.actividad, N.precio, COUNT(R.plan_usado) AS cantidad, (COUNT(R.plan_usado) * N.precio) AS total 
+                    // FROM notas_registros R
+                    // LEFT JOIN notas_registros_nova_valores N
+                    // ON R.plan_usado = N.id_valor
+                    // WHERE (R.banco=30) AND (R.estado=7)
+                    // GROUP BY R.plan_usado
+                    // ORDER BY COUNT(R.plan_usado) DESC");
+
+                    // if (is_array($consulta)){
+                    //     if (count($consulta) > 0){
+                    //         foreach ($consulta as $linea) {
+                    //             array_push($ventasNova, array(
+                    //                 "name" => $linea['actividad'],
+                    //                 "y" => (float) $linea['total']
+                    //             ));
+                    //         }
+                    //     }
+                    // }
+
                     $consulta = $mysql->Consulta("SELECT
-                    R.plan_usado, N.actividad, N.precio, COUNT(R.plan_usado) AS cantidad, (COUNT(R.plan_usado) * N.precio) AS total 
-                    FROM notas_registros R
-                    LEFT JOIN notas_registros_nova_valores N
-                    ON R.plan_usado = N.id_valor
-                    WHERE (R.banco=30) AND (R.estado=7)
-                    GROUP BY R.plan_usado
-                    ORDER BY COUNT(R.plan_usado) DESC");
+                    *
+                    FROM notas_registros_nova_valores
+                    WHERE estado=1
+                    ORDER BY actividad ASC");
 
-                    $ventasNova = [];
-
+                    $ventasNovaCompleto = array(
+                        "categories" => [],
+                        "series" => [
+                            array(
+                                "name" => 'Cantidad de Ventas Efectivas',
+                                "type" => 'column',
+                                "yAxis" => 1,
+                                "data" => [],
+                                "tooltip" => array(
+                                    "valueSuffix" => ' '
+                                )
+                            ),
+                            array(
+                                "name" => 'Total en Dólares',
+                                "type" => 'spline', 
+                                "data" => [],
+                                "tooltip" => array(
+                                    "valueSuffix" => ' $'
+                                )
+                            ),
+                        ]
+                    );
+                    
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
-                                array_push($ventasNova, array(
-                                    "name" => $linea['actividad'],
-                                    "y" => (float) $linea['total']
-                                ));
+                                $subconsulta = $mysql->Consulta_Unico("SELECT
+                                COUNT(*) as cantidad, SUM(V.precio) AS total
+                                FROM notas_registros N
+                                LEFT JOIN notas_registros_nova_valores V
+                                ON N.plan_usado = V.id_valor
+                                WHERE (N.banco=30) AND (N.estado=7) AND (N.plan_usado=".$linea['id_valor'].")");
+
+                                $cantidad = 0;
+                                $total = 0;
+                                if (isset($subconsulta['cantidad'])){
+                                    $cantidad = $subconsulta['cantidad'];
+                                    $total = $subconsulta['total'];
+                                }
+
+                                array_push($ventasNovaCompleto['categories'], $linea['actividad']); // categoria
+
+                                array_push($ventasNovaCompleto['series'][0]['data'], (int) $cantidad);
+                                array_push($ventasNovaCompleto['series'][1]['data'], (float) $total);
                             }
                         }
                     }
+
+                    $ventasNova = [];
+
                     
-                    $respuesta['ventasNova'] = $ventasNova;
+
+                   
+
+
+
+                    /// COMPARATICA POR MES, SEMANA Y DIA
+                    $tipoRango = "week";
+                    $tituloComparativa = "Comparativa Gestión ";
+                    if ((isset($params['tipoRango'])) && (!empty($params['tipoRango']))){
+                        $tipoRango = $params['tipoRango'];
+                        switch ($tipoRango) {
+                            case 'week':
+                                $tituloComparativa .= 'Semanal';
+                                break;
+                            case 'days':
+                                $tituloComparativa .= 'Diaria';
+                                break;
+                            case 'month':
+                                $tituloComparativa .= 'Mensual';
+                                break;
+                        }
+                    }
+
+                    $rangoFechas = $Functions->getRangeDates(date("Y-m-d"), $tipoRango, 5); 
+                    $comparativa = array(
+                        "title" => $tituloComparativa,
+                        "data" => [],
+                        "drilldown" => [],
+                        "range" => $rangoFechas
+                    );  
+
+                    if (is_array($rangoFechas)){
+                        if (count($rangoFechas) > 0){
+                            $index = 0;
+                            foreach ($rangoFechas as $rango) {
+                                $rangeFrom = $rango['from'];
+                                $rangeTo = $rango['to'];
+
+                                $consulta = $mysql->Consulta("SELECT
+                                R.estado, E.descripcion, COUNT(*) AS total
+                                FROM notas_registros R
+                                LEFT JOIN notas_registros_estados E
+                                ON R.estado = E.id_estados
+                                WHERE (R.banco=".$idBanco.") ".$identificadores." AND (DATE(R.fecha_ultima_contacto) BETWEEN '".$rangeFrom."' AND '".$rangeTo."')
+                                GROUP BY R.estado");
+ 
+                                if (is_array($consulta)){
+                                    if (count($consulta) > 0){
+                                        $total = 0; 
+
+                                        $detalle = [];
+                                        foreach ($consulta as $linea) {
+                                            $total += $linea['total'];
+
+                                            array_push($detalle, [$linea['descripcion'], (int) $linea['total']]);
+                                        }
+
+                                        array_push($comparativa['drilldown'], array(
+                                            "name" => $rangeFrom." al ".$rangeTo,
+                                            "id" => "estado_".$index,
+                                            "data" => $detalle
+                                        ));
+
+                                        array_push($comparativa['data'], array(
+                                            "name" => $rangeFrom." al ".$rangeTo,
+                                            "y" => (int) $total,
+                                            "drilldown" => "estado_".$index
+                                        ));
+                                    }
+                                }
+                                $index += 1;
+                            }
+                            
+                        }
+                    }
+                    $respuesta['comparativa'] = $comparativa;
+                    
+                    $respuesta['ventasNova'] = $ventasNovaCompleto;
                     $respuesta['efectividad'] = (float) $efectividad;
                     $respuesta['porEstado'] = $listaporEstado;  
                     $respuesta['porCiudad'] = $listadoporCiudad;

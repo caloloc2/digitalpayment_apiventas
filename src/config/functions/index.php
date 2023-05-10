@@ -64,6 +64,76 @@ class Functions{
         return $response;
     }
 
+    function getRangeDates($fecha, $rango = "days", $number = 6){
+        $listaRango = [];
+    
+        $startTime = strtotime(date("Y-m-d", strtotime($fecha."- ".$number." ".$rango)));
+        $endTime = strtotime($fecha);
+    
+        $rangoDias = array();
+        switch ($rango) {
+            case 'days':
+                $startTime = strtotime(date("Y-m-d", strtotime($fecha."- ".$number." ".$rango)));
+                $period = new DatePeriod(
+                    new DateTime(date("Y-m-d", $startTime)),
+                    new DateInterval('P1D'),
+                    new DateTime(date("Y-m-d", $endTime))
+                );
+                foreach ($period as $key => $value) {
+                    array_push($listaRango, array(
+                        "from" => $value->format("Y-m-d"),
+                        "to" => $value->format("Y-m-d")
+                    ));
+                }
+                // agrego el dia actual
+                array_push($listaRango, array(
+                    "from" => date("Y-m-d", $endTime),
+                    "to" => date("Y-m-d", $endTime)
+                ));
+                break;
+            case 'week':
+                while ($startTime <= $endTime) {  
+                    $rangoDias[] = date('W', $startTime);  // numero de semana
+                    $startTime += strtotime('+1 week', 0); // suma una semana 
+                }
+    
+                foreach ($rangoDias as $semana) {
+                    $dto = new DateTime();
+                    $dto->setISODate(date("Y"), $semana);
+                    $inicio_semana = $dto->format('Y-m-d');
+                    $dto->modify('+6 days');
+                    $fin_semana = $dto->format('Y-m-d');
+            
+                    array_push($listaRango, array(
+                        "from" => $inicio_semana,
+                        "to" => $fin_semana
+                    ));
+                }
+                break;
+            case 'month':
+                $startTime = strtotime(date("Y-m-d", strtotime($fecha."- ".$number." ".$rango)));
+                $period = new DatePeriod(
+                    new DateTime(date("Y-m-d", $startTime)),
+                    new DateInterval('P1M'),
+                    new DateTime(date("Y-m-d", $endTime))
+                );
+                foreach ($period as $key => $value) { 
+                    array_push($listaRango, array(
+                        "from" => $value->format("Y-m-01"),
+                        "to" => $value->format("Y-m-t")
+                    ));
+                }
+                // agrego el dia actual
+                array_push($listaRango, array(
+                    "from" => date("Y-m-01", $endTime),
+                    "to" => date("Y-m-t", $endTime)
+                ));
+                break;
+        }
+     
+        return $listaRango;
+    }
+
     function Validar_Solo_Texto($campo){
         $retorno = false;
         
