@@ -2518,12 +2518,12 @@ $app->group('/api', function() use ($app) {
                                                 $ultimo_contacto = $linea['fecha_ultima_contacto'];
                                             }
 
-                                            $estadoActual = $linea['estado'];
-                                            $consultaEstado = $mysql->Consulta_Unico("SELECT * FROM notas_registros_estados WHERE id_estados=".$estadoActual);
-                                            $descripcionEstado = "S/N";
-                                            if (isset($consultaEstado['descripcion'])){
-                                            $descripcionEstado = $consultaEstado['descripcion'];
-                                                }
+					    $estadoActual = $linea['estado'];
+					    $consultaEstado = $mysql->Consulta_Unico("SELECT * FROM notas_registros_estados WHERE id_estados=".$estadoActual);
+					    $descripcionEstado = "S/N";
+					    if (isset($consultaEstado['descripcion'])){
+						$descripcionEstado = $consultaEstado['descripcion'];
+    					    }
                                             $datos = array(
                                                 "id_lista" => (int) $linea['id_lista'],
                                                 // "documento" => $linea['documento'],
@@ -4655,7 +4655,7 @@ $app->group('/api', function() use ($app) {
                     if ($id_lista > 0){
                         $mysql = new Database(DATABASE);
                         $banco_nova = 30;
-			            $banco_cuentas_nova = 31;
+			$banco_cuentas_nova = 31;
                         // verifica que el dato sea solamente de la base nova
                         $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE (id_lista=".$id_lista.") AND ((banco=".$banco_nova.") OR (banco=".$banco_cuentas_nova."))"); 
 
