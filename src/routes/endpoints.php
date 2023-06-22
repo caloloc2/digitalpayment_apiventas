@@ -1999,6 +1999,134 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->get("/base-imprimir", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false;
+
+                try{
+
+			        // if ((isset($params['banco'])) && (!empty($params['banco']))){
+
+                    //     if ((isset($params['identificador'])) && (!empty($params['identificador']))){
+
+                    //         if ((isset($params['limite'])) && (!empty($params['limite']))){
+
+                                $mysql = new Database("vtgsa_ventas");
+ 
+                                $separador = "|"; 
+                                $bloqueo = 22;
+                                $banco = 29; //$params['banco'];
+                                // $identificador = $params['identificador'];
+                                // $limite = $params['limite'];
+                                            
+                                $documentos = $mysql->Consulta("SELECT
+                                id_lista, documento, nombres, telefono, ciudad, direccion, correo, observaciones
+                                FROM notas_registros
+                                WHERE (banco=29) AND (estado=40)
+                                ORDER BY id_lista ASC");
+
+                                
+
+                                if (is_array($documentos)){
+                                    if (count($documentos) > 0){
+                                        $datoscsv = [];
+
+                                        foreach ($documentos as $linea) {
+                                            $id_lista = $linea['id_lista'];
+                                            $documento = $linea['documento'];
+                                            $nombres = $linea['nombres'];
+                                            $telefono = $linea['telefono'];
+                                            $ciudad = $linea['ciudad'];
+                                            $direccion = $linea['direccion'];
+                                            $correo = $linea['correo'];
+                                            // $observaciones = $linea['observaciones'];
+
+                                            // Busca otros numeros
+                                            $listaContactos = "";
+                                            $contactos = $mysql->Consulta("SELECT contacto FROM notas_registros_contactos WHERE id_lista=".$id_lista);
+                                            if (is_array($contactos)){
+                                                $diferencia = 5 - count($contactos);
+
+                                                if (count($contactos) > 0){
+                                                    foreach ($contactos as $numero) {
+                                                        $listaContactos .= $numero['contacto'];
+                                                        if (next($contactos)==true) $listaContactos .= $separador;
+                                                    }
+                                                }
+
+                                                for ($i=0; $i < $diferencia; $i++) { 
+                                                    $listaContactos .= " ";
+                                                    if ($i < $diferencia){
+                                                        $listaContactos .= $separador;
+                                                    }
+                                                }
+                                            }
+
+                                            $cadena = $documento;
+                                            $cadena .= $separador;
+                                            $cadena .= $nombres;
+                                            $cadena .= $separador;
+                                            $cadena .= $telefono;
+                                            $cadena .= $separador;
+                                            $cadena .= $listaContactos;
+                                            $cadena .= $separador;
+                                            $cadena .= $ciudad;
+                                            $cadena .= $separador;
+                                            $cadena .= $direccion;
+                                            $cadena .= $separador;
+                                            $cadena .= $correo;
+                                            $cadena .= $separador;
+                                            $cadena .= $observaciones;
+
+                                            array_push($datoscsv, $cadena);
+
+
+                                            // bloquear
+                                            // $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($bloqueo, $id_lista));
+                                        }
+
+					                    $final = "baseImprimir".date("YmdHis").".csv";
+                                        $archivos = __DIR__."/../../public/tmp/".$final;
+
+                                        $fp = fopen($archivos, 'wb');
+                                        foreach ( $datoscsv as $line ) {
+                                            $val = explode(",", $line);
+                                            fputcsv($fp, $val);
+                                        }
+                                        fclose($fp);
+
+					                    $respuesta['link'] = "https://apicrm.mvevip.com/tmp/".$final;
+
+                                        $respuesta['estado'] = true;
+                                        
+                                    }else{
+                                        $respuesta['error'] = "No existen datos disponibles para descargar.";
+                                    }
+                                } 
+                                
+
+                    //         }else{
+                    //             $respuesta['error'] = "Debe indicar la cantidad de registros a descargar.";
+                    //         }
+
+                    //     }else{
+                    //         $respuesta['error'] = "Debe seleccionar un identificador.";
+                    //     }
+
+                    // }else{
+                    //     $respuesta['error'] = "Debe seleccionar un banco.";
+                    // }
+
+                }catch(Exception $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
             $app->get("/base_asignada/{id_asesor}", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
                 $id_asesor = $request->getAttribute('id_asesor');
@@ -2389,7 +2517,13 @@ $app->group('/api', function() use ($app) {
                                             if (!is_null($linea['fecha_ultima_contacto'])){
                                                 $ultimo_contacto = $linea['fecha_ultima_contacto'];
                                             }
-    
+
+                                            $estadoActual = $linea['estado'];
+                                            $consultaEstado = $mysql->Consulta_Unico("SELECT * FROM notas_registros_estados WHERE id_estados=".$estadoActual);
+                                            $descripcionEstado = "S/N";
+                                            if (isset($consultaEstado['descripcion'])){
+                                            $descripcionEstado = $consultaEstado['descripcion'];
+                                                }
                                             $datos = array(
                                                 "id_lista" => (int) $linea['id_lista'],
                                                 // "documento" => $linea['documento'],
@@ -2398,10 +2532,10 @@ $app->group('/api', function() use ($app) {
                                                 // "ciudad" => $linea['ciudad'],
                                                 // "correo" => $linea['correo'],
                                                 "observaciones" => $linea['observaciones'],
-                                                "llamado" => (int) $linea['llamado'],
+                                                "llamado" => $descripcionEstado, // (int) $linea['llamado'],
                                                 "fecha_prox_llamada" => $linea['fecha_prox_llamada'],
                                                 "hora_prox_llamada" => $linea['hora_prox_llamada'],
-                                                "fecha_asignacion" => $linea['fecha_asignacion'],
+                                                "fecha_asignacion" => $linea['ciudad'], // $linea['fecha_asignacion'],
                                                 "llamar_ahora" => $estado_prox_llamada,
                                                 "llamadas" => array(
                                                     "ultima" => $ultimo_contacto, //$ultima_llamada_registro,
@@ -2437,7 +2571,7 @@ $app->group('/api', function() use ($app) {
                                                 case 14:
                                                     array_push($formularios, $datos);
                                                     break;
-                                                case 13:
+                                                default:
                                                     array_push($temporal, $datos);
                                                     break;
                                             }
@@ -4521,8 +4655,9 @@ $app->group('/api', function() use ($app) {
                     if ($id_lista > 0){
                         $mysql = new Database(DATABASE);
                         $banco_nova = 30;
+			            $banco_cuentas_nova = 31;
                         // verifica que el dato sea solamente de la base nova
-                        $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE (id_lista=".$id_lista.") AND (banco=".$banco_nova.")"); 
+                        $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE (id_lista=".$id_lista.") AND ((banco=".$banco_nova.") OR (banco=".$banco_cuentas_nova."))"); 
 
                         if (isset($consulta['id_lista'])){
 
@@ -4704,9 +4839,20 @@ $app->group('/api', function() use ($app) {
                 try{
                     $mysql = new Database(DATABASE);
 
+                    
+
                     $porZonas = "";
                     if ((isset($params['zonas'])) && (!empty($params['zonas']))){
                         $porZonas = " AND (R.id_zona=".$params['zonas'].")";
+                    }
+
+                    $tipos = "";
+                    if ((isset($params['tipos'])) && (!empty($params['tipos']))){
+                        if ($params['tipos'] == 1){ // sicv
+                            $tipos = " AND (R.tipo='SICV')";
+                        }else if ($params['tipos'] == 2){ // no sicv
+                            $tipos = " AND (R.tipo='NO SICV')";
+                        } 
                     }
   
                     $consulta = $mysql->Consulta("SELECT
@@ -4735,7 +4881,7 @@ $app->group('/api', function() use ($app) {
                                 ON E.diners_agrupacion = A.id
                                 LEFT JOIN notas_registros_zonas Z
                                 ON R.id_zona = Z.id
-                                WHERE (banco=29) AND (A.id=".$id_grupo.") ".$porZonas."
+                                WHERE (banco=29) AND (A.id=".$id_grupo.") ".$porZonas." ".$tipos."
                                 GROUP BY R.estado");
 
                                 if (is_array($subconsulta)){
@@ -4767,6 +4913,121 @@ $app->group('/api', function() use ($app) {
                     } 
 
                     $respuesta['consulta'] = $reporte;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
+            $app->get("/estadisticas-descarga", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false; 
+
+                $respuesta['params'] = $params;
+            
+                try{
+                    $mysql = new Database(DATABASE);
+
+                    
+
+                    $porZonas = "";
+                    if ((isset($params['zonas'])) && (!empty($params['zonas']))){
+                        $porZonas = " AND (N.id_zona=".$params['zonas'].")";
+                    }
+
+                    $tipos = "";
+                    if ((isset($params['tipos'])) && (!empty($params['tipos']))){
+                        if ($params['tipos'] == 1){ // sicv
+                            $tipos = " AND (N.tipo='SICV')";
+                        }else if ($params['tipos'] == 2){ // no sicv
+                            $tipos = " AND (N.tipo='NO SICV')";
+                        } 
+                    }
+
+                    $consulta = $mysql->Consulta("SELECT 
+                    N.identificador, N.documento, N.nombres, N.telefono, N.observaciones, U.nombres AS asesor, E.descripcion AS estado, N.fecha_asignacion AS fechaAsignacion, 
+                    N.fecha_ultima_contacto AS fechaUltimoContacto, N.tipo
+                    FROM notas_registros N
+                    LEFT JOIN usuarios U
+                    ON (N.asignado=U.id_usuario)
+                    LEFT JOIN notas_registros_bancos B
+                    ON N.banco = B.id_banco
+                    LEFT JOIN notas_registros_estados E
+                    ON N.estado = E.id_estados
+                    LEFT JOIN notas_registros_no_interesados T
+                    ON N.impreso = T.id
+                    LEFT JOIN notas_registros_agrupacion_actualizacion A
+                    ON E.diners_agrupacion = A.id 
+                    WHERE 
+                    (N.banco=29) ".$porZonas." ".$tipos."
+                    ORDER BY N.banco ASC, N.identificador ASC, N.estado DESC");
+
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            $datoscsv = [];
+                            $separador = "|"; 
+
+                            foreach ($consulta as $linea) {
+                                // $id_lista = $linea['id_lista'];
+                                $documento = $linea['documento'];
+                                $nombres = $linea['nombres'];
+                                $telefono = $linea['telefono'];
+                                $observaciones = $linea['observaciones'];
+                                $asesor = $linea['asesor'];
+                                $estado = $linea['estado'];
+                                $fechaAsignacion = $linea['fechaAsignacion'];
+                                $fechaUltimoContacto = $linea['fechaUltimoContacto'];
+                                $tipo = $linea['tipo'];
+
+                                $cadena = $documento;
+                                $cadena .= $separador;
+                                $cadena .= $nombres;
+                                $cadena .= $separador;
+                                $cadena .= $telefono;
+                                // $cadena .= $separador;
+                                // $cadena .= $observaciones;
+                                $cadena .= $separador;
+                                $cadena .= $asesor;
+                                $cadena .= $separador;
+                                $cadena .= $estado;
+                                $cadena .= $separador;
+                                $cadena .= $fechaAsignacion;
+                                $cadena .= $separador;
+                                $cadena .= $fechaUltimoContacto;
+                                $cadena .= $separador;
+                                $cadena .= $tipo;
+
+                                array_push($datoscsv, $cadena);
+                            }
+
+                            $final = "reporte_Actualizacion_".date("YmdHis").".csv";
+                            $archivos = __DIR__."/../../public/tmp/".$final;
+
+                            $fp = fopen($archivos, 'wb');
+                            foreach ( $datoscsv as $line ) {
+                                $val = explode(",", $line);
+                                fputcsv($fp, $val);
+                            }
+                            fclose($fp);
+
+                            $respuesta['link'] = "https://api.digitalpaymentnow.com/tmp/".$final;
+
+                            $respuesta['estado'] = true;
+                            
+                        }else{
+                            $respuesta['error'] = "No existen datos disponibles para descargar.";
+                        }
+                    } 
+  
+                   
+
+                    $respuesta['consulta'] = $consulta;
                     $respuesta['estado'] = true;
                     
                 }catch(PDOException $e){
@@ -5498,7 +5759,7 @@ $app->group('/api', function() use ($app) {
                                 FROM notas_registros N
                                 LEFT JOIN notas_registros_nova_valores V
                                 ON N.plan_usado = V.id_valor
-                                WHERE (N.banco=30) AND (N.estado=7) AND (N.plan_usado=".$linea['id_valor'].")");
+                                WHERE ((N.banco=30) OR (N.banco=31)) AND (N.estado=7) AND (N.plan_usado=".$linea['id_valor'].")");
 
                                 $cantidad = 0;
                                 $total = 0;
@@ -10565,7 +10826,49 @@ $app->group('/api', function() use ($app) {
             });
         });
 
+        // GRUPO PARA APP
 
+        $app->group('/app', function() use ($app) {
+    
+            $app->get("/buscar-ruc/{ruc}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $ruc = $request->getAttribute('ruc');
+                $respuesta['estado'] = false;
+                
+                try{
+                    $mysql = new Database(DATABASE);
+
+                    $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE (documento='".$ruc."')");
+
+                    if (isset($consulta['id_lista'])){
+                        $direccion = $consulta['direccion'];
+
+                        if ((isset($consulta['direccion_confirmada'])) && (!empty($consulta['direccion_confirmada']))){
+                            $direccion = $consulta['direccion_confirmada'];
+                        }
+
+                        $respuesta['consulta'] = array(
+                            "documento" => $consulta['documento'],
+                            "razonSocial" => $consulta['nombres'],
+                            "representante" => $consulta['representanteLegal'],
+                            "direccion" => $direccion,
+                            "correo" => strtolower($consulta['correo']),
+                            "celular" => $consulta['telefono']
+                        );
+                    }else{
+                        $respuesta['error'] = "No se encuentra información con el RUC ingresado.";
+                    } 
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+ 
+        });
 
 
         /// BANCO INTERNACIONAL
