@@ -26,7 +26,7 @@ class sendinblue{
     ];
 
     function __construct(){ 
-        $mysql = new Database("vtgsa_ventas");
+        $mysql = new Database(DATABASE);
 
         $consulta = $mysql->Consulta_Unico("SELECT * FROM configuracion_sendinblue ORDER BY id_sendinblue DESC LIMIT 1");
         
