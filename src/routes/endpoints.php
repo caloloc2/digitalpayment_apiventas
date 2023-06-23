@@ -10829,6 +10829,40 @@ $app->group('/api', function() use ($app) {
         // GRUPO PARA APP
 
         $app->group('/app', function() use ($app) {
+
+            $app->get("/formularios", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $respuesta['estado'] = false;
+                
+                try{
+                    $mysql = new Database(DATABASE);
+
+                    $consulta = $mysql->Consulta("SELECT * FROM actualizacion_formularios WHERE (estado=1)");
+
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($listado, array(
+                                    "id" => (int) $linea['id'],
+                                    "formulario" => strtoupper($linea['formulario']),
+                                    "seleccionado" => (bool) $linea['principal']
+                                ));
+                            }
+                        }
+                    }
+                    
+                    $respuesta['consulta'] = $listado;
+                    $respuesta['estado'] = true;
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
     
             $app->get("/buscar-ruc/{ruc}", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
@@ -10858,6 +10892,30 @@ $app->group('/api', function() use ($app) {
                     }else{
                         $respuesta['error'] = "No se encuentra información con el RUC ingresado.";
                     } 
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
+            $app->post("/actualizacion", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $data = $request->getParsedBody();
+                $files = $request->getUploadedFiles();      
+                $respuesta['estado'] = false;
+                
+                try{
+                    $mysql = new Database(DATABASE);
+                    $respuesta['data'] = $data;
+                    $respuesta['files'] = $files;
+                    
+                    sleep(3);
+ 
+                    $respuesta['estado'] = true;
 
                 }catch(PDOException $e){
                     $respuesta['error'] = $e->getMessage();
