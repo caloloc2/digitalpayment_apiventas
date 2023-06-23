@@ -10999,7 +10999,7 @@ $app->group('/api', function() use ($app) {
                                     ); 
 
                                     $carpeta = __DIR__."/../../public/evidencias";
-                                    move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
+                                    // move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
 
                                     // guarda el registro
                                     $id = $mysql->Ingreso("INSERT INTO actualizacion_establecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, link) VALUES (?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $nuevoNombre));
@@ -11008,12 +11008,78 @@ $app->group('/api', function() use ($app) {
 
                                     // actualiza estado
                                     if ($estadoEstablecimiento == 1){
+                                        $sendinblue = new sendinblue();
+                                        $carpetaFormulario = __DIR__."/../../public/evidencias/formularios";
+                                        // $carpetaFormulario = "https://api.digitalpaymentnow.com/evidencias/formularios";
+
+                                        $idFormulario = 0;
+                                        $linkFormulario = 0; 
+                                        if ((isset($data['formularios'])) && (!empty($data['formularios']))){
+                                            $idFormulario = $data['formularios'];
+ 
+                                            $consultaAdjunto = $mysql->Consulta_Unico("SELECT * FROM actualizacion_formularios WHERE id=".$idFormulario);
+
+                                            if (isset($consultaAdjunto['id'])){
+                                                $idFormulario = $consultaAdjunto['id'];
+                                                $linkFormulario = $consultaAdjunto['link']; 
+                                            }
+                                        } 
+
+                                        $adjuntos = [];
+                                        array_push($adjuntos, array(
+                                            "url" => $carpetaFormulario."/CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf",
+                                            "name" => "CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf"
+                                        ));
+
+                                        if ($idFormulario>0){
+                                            array_push($adjuntos, array(
+                                                "url" => $carpetaFormulario."/".$linkFormulario,
+                                                "name" => $linkFormulario
+                                            ));
+                                        }
+
+                                        $respuesta['adjuntos'] = $adjuntos;
+
+                                        // ENVIA CORREO DIRECTAMENTE
+                                        $envioMail = $sendinblue->envioMail(array(
+                                            "to" => [array(
+                                                "email" => "calolomino@gmail.com", //$correo,
+                                                "name" => $representante
+                                            )], 
+                                            "bcc" => [
+                                                array(
+                                                    "email" => "amoreno@digitalpaymentnow.com",
+                                                    "name" => "Alejandro Moreno"
+                                                ),
+                                                array(
+                                                    "email" => "soporte@digitalpaymentnow.com",
+                                                    "name" => "Ing. Carlos Mino"
+                                                ),
+                                                array(
+                                                    "email" => "operaciones@digitalpaymentnow.com",
+                                                    "name" => "Fernanda Ortiz"
+                                                ),
+                                            ],
+                                            "replyTo" => array(
+                                                "email" => "operaciones@digitalpaymentnow.com",
+                                                "name" => "Fernanda Ortiz"
+                                            ),
+                                            "templateId" => 7,
+                                            "params" => array(
+                                                "representante" => $representante
+                                            ),
+                                            "attachment" => $adjuntos
+                                        ));
+                                        $respuesta['mail'] = $envioMail;
+
                                         $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
                                         $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
                                     }else if ($estadoEstablecimiento == 2){
                                         $nuevoEstado = 46; // ESTABLECIMIENTO CERRADO
                                         $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
                                     }
+
+                                    
                                     
                                     $respuesta['estado'] = true;
                                 }else{
