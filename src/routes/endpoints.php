@@ -11009,8 +11009,8 @@ $app->group('/api', function() use ($app) {
                                     // actualiza estado
                                     if ($estadoEstablecimiento == 1){
                                         $sendinblue = new sendinblue();
-                                        $carpetaFormulario = __DIR__."/../../public/evidencias/formularios";
-                                        // $carpetaFormulario = "https://api.digitalpaymentnow.com/evidencias/formularios";
+                                        // $carpetaFormulario = __DIR__."/../../public/evidencias/formularios";
+                                        $carpetaFormulario = "https://api.digitalpaymentnow.com/evidencias/formularios";
 
                                         $idFormulario = 0;
                                         $linkFormulario = 0; 
@@ -11041,36 +11041,32 @@ $app->group('/api', function() use ($app) {
                                         $respuesta['adjuntos'] = $adjuntos;
 
                                         // ENVIA CORREO DIRECTAMENTE
-                                        // $envioMail = $sendinblue->envioMail(array(
-                                        //     "to" => [array(
-                                        //         "email" => "calolomino@gmail.com", //$correo,
-                                        //         "name" => $representante
-                                        //     )], 
-                                        //     "bcc" => [
-                                        //         array(
-                                        //             "email" => "amoreno@digitalpaymentnow.com",
-                                        //             "name" => "Alejandro Moreno"
-                                        //         ),
-                                        //         array(
-                                        //             "email" => "soporte@digitalpaymentnow.com",
-                                        //             "name" => "Ing. Carlos Mino"
-                                        //         ),
-                                        //         array(
-                                        //             "email" => "operaciones@digitalpaymentnow.com",
-                                        //             "name" => "Fernanda Ortiz"
-                                        //         ),
-                                        //     ],
-                                        //     "replyTo" => array(
-                                        //         "email" => "operaciones@digitalpaymentnow.com",
-                                        //         "name" => "Fernanda Ortiz"
-                                        //     ),
-                                        //     "templateId" => 7,
-                                        //     "params" => array(
-                                        //         "representante" => $representante
-                                        //     ),
-                                        //     "attachment" => $adjuntos
-                                        // ));
-                                        // $respuesta['mail'] = $envioMail;
+                                        $envioMail = $sendinblue->envioMail(array(
+                                            "to" => [array(
+                                                "email" => "calolomino@gmail.com", //$correo,
+                                                "name" => $representante
+                                            )], 
+                                            "bcc" => [ 
+                                                array(
+                                                    "email" => "soporte@digitalpaymentnow.com",
+                                                    "name" => "Ing. Carlos Mino"
+                                                ),
+                                                array(
+                                                    "email" => "operaciones@digitalpaymentnow.com",
+                                                    "name" => "Fernanda Ortiz"
+                                                ),
+                                            ],
+                                            "replyTo" => array(
+                                                "email" => "operaciones@digitalpaymentnow.com",
+                                                "name" => "Fernanda Ortiz"
+                                            ),
+                                            "templateId" => 7,
+                                            "params" => array(
+                                                "representante" => $representante
+                                            ),
+                                            "attachment" => $adjuntos
+                                        ));
+                                        $respuesta['mail'] = $envioMail;
 
                                         $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
                                         $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
