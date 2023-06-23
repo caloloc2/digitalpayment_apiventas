@@ -10999,7 +10999,7 @@ $app->group('/api', function() use ($app) {
                                     ); 
 
                                     $carpeta = __DIR__."/../../public/evidencias";
-                                    // move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
+                                    move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
 
                                     // guarda el registro
                                     $id = $mysql->Ingreso("INSERT INTO actualizacion_establecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, link) VALUES (?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $nuevoNombre));
