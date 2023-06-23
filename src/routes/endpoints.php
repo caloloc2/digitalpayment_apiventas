@@ -11002,7 +11002,7 @@ $app->group('/api', function() use ($app) {
                                     move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
 
                                     // guarda el registro
-                                    $id = $mysql->Ingreso("INSERT INTO actualizacionEstablecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, link) VALUES (?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $nuevoNombre));
+                                    $id = $mysql->Ingreso("INSERT INTO actualizacion_establecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, link) VALUES (?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $nuevoNombre));
 
                                     $respuesta['id'] = $id;
 
