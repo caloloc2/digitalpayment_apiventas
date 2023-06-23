@@ -11013,6 +11013,7 @@ $app->group('/api', function() use ($app) {
                                         $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
                                     }
                                     
+                                    $respuesta['estado'] = true;
                                 }else{
                                     $respuesta['error'] = "Debe ingresar una evidencia fotográfica.";
                                 }
@@ -11022,11 +11023,7 @@ $app->group('/api', function() use ($app) {
                         }else{
                             $respuesta['error'] = "Debe ingresar la ubicación por Geolocalización.";
                         } 
-                    }
-                    
-                    sleep(3);
-
-                    // $respuesta['estado'] = true;
+                    } 
 
                 }catch(PDOException $e){
                     $respuesta['error'] = $e->getMessage();
