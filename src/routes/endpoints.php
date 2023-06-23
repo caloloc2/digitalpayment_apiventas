@@ -10920,184 +10920,192 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
                 
                 try{
-                    $mysql = new Database(DATABASE);
-                    $respuesta['data'] = $data;
-                    $respuesta['files'] = $files;
+                    $hora = strtotime(date("H:i:s"));
+                    $limiteInf = strtotime("09:00:00");
+                    $limiteSup = strtotime("13:00:00");
 
-                    $validacion = false;
+                    if (($hora >= $limiteInf) && ($hora <= $limiteSup)){ 
+                        $mysql = new Database(DATABASE);
+                        $respuesta['data'] = $data;
+                        $respuesta['files'] = $files;
 
-                    if ((isset($data['id'])) && (!empty($data['id']))){
-                        $idLista = $data['id'];
+                        $validacion = false;
 
-                        if ((isset($data['direccion'])) && (!empty($data['direccion']))){
-                            $direccion = $data['direccion'];
-    
-                            if ((isset($data['representante'])) && (!empty($data['representante']))){
-                                $representante = strtoupper($data['representante']);
+                        if ((isset($data['id'])) && (!empty($data['id']))){
+                            $idLista = $data['id'];
+
+                            if ((isset($data['direccion'])) && (!empty($data['direccion']))){
+                                $direccion = $data['direccion'];
         
-                                if ((isset($data['correo'])) && (!empty($data['correo']))){
-                                    $correo = strtolower($data['correo']);
+                                if ((isset($data['representante'])) && (!empty($data['representante']))){
+                                    $representante = strtoupper($data['representante']);
             
-                                    if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-                                        
-                                        if ((isset($data['celular'])) && (!empty($data['celular']))){
-                                            $celular = $data['celular'];
+                                    if ((isset($data['correo'])) && (!empty($data['correo']))){
+                                        $correo = strtolower($data['correo']);
+                
+                                        if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                                            
+                                            if ((isset($data['celular'])) && (!empty($data['celular']))){
+                                                $celular = $data['celular'];
 
-                                            if (strlen($celular) == 10){
-                                                if (substr($celular, 0, 2) == "09"){
+                                                if (strlen($celular) == 10){
+                                                    if (substr($celular, 0, 2) == "09"){
 
-                                                    if ((isset($data['estadoEstablecimiento'])) && (!empty($data['estadoEstablecimiento']))){
-                                                        $estadoEstablecimiento = $data['estadoEstablecimiento'];
+                                                        if ((isset($data['estadoEstablecimiento'])) && (!empty($data['estadoEstablecimiento']))){
+                                                            $estadoEstablecimiento = $data['estadoEstablecimiento'];
 
-                                                        $validacion = true;
+                                                            $validacion = true;
+
+                                                        }else{
+                                                            $respuesta['error'] = "Debe seleccionar un estado del establecimiento.";
+                                                        } 
 
                                                     }else{
-                                                        $respuesta['error'] = "Debe seleccionar un estado del establecimiento.";
-                                                    } 
-
+                                                        $respuesta['error'] = "El celular debe empezar con 09.";
+                                                    }
                                                 }else{
-                                                    $respuesta['error'] = "El celular debe empezar con 09.";
+                                                    $respuesta['error'] = "El celular debe contener 10 dígitos.";
                                                 }
+
                                             }else{
-                                                $respuesta['error'] = "El celular debe contener 10 dígitos.";
+                                                $respuesta['error'] = "Debe ingresar un número de celular.";
                                             }
 
                                         }else{
-                                            $respuesta['error'] = "Debe ingresar un número de celular.";
+                                            $respuesta['error'] = "Debe ingresar una dirección de correo válida.";
                                         }
-
+                                        
                                     }else{
-                                        $respuesta['error'] = "Debe ingresar una dirección de correo válida.";
+                                        $respuesta['error'] = "Debe ingresar una dirección de correo.";
                                     }
-                                    
                                 }else{
-                                    $respuesta['error'] = "Debe ingresar una dirección de correo.";
-                                }
+                                    $respuesta['error'] = "Debe ingresar un representante o persona de contacto.";
+                                }    
                             }else{
-                                $respuesta['error'] = "Debe ingresar un representante o persona de contacto.";
-                            }    
+                                $respuesta['error'] = "Debe ingresar una dirección válida.";
+                            }   
                         }else{
-                            $respuesta['error'] = "Debe ingresar una dirección válida.";
-                        }   
-                    }else{
-                        $respuesta['error'] = "No se ha seleccionado o no se encuentra el establecimiento.";
-                    }
+                            $respuesta['error'] = "No se ha seleccionado o no se encuentra el establecimiento.";
+                        }
 
-                    if ($validacion){
-                        // validacion de ubicacion
-                        $ubicacion = json_decode($data['ubicacion'], true);
+                        if ($validacion){
+                            // validacion de ubicacion
+                            $ubicacion = json_decode($data['ubicacion'], true);
 
-                        if ((!empty($ubicacion['latitud'])) && (!empty($ubicacion['longitud']))){
-                            $latitud = $ubicacion['latitud'];
-                            $longitud = $ubicacion['longitud'];
- 
-                            // valida que tenga un archivo o foto
-                            if (is_array($files)){  
-                                if (count($files) > 0){
-                                    $archivo = $files['voucher0']->file;
-                                    $nombreArchivo = $data['nombre_voucher0'];
-                                    $extension = pathinfo($nombreArchivo, PATHINFO_EXTENSION);
-                                    $nuevoNombre = "evidencia-".$idLista."-".date("YmdHis").".".$extension;
-                                    
-                                    // guarda archivo 
+                            if ((!empty($ubicacion['latitud'])) && (!empty($ubicacion['longitud']))){
+                                $latitud = $ubicacion['latitud'];
+                                $longitud = $ubicacion['longitud'];
+    
+                                // valida que tenga un archivo o foto
+                                if (is_array($files)){  
+                                    if (count($files) > 0){
+                                        $archivo = $files['voucher0']->file;
+                                        $nombreArchivo = $data['nombre_voucher0'];
+                                        $extension = pathinfo($nombreArchivo, PATHINFO_EXTENSION);
+                                        $nuevoNombre = "evidencia-".$idLista."-".date("YmdHis").".".$extension;
+                                        
+                                        // guarda archivo 
 
-                                    $respuesta['procesarArchivo'] = array(
-                                        "archivo" => $archivo,
-                                        "nombre" => $nombreArchivo,
-                                        "extension" => $extension,
-                                        "nuevo" => $nuevoNombre
-                                    ); 
+                                        $respuesta['procesarArchivo'] = array(
+                                            "archivo" => $archivo,
+                                            "nombre" => $nombreArchivo,
+                                            "extension" => $extension,
+                                            "nuevo" => $nuevoNombre
+                                        ); 
 
-                                    $carpeta = __DIR__."/../../public/evidencias";
-                                    move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
+                                        $carpeta = __DIR__."/../../public/evidencias";
+                                        move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
 
-                                    // guarda el registro
-                                    $id = $mysql->Ingreso("INSERT INTO actualizacion_establecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, link) VALUES (?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $nuevoNombre));
+                                        // guarda el registro
+                                        $id = $mysql->Ingreso("INSERT INTO actualizacion_establecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, link) VALUES (?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $nuevoNombre));
 
-                                    $respuesta['id'] = $id;
+                                        $respuesta['id'] = $id;
 
-                                    // actualiza estado
-                                    if ($estadoEstablecimiento == 1){
-                                        $sendinblue = new sendinblue();
-                                        // $carpetaFormulario = __DIR__."/../../public/evidencias/formularios";
-                                        $carpetaFormulario = "https://api.digitalpaymentnow.com/evidencias/formularios";
+                                        // actualiza estado
+                                        if ($estadoEstablecimiento == 1){
+                                            $sendinblue = new sendinblue();
+                                            // $carpetaFormulario = __DIR__."/../../public/evidencias/formularios";
+                                            $carpetaFormulario = "https://api.digitalpaymentnow.com/evidencias/formularios";
 
-                                        $idFormulario = 0;
-                                        $linkFormulario = 0; 
-                                        if ((isset($data['formularios'])) && (!empty($data['formularios']))){
-                                            $idFormulario = $data['formularios'];
- 
-                                            $consultaAdjunto = $mysql->Consulta_Unico("SELECT * FROM actualizacion_formularios WHERE id=".$idFormulario);
+                                            $idFormulario = 0;
+                                            $linkFormulario = 0; 
+                                            if ((isset($data['formularios'])) && (!empty($data['formularios']))){
+                                                $idFormulario = $data['formularios'];
+    
+                                                $consultaAdjunto = $mysql->Consulta_Unico("SELECT * FROM actualizacion_formularios WHERE id=".$idFormulario);
 
-                                            if (isset($consultaAdjunto['id'])){
-                                                $idFormulario = $consultaAdjunto['id'];
-                                                $linkFormulario = $consultaAdjunto['link']; 
-                                            }
-                                        } 
+                                                if (isset($consultaAdjunto['id'])){
+                                                    $idFormulario = $consultaAdjunto['id'];
+                                                    $linkFormulario = $consultaAdjunto['link']; 
+                                                }
+                                            } 
 
-                                        $adjuntos = [];
-                                        array_push($adjuntos, array(
-                                            "url" => $carpetaFormulario."/CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf",
-                                            "name" => "CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf"
-                                        ));
-
-                                        if ($idFormulario>0){
+                                            $adjuntos = [];
                                             array_push($adjuntos, array(
-                                                "url" => $carpetaFormulario."/".$linkFormulario,
-                                                "name" => $linkFormulario
+                                                "url" => $carpetaFormulario."/CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf",
+                                                "name" => "CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf"
                                             ));
-                                        }
 
-                                        $respuesta['adjuntos'] = $adjuntos;
+                                            if ($idFormulario>0){
+                                                array_push($adjuntos, array(
+                                                    "url" => $carpetaFormulario."/".$linkFormulario,
+                                                    "name" => $linkFormulario
+                                                ));
+                                            }
 
-                                        // ENVIA CORREO DIRECTAMENTE
-                                        $envioMail = $sendinblue->envioMail(array(
-                                            "to" => [array(
-                                                "email" => "calolomino@gmail.com", //$correo,
-                                                "name" => $representante
-                                            )], 
-                                            "bcc" => [ 
-                                                array(
-                                                    "email" => "soporte@digitalpaymentnow.com",
-                                                    "name" => "Ing. Carlos Mino"
-                                                ),
-                                                array(
+                                            $respuesta['adjuntos'] = $adjuntos;
+
+                                            // ENVIA CORREO DIRECTAMENTE
+                                            $envioMail = $sendinblue->envioMail(array(
+                                                "to" => [array(
+                                                    "email" => "calolomino@gmail.com", //$correo,
+                                                    "name" => $representante
+                                                )], 
+                                                "bcc" => [ 
+                                                    array(
+                                                        "email" => "soporte@digitalpaymentnow.com",
+                                                        "name" => "Ing. Carlos Mino"
+                                                    ),
+                                                    array(
+                                                        "email" => "operaciones@digitalpaymentnow.com",
+                                                        "name" => "Fernanda Ortiz"
+                                                    ),
+                                                ],
+                                                "replyTo" => array(
                                                     "email" => "operaciones@digitalpaymentnow.com",
                                                     "name" => "Fernanda Ortiz"
                                                 ),
-                                            ],
-                                            "replyTo" => array(
-                                                "email" => "operaciones@digitalpaymentnow.com",
-                                                "name" => "Fernanda Ortiz"
-                                            ),
-                                            "templateId" => 7,
-                                            "params" => array(
-                                                "representante" => $representante
-                                            ),
-                                            "attachment" => $adjuntos
-                                        ));
-                                        $respuesta['mail'] = $envioMail;
+                                                "templateId" => 7,
+                                                "params" => array(
+                                                    "representante" => $representante
+                                                ),
+                                                "attachment" => $adjuntos
+                                            ));
+                                            $respuesta['mail'] = $envioMail;
 
-                                        $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
-                                        $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
-                                    }else if ($estadoEstablecimiento == 2){
-                                        $nuevoEstado = 46; // ESTABLECIMIENTO CERRADO
-                                        $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                            $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
+                                            $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                        }else if ($estadoEstablecimiento == 2){
+                                            $nuevoEstado = 46; // ESTABLECIMIENTO CERRADO
+                                            $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                        }
+
+                                        
+                                        
+                                        $respuesta['estado'] = true;
+                                    }else{
+                                        $respuesta['error'] = "Debe ingresar una evidencia fotográfica.";
                                     }
-
-                                    
-                                    
-                                    $respuesta['estado'] = true;
                                 }else{
-                                    $respuesta['error'] = "Debe ingresar una evidencia fotográfica.";
+                                    $respuesta['error'] = "No se incluyen evidencias.";
                                 }
                             }else{
-                                $respuesta['error'] = "No se incluyen evidencias.";
-                            }
-                        }else{
-                            $respuesta['error'] = "Debe ingresar la ubicación por Geolocalización.";
+                                $respuesta['error'] = "Debe ingresar la ubicación por Geolocalización.";
+                            } 
                         } 
-                    } 
+                    }else{
+                        $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 13:00.";
+                    }
 
                 }catch(PDOException $e){
                     $respuesta['error'] = $e->getMessage();
