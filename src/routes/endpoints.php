@@ -10882,6 +10882,7 @@ $app->group('/api', function() use ($app) {
                         }
 
                         $respuesta['consulta'] = array(
+                            "id" => (int) $consulta['id_lista'],
                             "documento" => $consulta['documento'],
                             "razonSocial" => $consulta['nombres'],
                             "representante" => $consulta['representanteLegal'],
@@ -10912,10 +10913,120 @@ $app->group('/api', function() use ($app) {
                     $mysql = new Database(DATABASE);
                     $respuesta['data'] = $data;
                     $respuesta['files'] = $files;
+
+                    $validacion = false;
+
+                    if ((isset($data['id'])) && (!empty($data['id']))){
+                        $idLista = $data['id'];
+
+                        if ((isset($data['direccion'])) && (!empty($data['direccion']))){
+                            $direccion = $data['direccion'];
+    
+                            if ((isset($data['representante'])) && (!empty($data['representante']))){
+                                $representante = strtoupper($data['representante']);
+        
+                                if ((isset($data['correo'])) && (!empty($data['correo']))){
+                                    $correo = strtolower($data['correo']);
+            
+                                    if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                                        
+                                        if ((isset($data['celular'])) && (!empty($data['celular']))){
+                                            $celular = $data['celular'];
+
+                                            if (strlen($celular) == 10){
+                                                if (substr($celular, 0, 2) == "09"){
+
+                                                    if ((isset($data['estadoEstablecimiento'])) && (!empty($data['estadoEstablecimiento']))){
+                                                        $estadoEstablecimiento = $data['estadoEstablecimiento'];
+
+                                                        $validacion = true;
+
+                                                    }else{
+                                                        $respuesta['error'] = "Debe seleccionar un estado del establecimiento.";
+                                                    } 
+
+                                                }else{
+                                                    $respuesta['error'] = "El celular debe empezar con 09.";
+                                                }
+                                            }else{
+                                                $respuesta['error'] = "El celular debe contener 10 dígitos.";
+                                            }
+
+                                        }else{
+                                            $respuesta['error'] = "Debe ingresar un número de celular.";
+                                        }
+
+                                    }else{
+                                        $respuesta['error'] = "Debe ingresar una dirección de correo válida.";
+                                    }
+                                    
+                                }else{
+                                    $respuesta['error'] = "Debe ingresar una dirección de correo.";
+                                }
+                            }else{
+                                $respuesta['error'] = "Debe ingresar un representante o persona de contacto.";
+                            }    
+                        }else{
+                            $respuesta['error'] = "Debe ingresar una dirección válida.";
+                        }   
+                    }else{
+                        $respuesta['error'] = "No se ha seleccionado o no se encuentra el establecimiento.";
+                    }
+
+                    if ($validacion){
+                        // validacion de ubicacion
+                        $ubicacion = json_decode($data['ubicacion'], true);
+
+                        if ((!empty($ubicacion['latitud'])) && (!empty($ubicacion['longitud']))){
+                            $latitud = $ubicacion['latitud'];
+                            $longitud = $ubicacion['longitud'];
+ 
+                            // valida que tenga un archivo o foto
+                            if (is_array($files)){  
+                                if (count($files) > 0){
+                                    $archivo = $files['voucher0']->file;
+                                    $nombreArchivo = $data['nombre_voucher0'];
+                                    $extension = pathinfo($nombreArchivo, PATHINFO_EXTENSION);
+                                    $nuevoNombre = "evidencia-".$idLista."-".date("YmdHis").".".$extension;
+                                    
+                                    // guarda archivo 
+
+                                    $respuesta['procesarArchivo'] = array(
+                                        "archivo" => $archivo,
+                                        "nombre" => $nombreArchivo,
+                                        "extension" => $extension,
+                                        "nuevo" => $nuevoNombre
+                                    ); 
+
+                                    $carpeta = __DIR__."/../../public/evidencias";
+                                    move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
+
+                                    // guarda el registro
+                                    $mysql->Ingreso("INSERT INTO actualizacionEstablecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, link) VALUES (?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $nuevoNombre));
+
+                                    // actualiza estado
+                                    if ($estadoEstablecimiento == 1){
+                                        $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
+                                        $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                    }else if ($estadoEstablecimiento == 2){
+                                        $nuevoEstado = 46; // ESTABLECIMIENTO CERRADO
+                                        $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                    }
+                                    
+                                }else{
+                                    $respuesta['error'] = "Debe ingresar una evidencia fotográfica.";
+                                }
+                            }else{
+                                $respuesta['error'] = "No se incluyen evidencias.";
+                            }
+                        }else{
+                            $respuesta['error'] = "Debe ingresar la ubicación por Geolocalización.";
+                        } 
+                    }
                     
                     sleep(3);
- 
-                    $respuesta['estado'] = true;
+
+                    // $respuesta['estado'] = true;
 
                 }catch(PDOException $e){
                     $respuesta['error'] = $e->getMessage();
