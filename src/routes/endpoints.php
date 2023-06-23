@@ -10870,29 +10870,39 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
                 
                 try{
-                    $mysql = new Database(DATABASE);
+                    $hora = strtotime(date("H:i:s"));
+                    $limiteInf = strtotime("09:00:00");
+                    $limiteSup = strtotime("13:00:00");
 
-                    $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE (documento='".$ruc."')");
+                    if (($hora >= $limiteInf) && ($hora <= $limiteSup)){
+                        $mysql = new Database(DATABASE);
 
-                    if (isset($consulta['id_lista'])){
-                        $direccion = $consulta['direccion'];
+                        $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE (documento='".$ruc."')");
 
-                        if ((isset($consulta['direccion_confirmada'])) && (!empty($consulta['direccion_confirmada']))){
-                            $direccion = $consulta['direccion_confirmada'];
-                        }
+                        if (isset($consulta['id_lista'])){
+                            $direccion = $consulta['direccion'];
 
-                        $respuesta['consulta'] = array(
-                            "id" => (int) $consulta['id_lista'],
-                            "documento" => $consulta['documento'],
-                            "razonSocial" => $consulta['nombres'],
-                            "representante" => $consulta['representanteLegal'],
-                            "direccion" => $direccion,
-                            "correo" => strtolower($consulta['correo']),
-                            "celular" => $consulta['telefono']
-                        );
+                            if ((isset($consulta['direccion_confirmada'])) && (!empty($consulta['direccion_confirmada']))){
+                                $direccion = $consulta['direccion_confirmada'];
+                            }
+
+                            $respuesta['consulta'] = array(
+                                "id" => (int) $consulta['id_lista'],
+                                "documento" => $consulta['documento'],
+                                "razonSocial" => $consulta['nombres'],
+                                "representante" => $consulta['representanteLegal'],
+                                "direccion" => $direccion,
+                                "correo" => strtolower($consulta['correo']),
+                                "celular" => $consulta['telefono']
+                            );
+                        }else{
+                            $respuesta['error'] = "No se encuentra información con el RUC ingresado.";
+                        } 
                     }else{
-                        $respuesta['error'] = "No se encuentra información con el RUC ingresado.";
-                    } 
+                        $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 13:00.";
+                    }
+                    
+                 
 
                 }catch(PDOException $e){
                     $respuesta['error'] = $e->getMessage();
