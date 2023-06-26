@@ -10895,6 +10895,8 @@ $app->group('/api', function() use ($app) {
                                 "correo" => strtolower($consulta['correo']),
                                 "celular" => $consulta['telefono']
                             );
+
+                            $respuesta['estado'] = true;
                         }else{
                             $respuesta['error'] = "No se encuentra información con el RUC ingresado.";
                         } 
