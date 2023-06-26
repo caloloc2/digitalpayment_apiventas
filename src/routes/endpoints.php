@@ -10872,7 +10872,7 @@ $app->group('/api', function() use ($app) {
                 try{
                     $hora = strtotime(date("H:i:s"));
                     $limiteInf = strtotime("09:00:00");
-                    $limiteSup = strtotime("13:00:00");
+                    $limiteSup = strtotime("19:00:00");
 
                     if (($hora >= $limiteInf) && ($hora <= $limiteSup)){
                         $mysql = new Database(DATABASE);
@@ -10922,7 +10922,7 @@ $app->group('/api', function() use ($app) {
                 try{
                     $hora = strtotime(date("H:i:s"));
                     $limiteInf = strtotime("09:00:00");
-                    $limiteSup = strtotime("13:00:00");
+                    $limiteSup = strtotime("19:00:00");
 
                     if (($hora >= $limiteInf) && ($hora <= $limiteSup)){ 
                         $mysql = new Database(DATABASE);
