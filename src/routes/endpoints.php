@@ -10901,7 +10901,7 @@ $app->group('/api', function() use ($app) {
                             $respuesta['error'] = "No se encuentra información con el RUC ingresado.";
                         } 
                     }else{
-                        $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 13:00.";
+                        $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 19:00.";
                     }
                     
                  
@@ -11106,7 +11106,7 @@ $app->group('/api', function() use ($app) {
                             } 
                         } 
                     }else{
-                        $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 13:00.";
+                        $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 19:00.";
                     }
 
                 }catch(PDOException $e){
