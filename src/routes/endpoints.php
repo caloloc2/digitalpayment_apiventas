@@ -10997,6 +10997,8 @@ $app->group('/api', function() use ($app) {
                             if ((!empty($ubicacion['latitud'])) && (!empty($ubicacion['longitud']))){
                                 $latitud = $ubicacion['latitud'];
                                 $longitud = $ubicacion['longitud'];
+
+                                $nuevoNombre = "";
     
                                 // valida que tenga un archivo o foto
                                 if (is_array($files)){  
@@ -11060,7 +11062,7 @@ $app->group('/api', function() use ($app) {
                                             // ENVIA CORREO DIRECTAMENTE
                                             $envioMail = $sendinblue->envioMail(array(
                                                 "to" => [array(
-                                                    "email" => "calolomino@gmail.com", //$correo,
+                                                    "email" => $correo,
                                                     "name" => $representante
                                                 )], 
                                                 "bcc" => [ 
