@@ -11107,6 +11107,7 @@ $app->group('/api', function() use ($app) {
                                 }else{
                                     $respuesta['error'] = "No se incluyen evidencias.";
                                 }
+                                
                             // }else{
                             //     $respuesta['error'] = "Debe ingresar la ubicación por Geolocalización.";
                             // } 
