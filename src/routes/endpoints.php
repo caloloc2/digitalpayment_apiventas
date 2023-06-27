@@ -10994,9 +10994,13 @@ $app->group('/api', function() use ($app) {
                             // validacion de ubicacion
                             $ubicacion = json_decode($data['ubicacion'], true);
 
+                            $latitud = 0;
+                            $longitud = 0;
+
                             if ((!empty($ubicacion['latitud'])) && (!empty($ubicacion['longitud']))){
                                 $latitud = $ubicacion['latitud'];
                                 $longitud = $ubicacion['longitud'];
+                            }
 
                                 $nuevoNombre = "";
     
@@ -11103,9 +11107,9 @@ $app->group('/api', function() use ($app) {
                                 }else{
                                     $respuesta['error'] = "No se incluyen evidencias.";
                                 }
-                            }else{
-                                $respuesta['error'] = "Debe ingresar la ubicación por Geolocalización.";
-                            } 
+                            // }else{
+                            //     $respuesta['error'] = "Debe ingresar la ubicación por Geolocalización.";
+                            // } 
                         } 
                     }else{
                         $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 19:00.";
