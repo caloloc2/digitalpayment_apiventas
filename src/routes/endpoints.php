@@ -10901,7 +10901,7 @@ $app->group('/api', function() use ($app) {
                             $respuesta['error'] = "No se encuentra información con el RUC ingresado.";
                         } 
                     }else{
-                        $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 19:00.";
+                        $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 19:00.".date("H:i:s", $hora);
                     }
                     
                  
@@ -10931,61 +10931,24 @@ $app->group('/api', function() use ($app) {
                         $respuesta['data'] = $data;
                         $respuesta['files'] = $files;
 
+                        $observaciones = "";
+                        if ((isset($data['observaciones'])) && (!empty($data['observaciones']))){
+                            $observaciones = $data['observaciones'];
+                        }
+
                         $validacion = false;
 
                         if ((isset($data['id'])) && (!empty($data['id']))){
                             $idLista = $data['id'];
 
-                            if ((isset($data['direccion'])) && (!empty($data['direccion']))){
-                                $direccion = $data['direccion'];
-        
-                                if ((isset($data['representante'])) && (!empty($data['representante']))){
-                                    $representante = strtoupper($data['representante']);
-            
-                                    if ((isset($data['correo'])) && (!empty($data['correo']))){
-                                        $correo = strtolower($data['correo']);
-                
-                                        if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-                                            
-                                            if ((isset($data['celular'])) && (!empty($data['celular']))){
-                                                $celular = $data['celular'];
+                            if ((isset($data['estadoEstablecimiento'])) && (!empty($data['estadoEstablecimiento']))){
+                                $estadoEstablecimiento = $data['estadoEstablecimiento'];
 
-                                                if (strlen($celular) == 10){
-                                                    if (substr($celular, 0, 2) == "09"){
+                                $validacion = true;
 
-                                                        if ((isset($data['estadoEstablecimiento'])) && (!empty($data['estadoEstablecimiento']))){
-                                                            $estadoEstablecimiento = $data['estadoEstablecimiento'];
-
-                                                            $validacion = true;
-
-                                                        }else{
-                                                            $respuesta['error'] = "Debe seleccionar un estado del establecimiento.";
-                                                        } 
-
-                                                    }else{
-                                                        $respuesta['error'] = "El celular debe empezar con 09.";
-                                                    }
-                                                }else{
-                                                    $respuesta['error'] = "El celular debe contener 10 dígitos.";
-                                                }
-
-                                            }else{
-                                                $respuesta['error'] = "Debe ingresar un número de celular.";
-                                            }
-
-                                        }else{
-                                            $respuesta['error'] = "Debe ingresar una dirección de correo válida.";
-                                        }
-                                        
-                                    }else{
-                                        $respuesta['error'] = "Debe ingresar una dirección de correo.";
-                                    }
-                                }else{
-                                    $respuesta['error'] = "Debe ingresar un representante o persona de contacto.";
-                                }    
                             }else{
-                                $respuesta['error'] = "Debe ingresar una dirección válida.";
-                            }   
+                                $respuesta['error'] = "Debe seleccionar un estado del establecimiento.";
+                            } 
                         }else{
                             $respuesta['error'] = "No se ha seleccionado o no se encuentra el establecimiento.";
                         }
@@ -11024,90 +10987,152 @@ $app->group('/api', function() use ($app) {
                                         $carpeta = __DIR__."/../../public/evidencias";
                                         move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
 
-                                        // guarda el registro
-                                        $id = $mysql->Ingreso("INSERT INTO actualizacion_establecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, link) VALUES (?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $nuevoNombre));
+                                        $representante = "";
+                                        $correo = "";
+                                        $celular = "";
+                                        $direccion = "";
+                                        $ultimaValidacion = false;
 
-                                        $respuesta['id'] = $id;
-
-                                        // actualiza estado
                                         if ($estadoEstablecimiento == 1){
-                                            $sendinblue = new sendinblue();
-                                            // $carpetaFormulario = __DIR__."/../../public/evidencias/formularios";
-                                            $carpetaFormulario = "https://api.digitalpaymentnow.com/evidencias/formularios";
 
-                                            $idFormulario = 0;
-                                            $linkFormulario = 0; 
-                                            if ((isset($data['formularios'])) && (!empty($data['formularios']))){
-                                                $idFormulario = $data['formularios'];
-    
-                                                $consultaAdjunto = $mysql->Consulta_Unico("SELECT * FROM actualizacion_formularios WHERE id=".$idFormulario);
+                                            if ((isset($data['direccion'])) && (!empty($data['direccion']))){
+                                                $direccion = $data['direccion'];
+                                            
+                                                if ((isset($data['representante'])) && (!empty($data['representante']))){
+                                                    $representante = strtoupper($data['representante']);
+                            
+                                                    if ((isset($data['correo'])) && (!empty($data['correo']))){
+                                                        $correo = strtolower($data['correo']);
+                                
+                                                        if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                                                            
+                                                            if ((isset($data['celular'])) && (!empty($data['celular']))){
+                                                                $celular = $data['celular'];
+                
+                                                                if (strlen($celular) == 10){
+                                                                    if (substr($celular, 0, 2) == "09"){
+                
+                                                                        $ultimaValidacion = true;
+                
+                                                                    }else{
+                                                                        $respuesta['error'] = "El celular debe empezar con 09.";
+                                                                    }
+                                                                }else{
+                                                                    $respuesta['error'] = "El celular debe contener 10 dígitos.";
+                                                                }
+                
+                                                            }else{
+                                                                $respuesta['error'] = "Debe ingresar un número de celular.";
+                                                            }
+                
+                                                        }else{
+                                                            $respuesta['error'] = "Debe ingresar una dirección de correo válida.";
+                                                        }
+                                                        
+                                                    }else{
+                                                        $respuesta['error'] = "Debe ingresar una dirección de correo.";
+                                                    }
+                                                }else{
+                                                    $respuesta['error'] = "Debe ingresar un representante o persona de contacto.";
+                                                }    
+                                            }else{
+                                                $respuesta['error'] = "Debe ingresar una dirección válida.";
+                                            }  
 
-                                                if (isset($consultaAdjunto['id'])){
-                                                    $idFormulario = $consultaAdjunto['id'];
-                                                    $linkFormulario = $consultaAdjunto['link']; 
-                                                }
-                                            } 
+                                          
 
-                                            $adjuntos = [];
-                                            array_push($adjuntos, array(
-                                                "url" => $carpetaFormulario."/CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf",
-                                                "name" => "CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf"
-                                            ));
+                                        }else{
+                                            $ultimaValidacion = true;
+                                        }
 
-                                            if ($idFormulario>0){
+                                        if ($ultimaValidacion){
+                                            // guarda el registro
+                                            $id = $mysql->Ingreso("INSERT INTO actualizacion_establecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, observaciones, link) VALUES (?,?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $observaciones, $nuevoNombre));
+
+                                            $respuesta['id'] = $id;
+
+                                            // actualiza estado
+                                            if ($estadoEstablecimiento == 1){
+                                                $sendinblue = new sendinblue();
+                                                // $carpetaFormulario = __DIR__."/../../public/evidencias/formularios";
+                                                $carpetaFormulario = "https://api.digitalpaymentnow.com/evidencias/formularios";
+
+                                                $idFormulario = 0;
+                                                $linkFormulario = 0; 
+                                                if ((isset($data['formularios'])) && (!empty($data['formularios']))){
+                                                    $idFormulario = $data['formularios'];
+
+                                                    $consultaAdjunto = $mysql->Consulta_Unico("SELECT * FROM actualizacion_formularios WHERE id=".$idFormulario);
+
+                                                    if (isset($consultaAdjunto['id'])){
+                                                        $idFormulario = $consultaAdjunto['id'];
+                                                        $linkFormulario = $consultaAdjunto['link']; 
+                                                    }
+                                                } 
+
+                                                $adjuntos = [];
                                                 array_push($adjuntos, array(
-                                                    "url" => $carpetaFormulario."/".$linkFormulario,
-                                                    "name" => $linkFormulario
+                                                    "url" => $carpetaFormulario."/CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf",
+                                                    "name" => "CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf"
                                                 ));
-                                            }
 
-                                            $respuesta['adjuntos'] = $adjuntos;
+                                                if ($idFormulario>0){
+                                                    array_push($adjuntos, array(
+                                                        "url" => $carpetaFormulario."/".$linkFormulario,
+                                                        "name" => $linkFormulario
+                                                    ));
+                                                }
 
-                                            // ENVIA CORREO DIRECTAMENTE
-                                            $envioMail = $sendinblue->envioMail(array(
-                                                "to" => [array(
-                                                    "email" => $correo,
-                                                    "name" => $representante
-                                                )], 
-                                                "bcc" => [ 
-                                                    array(
-                                                        "email" => "soporte@digitalpaymentnow.com",
-                                                        "name" => "Ing. Carlos Mino"
-                                                    ),
-                                                    array(
+                                                $respuesta['adjuntos'] = $adjuntos;
+
+                                                // ENVIA CORREO DIRECTAMENTE
+                                                $envioMail = $sendinblue->envioMail(array(
+                                                    "to" => [array(
+                                                        "email" => $correo,
+                                                        "name" => $representante
+                                                    )], 
+                                                    "bcc" => [ 
+                                                        array(
+                                                            "email" => "soporte@digitalpaymentnow.com",
+                                                            "name" => "Ing. Carlos Mino"
+                                                        ),
+                                                        array(
+                                                            "email" => "operaciones@digitalpaymentnow.com",
+                                                            "name" => "Fernanda Ortiz"
+                                                        ),
+                                                    ],
+                                                    "replyTo" => array(
                                                         "email" => "operaciones@digitalpaymentnow.com",
                                                         "name" => "Fernanda Ortiz"
                                                     ),
-                                                ],
-                                                "replyTo" => array(
-                                                    "email" => "operaciones@digitalpaymentnow.com",
-                                                    "name" => "Fernanda Ortiz"
-                                                ),
-                                                "templateId" => 7,
-                                                "params" => array(
-                                                    "representante" => $representante
-                                                ),
-                                                "attachment" => $adjuntos
-                                            ));
-                                            $respuesta['mail'] = $envioMail;
+                                                    "templateId" => 7,
+                                                    "params" => array(
+                                                        "representante" => $representante
+                                                    ),
+                                                    "attachment" => $adjuntos
+                                                ));
+                                                $respuesta['mail'] = $envioMail;
 
-                                            $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
-                                            $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
-                                        }else if ($estadoEstablecimiento == 2){
-                                            $nuevoEstado = 46; // ESTABLECIMIENTO CERRADO
-                                            $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                                $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
+                                                $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                            }else if ($estadoEstablecimiento == 2){
+                                                $nuevoEstado = 46; // ESTABLECIMIENTO CERRADO
+                                                $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                            }else if ($estadoEstablecimiento == 3){
+                                                $nuevoEstado = 45; // NO TRABAJA CON TARJETAS DE CREDITO
+                                                $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                            } 
+                                            
+                                            $respuesta['estado'] = true;
                                         }
-
-                                        
-                                        
-                                        $respuesta['estado'] = true;
+                                       
                                     }else{
                                         $respuesta['error'] = "Debe ingresar una evidencia fotográfica.";
                                     }
                                 }else{
                                     $respuesta['error'] = "No se incluyen evidencias.";
                                 }
-                                
+
                             // }else{
                             //     $respuesta['error'] = "Debe ingresar la ubicación por Geolocalización.";
                             // } 
