@@ -562,6 +562,98 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->get("/registros", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false;
+                $respuesta['params'] = $params; 
+            
+                try{
+                    $mysql = new Database(DATABASE);
+
+                    $porBanco = "";
+                    if ((isset($params['producto'])) && (!empty($params['producto']))){
+                        $porBanco = "(R.banco=".$params['producto'].") AND";
+                    }
+
+                    $porIdentificador = "";
+                    if ((isset($params['identificador'])) && (!empty($params['identificador']))){
+                        $porIdentificador = "(R.identificador='".$params['identificador']."') AND";
+                    }
+
+                    $buscador = "";
+                    $limite = " LIMIT 100";
+                    if ((isset($params['buscador'])) && (!empty($params['buscador']))){
+                        $buscador = $params['buscador'];
+                        $limite = "";
+                    }
+
+                    $sql = "SELECT
+                    R.id_lista, B.banco, R.identificador, R.documento, R.nombres, R.ciudad, R.ciudad_confirmada, R.asignado, U.nombres AS asesor, R.estado, E.descripcion, R.fecha_alta, R.fecha_ultima_contacto, R.fecha_asignacion, R.tipo, E.color
+                    FROM notas_registros R
+                    LEFT JOIN usuarios U
+                    ON R.asignado = U.id_usuario
+                    LEFT JOIN notas_registros_estados E
+                    ON R.estado = E.id_estados
+                    LEFT JOIN notas_registros_bancos B
+                    ON R.banco = B.id_banco
+                    WHERE ".$porBanco." ".$porIdentificador."
+                    ((R.documento LIKE '%".$buscador."%'))
+                    ORDER BY R.fecha_asignacion ASC, R.documento ASC ".$limite;
+
+                    $consulta = $mysql->Consulta($sql);
+
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) >0){
+                            foreach ($consulta as $linea) {
+                                $ciudad = $linea['ciudad'];
+                                if ((isset($linea['ciudad_confirmada'])) && (!empty($linea['ciudad_confirmada']))){
+                                    $ciudad = $linea['ciudad_confirmada'];
+                                }
+
+                                $asesor = "Sin Asignar";
+                                if ($linea['asignado'] > 0){
+                                     $asesor = strtoupper($linea['asesor']);
+                                }
+
+                                array_push($listado, array(
+                                    "id" => (int) $linea['id_lista'],
+                                    "banco" => strtoupper($linea['banco']),
+                                    "identificador" => strtoupper($linea['identificador']),
+                                    "documento" => $linea['documento'],
+                                    "nombres" => $linea['nombres'],
+                                    "ciudad" => $ciudad,
+                                    "asesor" => $asesor,
+                                    "estado" => array(
+                                        "valor" => (int) $linea['estado'],
+                                        "descripcion" => strtoupper($linea['descripcion']),
+                                        "color" => $linea['color']
+                                    ),
+                                    "fechaAlta" => $linea['fecha_alta'],
+                                    "fechaUltimoContacto" => $linea['fecha_ultima_contacto'],
+                                    "fechaAsignado" => $linea['fecha_asignacion'],
+                                    "tipo" => $linea['tipo']
+                                ));
+                            }
+                        }
+                    }
+
+                    $respuesta['sql'] = array(
+                        "sql" => $sql,
+                        "consulta" => $consulta
+                    );
+                    $respuesta['consulta'] = $listado;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
         });
 
         $app->group('/ventas', function() use ($app) {
