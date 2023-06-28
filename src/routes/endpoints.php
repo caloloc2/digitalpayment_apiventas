@@ -840,6 +840,27 @@ $app->group('/api', function() use ($app) {
                     if (is_array($consulta)){
                         if (count($consulta) >0){
                             foreach ($consulta as $linea) {
+
+                                // busca en actualizacion de documentos las evidencias
+                                $detalleEvidencia = array(
+                                    "existe" => false,
+                                    "localizacion" => array(
+                                        "latitud" => 0,
+                                        "longitud" => 0
+                                    ),
+                                    "imagen" => ""
+                                );
+                                $evidencia = $mysql->Consulta_Unico("SELECT * FROM actualizacion_establecimientos WHERE idLista=".$linea['id_lista']); 
+
+                                if (isset($evidencia['id'])){
+                                    $detalleEvidencia['localizacion']['latitud'] = $evidencia['latitud'];
+                                    $detalleEvidencia['localizacion']['longitud'] = $evidencia['longitud'];
+                                    if (!empty($evidencia['link'])){
+                                        $detalleEvidencia['imagen'] = "https://api.digitalpaymentnow.com/evidencias/".$evidencia['link'];
+                                    }
+                                    $detalleEvidencia['existe'] = true;
+                                }
+
                                 $ciudad = $linea['ciudad'];
                                 if ((isset($linea['ciudad_confirmada'])) && (!empty($linea['ciudad_confirmada']))){
                                     $ciudad = $linea['ciudad_confirmada'];
@@ -866,7 +887,8 @@ $app->group('/api', function() use ($app) {
                                     "fechaAlta" => $linea['fecha_alta'],
                                     "fechaUltimoContacto" => $linea['fecha_ultima_contacto'],
                                     "fechaAsignado" => $linea['fecha_asignacion'],
-                                    "tipo" => $linea['tipo']
+                                    "tipo" => $linea['tipo'],
+                                    "evidencia" => $detalleEvidencia
                                 ));
                             }
                         }
@@ -11196,7 +11218,7 @@ $app->group('/api', function() use ($app) {
                 
                 try{
                     $hora = strtotime(date("H:i:s"));
-                    $limiteInf = strtotime("09:00:00");
+                    $limiteInf = strtotime("08:00:00");
                     $limiteSup = strtotime("19:00:00");
 
                     if (($hora >= $limiteInf) && ($hora <= $limiteSup)){
@@ -11226,7 +11248,7 @@ $app->group('/api', function() use ($app) {
                             $respuesta['error'] = "No se encuentra información con el RUC ingresado.";
                         } 
                     }else{
-                        $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 19:00.".date("H:i:s", $hora);
+                        $respuesta['error'] = "Hora de accesibilidad desde 08:00 hasta las 19:00.";
                     }
                     
                  
@@ -11248,7 +11270,7 @@ $app->group('/api', function() use ($app) {
                 
                 try{
                     $hora = strtotime(date("H:i:s"));
-                    $limiteInf = strtotime("09:00:00");
+                    $limiteInf = strtotime("08:00:00");
                     $limiteSup = strtotime("19:00:00");
 
                     if (($hora >= $limiteInf) && ($hora <= $limiteSup)){ 
@@ -11362,93 +11384,99 @@ $app->group('/api', function() use ($app) {
                                                 }    
                                             }else{
                                                 $respuesta['error'] = "Debe ingresar una dirección válida.";
-                                            }  
-
-                                          
+                                            }
 
                                         }else{
                                             $ultimaValidacion = true;
                                         }
 
                                         if ($ultimaValidacion){
-                                            // guarda el registro
-                                            $id = $mysql->Ingreso("INSERT INTO actualizacion_establecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, observaciones, link) VALUES (?,?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $observaciones, $nuevoNombre));
 
-                                            $respuesta['id'] = $id;
+                                            // valida que el archivo se haya guardado
+                                            if (file_exists($carpeta."/".$nuevoNombre)){
+                                                // guarda el registro
+                                                $id = $mysql->Ingreso("INSERT INTO actualizacion_establecimientos (idLista, direccion, representante, correo, celular, estadoEstablecimiento, latitud, longitud, observaciones, link) VALUES (?,?,?,?,?,?,?,?,?,?)", array($idLista, $direccion, $representante, $correo, $celular, $estadoEstablecimiento, $latitud, $longitud, $observaciones, $nuevoNombre));
 
-                                            // actualiza estado
-                                            if ($estadoEstablecimiento == 1){
-                                                $sendinblue = new sendinblue();
-                                                // $carpetaFormulario = __DIR__."/../../public/evidencias/formularios";
-                                                $carpetaFormulario = "https://api.digitalpaymentnow.com/evidencias/formularios";
+                                                $respuesta['id'] = $id;
 
-                                                $idFormulario = 0;
-                                                $linkFormulario = 0; 
-                                                if ((isset($data['formularios'])) && (!empty($data['formularios']))){
-                                                    $idFormulario = $data['formularios'];
+                                                // actualiza estado
+                                                if ($estadoEstablecimiento == 1){
+                                                    $sendinblue = new sendinblue();
+                                                    // $carpetaFormulario = __DIR__."/../../public/evidencias/formularios";
+                                                    $carpetaFormulario = "https://api.digitalpaymentnow.com/evidencias/formularios";
 
-                                                    $consultaAdjunto = $mysql->Consulta_Unico("SELECT * FROM actualizacion_formularios WHERE id=".$idFormulario);
+                                                    $idFormulario = 0;
+                                                    $linkFormulario = 0; 
+                                                    if ((isset($data['formularios'])) && (!empty($data['formularios']))){
+                                                        $idFormulario = $data['formularios'];
 
-                                                    if (isset($consultaAdjunto['id'])){
-                                                        $idFormulario = $consultaAdjunto['id'];
-                                                        $linkFormulario = $consultaAdjunto['link']; 
-                                                    }
-                                                } 
+                                                        $consultaAdjunto = $mysql->Consulta_Unico("SELECT * FROM actualizacion_formularios WHERE id=".$idFormulario);
 
-                                                $adjuntos = [];
-                                                array_push($adjuntos, array(
-                                                    "url" => $carpetaFormulario."/CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf",
-                                                    "name" => "CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf"
-                                                ));
+                                                        if (isset($consultaAdjunto['id'])){
+                                                            $idFormulario = $consultaAdjunto['id'];
+                                                            $linkFormulario = $consultaAdjunto['link']; 
+                                                        }
+                                                    } 
 
-                                                if ($idFormulario>0){
+                                                    $adjuntos = [];
                                                     array_push($adjuntos, array(
-                                                        "url" => $carpetaFormulario."/".$linkFormulario,
-                                                        "name" => $linkFormulario
+                                                        "url" => $carpetaFormulario."/CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf",
+                                                        "name" => "CARTA-ACTUALIZACION-DE-DATOS-PJ-ESTABLECIMIENTOS-2023.pdf"
                                                     ));
-                                                }
 
-                                                $respuesta['adjuntos'] = $adjuntos;
+                                                    if ($idFormulario>0){
+                                                        array_push($adjuntos, array(
+                                                            "url" => $carpetaFormulario."/".$linkFormulario,
+                                                            "name" => $linkFormulario
+                                                        ));
+                                                    }
 
-                                                // ENVIA CORREO DIRECTAMENTE
-                                                $envioMail = $sendinblue->envioMail(array(
-                                                    "to" => [array(
-                                                        "email" => $correo,
-                                                        "name" => $representante
-                                                    )], 
-                                                    "bcc" => [ 
-                                                        array(
-                                                            "email" => "soporte@digitalpaymentnow.com",
-                                                            "name" => "Ing. Carlos Mino"
-                                                        ),
-                                                        array(
-                                                            "email" => "operaciones@digitalpaymentnow.com",
-                                                            "name" => "Fernanda Ortiz"
-                                                        ),
-                                                    ],
-                                                    "replyTo" => array(
-                                                        "email" => "operaciones@digitalpaymentnow.com",
-                                                        "name" => "Fernanda Ortiz"
-                                                    ),
-                                                    "templateId" => 7,
-                                                    "params" => array(
-                                                        "representante" => $representante
-                                                    ),
-                                                    "attachment" => $adjuntos
-                                                ));
-                                                $respuesta['mail'] = $envioMail;
+                                                    $respuesta['adjuntos'] = $adjuntos;
 
-                                                $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
-                                                $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
-                                            }else if ($estadoEstablecimiento == 2){
-                                                $nuevoEstado = 46; // ESTABLECIMIENTO CERRADO
-                                                $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
-                                            }else if ($estadoEstablecimiento == 3){
-                                                $nuevoEstado = 45; // NO TRABAJA CON TARJETAS DE CREDITO
-                                                $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
-                                            } 
-                                            
-                                            $respuesta['estado'] = true;
+                                                    // ENVIA CORREO DIRECTAMENTE
+                                                    // $envioMail = $sendinblue->envioMail(array(
+                                                    //     "to" => [array(
+                                                    //         "email" => $correo,
+                                                    //         "name" => $representante
+                                                    //     )], 
+                                                    //     "bcc" => [ 
+                                                    //         array(
+                                                    //             "email" => "soporte@digitalpaymentnow.com",
+                                                    //             "name" => "Ing. Carlos Mino"
+                                                    //         ),
+                                                    //         array(
+                                                    //             "email" => "operaciones@digitalpaymentnow.com",
+                                                    //             "name" => "Fernanda Ortiz"
+                                                    //         ),
+                                                    //     ],
+                                                    //     "replyTo" => array(
+                                                    //         "email" => "operaciones@digitalpaymentnow.com",
+                                                    //         "name" => "Fernanda Ortiz"
+                                                    //     ),
+                                                    //     "templateId" => 7,
+                                                    //     "params" => array(
+                                                    //         "representante" => $representante
+                                                    //     ),
+                                                    //     "attachment" => $adjuntos
+                                                    // ));
+                                                    // $respuesta['mail'] = $envioMail;
+
+                                                    $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
+                                                    $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                                }else if ($estadoEstablecimiento == 2){
+                                                    $nuevoEstado = 46; // ESTABLECIMIENTO CERRADO
+                                                    $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                                }else if ($estadoEstablecimiento == 3){
+                                                    $nuevoEstado = 45; // NO TRABAJA CON TARJETAS DE CREDITO
+                                                    $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
+                                                } 
+                                                
+                                                $respuesta['estado'] = true;
+                                            }else{
+                                                $respuesta['error'] = "Existe un error y no se puede guardar la imagen. Favor intente nuevamente.";
+                                            }
+
+                                        
                                         }
                                        
                                     }else{
