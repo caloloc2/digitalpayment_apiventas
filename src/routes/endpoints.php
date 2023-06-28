@@ -11218,7 +11218,7 @@ $app->group('/api', function() use ($app) {
                 
                 try{
                     $hora = strtotime(date("H:i:s"));
-                    $limiteInf = strtotime("00:00:00");
+                    $limiteInf = strtotime("08:00:00");
                     $limiteSup = strtotime("19:00:00");
 
                     if (($hora >= $limiteInf) && ($hora <= $limiteSup)){
@@ -11270,7 +11270,7 @@ $app->group('/api', function() use ($app) {
                 
                 try{
                     $hora = strtotime(date("H:i:s"));
-                    $limiteInf = strtotime("00:00:00");
+                    $limiteInf = strtotime("08:00:00");
                     $limiteSup = strtotime("19:00:00");
 
                     if (($hora >= $limiteInf) && ($hora <= $limiteSup)){ 
