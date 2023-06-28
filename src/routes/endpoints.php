@@ -562,6 +562,239 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
+            $app->get("/asesores-disponibles", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $respuesta['estado'] = false; 
+            
+                try{
+                    $mysql = new Database(DATABASE);
+ 
+
+                    $consulta = $mysql->Consulta("SELECT
+                    id_usuario, nombres
+                    FROM usuarios
+                    WHERE (tipo=6) AND (estado=0)");
+
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) >0){
+                            foreach ($consulta as $linea) {
+                                 
+                                array_push($listado, array(
+                                    "id" => (int) $linea['id_usuario'],
+                                    "asesor" => strtoupper($linea['nombres'])
+                                ));
+                            }
+                        }
+                    }
+ 
+                    $respuesta['consulta'] = $listado;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
+            $app->get("/estados-disponibles", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $respuesta['estado'] = false; 
+            
+                try{
+                    $mysql = new Database(DATABASE);
+ 
+
+                    $consulta = $mysql->Consulta("SELECT
+                    id_estados, descripcion
+                    FROM notas_registros_estados
+                    WHERE (estado=0)");
+
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) >0){
+                            foreach ($consulta as $linea) {
+                                 
+                                array_push($listado, array(
+                                    "id" => (int) $linea['id_estados'],
+                                    "descripcion" => strtoupper($linea['descripcion'])
+                                ));
+                            }
+                        }
+                    }
+ 
+                    $respuesta['consulta'] = $listado;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
+            $app->put("/reasignacion-asesor/{id}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $data = $request->getParsedBody();
+                $id = $request->getAttribute('id');      
+                $respuesta['estado'] = false; 
+            
+                try{
+                    if (isset($authorization[0])){
+                        $autenticacion = new Authentication();
+                        $session = $autenticacion->Valida_Sesion($authorization[0]);
+    
+                        // $respuesta['asdf'] = $authorization[0];
+    
+                        if ($session['estado']){
+                            // $respuesta['usuario'] = $session['usuario'];
+                            $id_usuario = $session['usuario']['id_usuario'];
+
+                            $mysql = new Database(DATABASE);
+ 
+                            $respuesta['id'] = $id;
+                            $respuesta['data'] = $data;
+
+                            $nuevoAsesor = "";
+        
+                            if ((isset($data['nuevoAsesor'])) && (!empty($data['nuevoAsesor']))){
+                                $id_nuevo_asesor = $data['nuevoAsesor'];
+
+                                $consultaNuevoAsesor = $mysql->Consulta_Unico("SELECT * FROM usuarios WHERE id_usuario=".$id_nuevo_asesor);
+
+                                if (isset($consultaNuevoAsesor['id_usuario'])){
+                                    $nuevoAsesor = strtoupper($consultaNuevoAsesor['nombres']);
+                                }
+
+
+                                $verifica = $mysql->Consulta_Unico("SELECT R.id_lista, U.nombres FROM notas_registros R LEFT JOIN usuarios U ON R.asignado=U.id_usuario WHERE id_lista=".$id);
+
+                                if (isset($verifica['id_lista'])){
+                                    $valor_anterior = $verifica['nombres'];
+                                    
+                                    $fechaAsignacion = date("Y-m-d H:i:s");
+                                    $modificar = $mysql->Modificar("UPDATE notas_registros SET asignado=?, fecha_asignacion=? WHERE id_lista=?", array($id_nuevo_asesor, $fechaAsignacion, $id));
+        
+                                    $movimiento = "Reasignación de asesor.";
+                                    $log = $mysql->Ingreso("INSERT INTO notas_registros_logs (id_usuario, id_lista, `log`, valor_anterior, valor_nuevo) VALUES (?,?,?,?,?)", array($id_usuario, $id, $movimiento, $valor_anterior, $nuevoAsesor));
+                                    
+                                    $respuesta['estado'] = true;
+                                }else{
+                                    $respuesta['error'] = "No se encuentra información del establecimiento o cliente.";
+                                }
+        
+                               
+                            }else{
+                                $respuesta['error'] = "Debe seleccionar un nuevo asesor para poder reasignar.";
+                            }
+    
+                            $respuesta['estado'] = true;
+                        }else{
+                            $respuesta['error'] = $session['error'];
+                        }
+    
+                        
+                    }else{
+                        $respuesta['error'] = "Su token de acceso no se encuentra.";
+                    }
+
+
+                   
+                  
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
+            $app->put("/reasignacion-estado/{id}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $data = $request->getParsedBody();
+                $id = $request->getAttribute('id');      
+                $respuesta['estado'] = false; 
+            
+                try{
+                    if (isset($authorization[0])){
+                        $autenticacion = new Authentication();
+                        $session = $autenticacion->Valida_Sesion($authorization[0]);
+    
+                        // $respuesta['asdf'] = $authorization[0];
+    
+                        if ($session['estado']){
+                            // $respuesta['usuario'] = $session['usuario'];
+                            $id_usuario = $session['usuario']['id_usuario'];
+
+                            $mysql = new Database(DATABASE);
+ 
+                            $respuesta['id'] = $id;
+                            $respuesta['data'] = $data;
+
+                            $nuevoEstado = "";
+        
+                            if ((isset($data['nuevoEstado'])) && (!empty($data['nuevoEstado']))){
+                                $id_nuevo_estado = $data['nuevoEstado'];
+
+                                $consultanuevoEstado = $mysql->Consulta_Unico("SELECT * FROM notas_registros_estados WHERE id_estados=".$id_nuevo_estado);
+
+                                if (isset($consultanuevoEstado['id_estados'])){
+                                    $nuevoEstado = strtoupper($consultanuevoEstado['descripcion']);
+                                }
+
+
+                                $verifica = $mysql->Consulta_Unico("SELECT R.id_lista, E.descripcion FROM notas_registros R LEFT JOIN notas_registros_estados E ON R.estado=E.id_estados WHERE id_lista=".$id);
+
+                                if (isset($verifica['id_lista'])){
+                                    $valor_anterior = $verifica['descripcion'];
+                                    
+                                    $fechaAsignacion = date("Y-m-d H:i:s");
+                                    $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=?, fecha_asignacion=? WHERE id_lista=?", array($id_nuevo_estado, $fechaAsignacion, $id));
+        
+                                    $movimiento = "Actualización nuevo estado.";
+                                    $log = $mysql->Ingreso("INSERT INTO notas_registros_logs (id_usuario, id_lista, `log`, valor_anterior, valor_nuevo) VALUES (?,?,?,?,?)", array($id_usuario, $id, $movimiento, $valor_anterior, $nuevoEstado));
+                                    
+                                    $respuesta['estado'] = true;
+                                }else{
+                                    $respuesta['error'] = "No se encuentra información del establecimiento o cliente.";
+                                }
+        
+                               
+                            }else{
+                                $respuesta['error'] = "Debe seleccionar un nuevo asesor para poder reasignar.";
+                            }
+    
+                            $respuesta['estado'] = true;
+                        }else{
+                            $respuesta['error'] = $session['error'];
+                        }
+    
+                        
+                    }else{
+                        $respuesta['error'] = "Su token de acceso no se encuentra.";
+                    }
+
+
+                   
+                  
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
+
             $app->get("/registros", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
                 $params = $request->getQueryParams();
@@ -598,7 +831,7 @@ $app->group('/api', function() use ($app) {
                     LEFT JOIN notas_registros_bancos B
                     ON R.banco = B.id_banco
                     WHERE ".$porBanco." ".$porIdentificador."
-                    ((R.documento LIKE '%".$buscador."%'))
+                    ((R.documento LIKE '%".$buscador."%') OR (R.nombres LIKE '%".$buscador."%') OR (U.nombres LIKE '%".$buscador."%') OR (E.descripcion LIKE '%".$buscador."%'))
                     ORDER BY R.nombres ASC, R.fecha_asignacion ASC ".$limite;
 
                     $consulta = $mysql->Consulta($sql);
