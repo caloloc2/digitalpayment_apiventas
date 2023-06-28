@@ -11473,7 +11473,7 @@ $app->group('/api', function() use ($app) {
                                                 
                                                 $respuesta['estado'] = true;
                                             }else{
-                                                $respuesta['error'] = "Existe un error y no se puede guardar la imagen. Favor intente nuevamente. ".$carpeta."/".$nuevoNombre;
+                                                $respuesta['error'] = "Existe un error y no se puede guardar la imagen. Favor intente nuevamente. ".$archivo;
                                             }
 
                                         
