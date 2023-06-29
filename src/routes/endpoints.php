@@ -11434,32 +11434,32 @@ $app->group('/api', function() use ($app) {
                                                     $respuesta['adjuntos'] = $adjuntos;
 
                                                     // ENVIA CORREO DIRECTAMENTE
-                                                    // $envioMail = $sendinblue->envioMail(array(
-                                                    //     "to" => [array(
-                                                    //         "email" => $correo,
-                                                    //         "name" => $representante
-                                                    //     )], 
-                                                    //     "bcc" => [ 
-                                                    //         array(
-                                                    //             "email" => "soporte@digitalpaymentnow.com",
-                                                    //             "name" => "Ing. Carlos Mino"
-                                                    //         ),
-                                                    //         array(
-                                                    //             "email" => "operaciones@digitalpaymentnow.com",
-                                                    //             "name" => "Fernanda Ortiz"
-                                                    //         ),
-                                                    //     ],
-                                                    //     "replyTo" => array(
-                                                    //         "email" => "operaciones@digitalpaymentnow.com",
-                                                    //         "name" => "Fernanda Ortiz"
-                                                    //     ),
-                                                    //     "templateId" => 7,
-                                                    //     "params" => array(
-                                                    //         "representante" => $representante
-                                                    //     ),
-                                                    //     "attachment" => $adjuntos
-                                                    // ));
-                                                    // $respuesta['mail'] = $envioMail;
+                                                    $envioMail = $sendinblue->envioMail(array(
+                                                        "to" => [array(
+                                                            "email" => $correo,
+                                                            "name" => $representante
+                                                        )], 
+                                                        "bcc" => [ 
+                                                            array(
+                                                                "email" => "soporte@digitalpaymentnow.com",
+                                                                "name" => "Ing. Carlos Mino"
+                                                            ),
+                                                            array(
+                                                                "email" => "operaciones@digitalpaymentnow.com",
+                                                                "name" => "Fernanda Ortiz"
+                                                            ),
+                                                        ],
+                                                        "replyTo" => array(
+                                                            "email" => "operaciones@digitalpaymentnow.com",
+                                                            "name" => "Fernanda Ortiz"
+                                                        ),
+                                                        "templateId" => 7,
+                                                        "params" => array(
+                                                            "representante" => $representante
+                                                        ),
+                                                        "attachment" => $adjuntos
+                                                    ));
+                                                    $respuesta['mail'] = $envioMail;
 
                                                     $nuevoEstado = 34; // ESPERA DOCUMENTACION / INFORMACION DIGITAL
                                                     $modificar = $mysql->Modificar("UPDATE notas_registros SET estado=? WHERE id_lista=?", array($nuevoEstado, $idLista));
