@@ -11356,14 +11356,14 @@ $app->group('/api', function() use ($app) {
                                                             if ((isset($data['celular'])) && (!empty($data['celular']))){
                                                                 $celular = $data['celular'];
                 
-                                                                if (strlen($celular) == 10){
-                                                                    if (substr($celular, 0, 2) == "09"){
+                                                                if ((strlen($celular) == 10) || (strlen($celular) == 9)){
+                                                                    // if (substr($celular, 0, 2) == "09"){
                 
                                                                         $ultimaValidacion = true;
                 
-                                                                    }else{
-                                                                        $respuesta['error'] = "El celular debe empezar con 09.";
-                                                                    }
+                                                                    // }else{
+                                                                    //     $respuesta['error'] = "El celular debe empezar con 09.";
+                                                                    // }
                                                                 }else{
                                                                     $respuesta['error'] = "El celular debe contener 10 dígitos.";
                                                                 }
