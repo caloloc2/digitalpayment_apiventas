@@ -11695,13 +11695,13 @@ $app->group('/api', function() use ($app) {
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) { 
 
-                                if (isset($linea['idRed'])) && ($linea['idRespuesta'] == 1){
+                                if ((isset($linea['idRed'])) && ($linea['idRespuesta'] == 1)){
                                     array_push($general['series'][0]['data'], (int) $linea['total']);
                                 }else{
                                     array_push($general['series'][0]['data'], 0);
                                 }
 
-                                if (isset($linea['idRed'])) && ($linea['idRespuesta'] == 2){
+                                if ((isset($linea['idRed'])) && ($linea['idRespuesta'] == 2)){
                                     array_push($general['series'][1]['data'], (int) $linea['total']);
                                 }else{
                                     array_push($general['series'][1]['data'], 0);
