@@ -11649,8 +11649,14 @@ $app->group('/api', function() use ($app) {
                         ]
                     );
 
+                    // $nook = array(
+                    //     "title" => "CENTROS COMERCIALES",
+                    //     "data" => []
+                    // );
+
                     $nook = array(
                         "title" => "CENTROS COMERCIALES",
+                        "series" => [],
                         "data" => []
                     );
 
@@ -11771,14 +11777,43 @@ $app->group('/api', function() use ($app) {
                     WHERE ".$porZona." ".$porCiudad."
                     GROUP BY P.observaciones");
 
-                    
+                    $i=0;
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
                                 array_push($nook['data'], array(
                                     "name" => $linea['observaciones'],
-                                    "y" => (int) $linea['total']
+                                    "y" => (int) $linea['total'],
+                                    "drilldown" => $i 
                                 ));
+
+                                $consultaDetalle = $mysql->Consulta("SELECT
+                                P.observaciones, P.idRed, R.red, COUNT(*) AS total
+                                FROM redes R
+                                LEFT JOIN personasestablecimientosprocesos P
+                                ON R.id = P.idRed
+                                LEFT JOIN personasestablecimientos E
+                                ON P.idRegistro = E.id 
+                                WHERE ".$porZona." ".$porCiudad." AND (P.observaciones='".$linea['observaciones']."')
+                                GROUP BY P.observaciones, P.idRed");
+
+                                $temp = array(
+                                    "name" => $linea['observaciones'],
+                                    "id" => $i,
+                                    "data" => []
+                                );
+
+                                if (isset($consultaDetalle)){
+                                    if (count($consultaDetalle) > 0){
+                                        foreach ($consultaDetalle as $lineaDetalle) {
+                                            array_push($temp['data'], [$lineaDetalle['red'], (int) $lineaDetalle['total']]);
+                                        }
+                                    }
+                                }
+
+                                array_push($nook['series'], $temp);
+
+                                $i +=1;
                             }
                         }
                     }
