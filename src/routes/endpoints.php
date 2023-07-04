@@ -11836,7 +11836,7 @@ $app->group('/api', function() use ($app) {
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
                                 $link = "https://api.digitalpaymentnow/estab";
-                                if (empty($linea['evidencia'])){
+                                if (!empty($linea['evidencia'])){
                                     $link .= "/".$linea['evidencia'];
                                 }
 
