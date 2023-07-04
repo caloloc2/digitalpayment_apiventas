@@ -11564,7 +11564,7 @@ $app->group('/api', function() use ($app) {
                     FROM zonas Z
                     LEFT JOIN ciudades C
                     ON Z.idCiudad = C.id
-                    WHERE (C.estado=1) 
+                    WHERE (Z.estado=1) 
                     ORDER BY zona ASC");
 
                     $listado = [];
