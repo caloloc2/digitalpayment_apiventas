@@ -11671,7 +11671,7 @@ $app->group('/api', function() use ($app) {
                         }
                     }
 
-                    $redes = $mysql->Consulta("SELECT red FROM redes WHERE estado=1 ORDER BY id ASC");
+                    $redes = $mysql->Consulta("SELECT id, red FROM redes WHERE estado=1 ORDER BY id ASC");
                     if (is_array($redes)){
                         if (count($redes) > 0){
                             foreach ($redes as $linea) {
@@ -11694,29 +11694,11 @@ $app->group('/api', function() use ($app) {
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) { 
-
-                                // $conteo = 0;
-                                // foreach ($general['categories'] as $cat) {
-                                //     if ($cat == $linea['red']){
-                                //         $conteo += 1;
-                                //     }
-                                // }
-                                // if ($conteo==0){
-                                //     array_push($general['categories'], strtoupper($linea['red']));
-                                // }
-                                
-
                                 if ($linea['idRespuesta'] == 1){
                                     array_push($general['series'][0]['data'], (int) $linea['total']);
-                                }else{
-                                    array_push($general['series'][0]['data'], 0);
-                                }
-                                
-                                if ($linea['idRespuesta'] == 2){
+                                }else if ($linea['idRespuesta'] == 2){
                                     array_push($general['series'][1]['data'], (int) $linea['total']);
-                                }else{
-                                    array_push($general['series'][1]['data'], 0);
-                                }
+                                } 
 
                                 $general['contador'] += (int) $linea['total'];
                             }
