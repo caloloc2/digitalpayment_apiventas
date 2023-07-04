@@ -11508,64 +11508,6 @@ $app->group('/api', function() use ($app) {
 
         /// BANCO INTERNACIONAL
         $app->group('/internacional', function() use ($app) {
-    
-            $app->get("/estados", function(Request $request, Response $response){
-                $authorization = $request->getHeader('Authorization');
-                $params = $request->getQueryParams();
-                $respuesta['estado'] = false;
-                
-                try{
-                    $mysql = new Database(DATABASE);
-
-                    $filtro = "";
-                    $sql = "";
-                    if (isset($params['filtro'])){
-                        switch ($params['filtro']) {
-                            case 'visitas':
-                                $sql = "SELECT
-                                id_estado, UPPER(descripcion) AS descripcion
-                                FROM registros_internacional_visitas_estados
-                                WHERE (estado=1)";
-                                break; 
-                            default:
-                                $sql = "SELECT
-                                id_estado, UPPER(descripcion) AS descripcion
-                                FROM registros_internacional_estados
-                                WHERE (estado=1)";
-                                break;
-                        }
-                    }else{
-                        $sql = "SELECT
-                        id_estado, UPPER(descripcion) AS descripcion
-                        FROM registros_internacional_estados
-                        WHERE (estado=1)";
-                    }
-
-                    $consulta = $mysql->Consulta($sql);
-
-                    $listado = [];
-                    if (is_array($consulta)){
-                        if (count($consulta) > 0){
-                            foreach ($consulta as $linea) {
-                                array_push($listado, array(
-                                    "id" => (int) $linea['id_estado'],
-                                    "descripcion" => $linea['descripcion']
-                                ));
-                            }
-                        }
-                    }
-
-                    $respuesta['consulta'] = $listado;
-                    $respuesta['estado'] = true;
-
-                }catch(PDOException $e){
-                    $respuesta['error'] = $e->getMessage();
-                }
-
-                $newResponse = $response->withJson($respuesta);
-            
-                return $newResponse;
-            });
 
             $app->get("/ciudades", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
@@ -11573,42 +11515,20 @@ $app->group('/api', function() use ($app) {
                 $respuesta['estado'] = false;
                 
                 try{
-                    $mysql = new Database(DATABASE);
+                    $mysql = new Database(DATABASE); 
 
-                    $filtro = "";
-                    $sql = "";
-                    if (isset($params['filtro'])){
-                        switch ($params['filtro']) {
-                            case 'visitas':
-                                $sql = "SELECT
-                                id_ciudad, ciudad, sector
-                                FROM registros_internacional_visitas_ciudades
-                                WHERE (estado=1)";
-                                break; 
-                            default:
-                                $sql = "SELECT
-                                id_ciudad, ciudad, sector
-                                FROM registros_internacional_ciudades
-                                WHERE (estado=1)";
-                                break;
-                        }
-                    }else{
-                        $sql = "SELECT
-                        id_ciudad, ciudad, sector
-                        FROM registros_internacional_ciudades
-                        WHERE (estado=1)";
-                    }
-
-                    $consulta = $mysql->Consulta($sql);
+                    $consulta = $mysql->Consulta("SELECT
+                    *
+                    FROM ciudades
+                    WHERE estado=1");
 
                     $listado = [];
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
                                 array_push($listado, array(
-                                    "id" => (int) $linea['id_ciudad'],
-                                    "ciudad" => $linea['ciudad'],
-                                    "sector" => $linea['sector']
+                                    "id" => (int) $linea['id'],
+                                    "ciudad" => $linea['nombre']
                                 ));
                             }
                         }
@@ -11625,6 +11545,52 @@ $app->group('/api', function() use ($app) {
             
                 return $newResponse;
             });
+
+            $app->get("/zonas", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false;
+                
+                try{
+                    $mysql = new Database(DATABASE); 
+
+                    $filtro = "";
+                    if ((isset($params['id'])) && (!empty($params['id']))){
+                        $filtro = "AND (C.id=".$params['id'].")";
+                    }
+
+                    $consulta = $mysql->Consulta("SELECT
+                    Z.id, Z.zona
+                    FROM zonas Z
+                    LEFT JOIN ciudades C
+                    ON Z.idCiudad = C.id
+                    WHERE (C.estado=1) 
+                    ORDER BY zona ASC");
+
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($listado, array(
+                                    "id" => (int) $linea['id'],
+                                    "zona" => $linea['zona']
+                                ));
+                            }
+                        }
+                    }
+
+                    $respuesta['consulta'] = $listado;
+                    $respuesta['estado'] = true;
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            }); 
+            
 
             $app->get("/dashboard", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
@@ -11633,114 +11599,142 @@ $app->group('/api', function() use ($app) {
                 
                 try{
                     $mysql = new Database(DATABASE);
+                    $respuesta['params'] = $params;
 
-                    $ciudades = [];
+                    $porCiudad = "";
+                    if ((isset($params['idCiudad'])) && (!empty($params['idCiudad']))){
+                        $porCiudad = "AND (P.idCiudad=".$params['idCiudad'].")";
+                    }
 
+                    // ESTABLECIMIENTOS VISITADOS
+                    $visitados = [];
                     $consulta = $mysql->Consulta("SELECT
-                    R.id_ciudad, C.ciudad, COUNT(R.id_ciudad) AS total
-                    FROM registros_internacional R
-                    LEFT JOIN registros_internacional_ciudades C
-                    ON R.id_ciudad = C.id_ciudad
-                    GROUP BY R.id_ciudad
-                    ORDER BY COUNT(R.id_ciudad) DESC");
+                    P.idCiudad, C.nombre AS ciudad, P.idZona, Z.zona AS zona, COUNT(P.idZona) AS total
+                    FROM personasestablecimientos P
+                    LEFT JOIN zonas Z
+                    ON P.idZona = Z.id 
+                    LEFT JOIN ciudades C
+                    ON P.idCiudad = C.id
+                    WHERE (P.estado>=0) ".$porCiudad." 
+                    GROUP BY P.idCiudad, P.idZona");
 
-                    $listado = [];
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
-                                array_push($ciudades, array(
-                                    "name" => $linea['ciudad'],
+                                array_push($visitados, array(
+                                    "name" => strtoupper($linea['zona']),
+                                    "y" => (int) $linea['total'],
+                                    "z" => (int) $linea['total'],
+                                ));
+                            }
+                        }
+                    }
+
+
+                    /// GRAFICO 
+
+                    $general = array(
+                        "title" => "CENTROS COMERCIALES",
+                        "contador" => 0,
+                        "categories" => [],
+                        "series" => [
+                            array(
+                                "name" => "OK",
+                                "data" => []
+                            ),
+                            array(
+                                "name" => "NO OK",
+                                "data" => []
+                            ),
+                        ]
+                    );
+
+                    $nook = array(
+                        "title" => "CENTROS COMERCIALES",
+                        "data" => []
+                    );
+
+                    $porCiudad = "AND (E.idCiudad>=0)"; 
+                    if ((isset($params['idCiudad'])) && (!empty($params['idCiudad']))){
+                        $porCiudad = "AND (E.idCiudad=".$params['idCiudad'].")"; 
+                    }
+
+                    $porZona = "(E.idZona>=0)";
+                    if ((isset($params['idZona'])) && (!empty($params['idZona']))){
+                        $porZona = "(E.idZona=".$params['idZona'].")";
+
+                        // consulta zona
+                        $infoZona = $mysql->Consulta_Unico("SELECT * FROM zonas WHERE id=".$params['idZona']);
+                        if (isset($infoZona['id'])){
+                            $general['title'] = $infoZona['zona'];
+                            $nook['title'] = $infoZona['zona'];
+                        }
+                    }
+
+                    $redes = $mysql->Consulta("SELECT red FROM redes WHERE estado=1 ORDER BY id ASC");
+                    if (is_array($redes)){
+                        if (count($redes) > 0){
+                            foreach ($redes as $linea) {
+                                array_push($general['categories'], strtoupper($linea['red']));
+                            }
+                        }
+                    }
+
+                    $consulta = $mysql->Consulta("SELECT
+                    P.idRed, R.red, P.idRespuesta, COUNT(*) AS total
+                    FROM redes R
+                    LEFT JOIN personasestablecimientosprocesos P
+                    ON R.id = P.idRed
+                    LEFT JOIN personasestablecimientos E
+                    ON P.idRegistro = E.id
+                    WHERE ".$porZona." ".$porCiudad."
+                    GROUP BY P.idRed, P.idRespuesta
+                    ORDER BY P.idRed ASC, P.idRespuesta ASC");
+
+                   
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) { 
+                                if ($linea['idRespuesta'] == 1){
+                                    array_push($general['series'][0]['data'], (int) $linea['total']);
+                                }else if ($linea['idRespuesta'] == 2){
+                                    array_push($general['series'][1]['data'], (int) $linea['total']);
+                                }
+
+                                $general['contador'] += (int) $linea['total'];
+                            }
+                        }
+                    }
+
+                    /// NO OK
+                    $consulta = $mysql->Consulta("SELECT
+                    P.observaciones, COUNT(*) AS total
+                    FROM redes R
+                    LEFT JOIN personasestablecimientosprocesos P
+                    ON R.id = P.idRed
+                    LEFT JOIN personasestablecimientos E
+                    ON P.idRegistro = E.id
+                    WHERE ".$porZona." ".$porCiudad." AND (P.idRespuesta=2)
+                    GROUP BY P.observaciones");
+
+                    
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($nook['data'], array(
+                                    "name" => $linea['observaciones'],
                                     "y" => (int) $linea['total']
                                 ));
                             }
                         }
                     }
 
-                    // con documentacion
-                    $documentacion = array(
-                        "categories" => [],
-                        "series" => [
-                            array(
-                                "name" => "Pendientes",
-                                "data" => []
-                            ),
-                            array(
-                                "name" => "Parcialmente",
-                                "data" => []
-                            ),
-                            array(
-                                "name" => "Completo",
-                                "data" => []
-                            ),
-                        ]
-                    );
 
-                    $listaCiudades = $mysql->Consulta("SELECT
-                    R.id_ciudad, C.ciudad, COUNT(A.id_adjunto) AS total
-                    FROM registros_internacional_adjuntos A
-                    LEFT JOIN registros_internacional R
-                    ON A.id_lead = R.id_lead
-                    LEFT JOIN registros_internacional_ciudades C
-                    ON R.id_ciudad = C.id_ciudad
-                    WHERE (A.archivo!='')
-                    GROUP BY R.id_ciudad"); 
-
-                    if (is_array($listaCiudades)){
-                        if (count($listaCiudades) > 0){
-                            foreach ($listaCiudades as $linea) {
-                                $id_ciudad = $linea['id_ciudad'];
-
-                                array_push($documentacion['categories'], $linea['ciudad']);
-
-                                $data = [];
-                                $listaEstablecimientos = $mysql->Consulta("SELECT
-                                *
-                                FROM registros_internacional R
-                                WHERE (R.id_ciudad = ".$id_ciudad.")");
-
-                                if (is_array($listaEstablecimientos)){
-                                    if (count($listaEstablecimientos) > 0){ 
-                                        $totalDocs = 0;
-                                        $totalValidados = 0;
-
-                                        foreach ($listaEstablecimientos as $linea) {
-                                            $id_lead = $linea['id_lead']; 
-                                            
-                                            $verAdjuntos = $mysql->Consulta("SELECT
-                                            E.id_estado, E.descripcion, 
-                                            (SELECT COUNT(A.id_adjunto) FROM registros_internacional_adjuntos A WHERE (A.estado=E.id_estado) AND (A.id_lead=".$id_lead.")) AS total
-                                            FROM registros_internacional_adjuntos_estado E");
-
-                                            if (is_array($verAdjuntos)){
-                                                if (count($verAdjuntos) > 0){
-                                                    foreach ($verAdjuntos as $lineaAdjunto) {
-                                                        $totalDocs += $lineaAdjunto['total'];
-
-                                                        if ($lineaAdjunto['id_estado'] == 2){
-                                                            $totalValidados += $lineaAdjunto['total'];
-                                                        }
-                                                    }
-                                                }
-                                            } 
-                                        }
-
-                                        $pendientes = $totalDocs - $totalValidados;
-                                        $parcialmente = 0;
-
-                                        array_push($documentacion['series'][0]['data'], (int) $pendientes );
-                                        array_push($documentacion['series'][1]['data'], (int) $parcialmente );
-                                        array_push($documentacion['series'][2]['data'], (int) $totalValidados );
-                                    }
-                                }
-
-
- 
-                            }
-                        }
-                    }
-
-                    $respuesta['documentacion'] = $documentacion;
-                    $respuesta['ciudades'] = $ciudades;
+                    $respuesta['consulta'] = $consulta;
+                    $respuesta['visitados'] = $visitados;
+                    $respuesta['general'] = $general;
+                    $respuesta['nook'] = $nook;
+                    
                     $respuesta['estado'] = true;
 
                 }catch(PDOException $e){
@@ -11751,71 +11745,59 @@ $app->group('/api', function() use ($app) {
             
                 return $newResponse;
             });
-
+ 
             $app->get("/establecimientos", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
                 $params = $request->getQueryParams();
                 $respuesta['estado'] = false;
-                $respuesta['params'] = $params;
                 
                 try{
                     $mysql = new Database(DATABASE);
+                    $respuesta['params'] = $params;
 
-                    $buscador = '';
+                    $buscador = "";
                     if ((isset($params['buscador'])) && (!empty($params['buscador']))){
                         $buscador = $params['buscador'];
                     }
 
-                    $ciudad = '';
-                    if ((isset($params['ciudad']))){
-                        if ($params['ciudad'] >= 0){
-                            $ciudad = "AND (C.id_ciudad = ".$params['ciudad'].")";
-                        }
+                    $idCiudad = "(E.idCiudad>0)";
+                    if ((isset($params['idCiudad'])) && (!empty($params['idCiudad']))){
+                        $idCiudad = "(E.idCiudad=".$params['idCiudad'].")";
                     }
 
-                    $estado = '';
-                    if ((isset($params['estado']))){
-                        if ($params['estado'] >= 0){
-                            $estado = "AND (R.estado = ".$params['estado'].")";
-                        }
+                    $idZona = "(E.idZona>0)";
+                    if ((isset($params['idZona'])) && (!empty($params['idZona']))){
+                        $idZona = "(E.idZona=".$params['idZona'].")";
                     }
 
                     $consulta = $mysql->Consulta("SELECT
-                    R.id_lead, R.ruc, R.comercio, R.propietario, C.ciudad, R.direccion, R.telefono, R.celular, R.fechaAlta, R.fechaModificacion, R.estado, E.descripcion, E.color, E.icono, E.linkeable
-                    FROM registros_internacional R
-                    LEFT JOIN registros_internacional_ciudades C
-                    ON R.id_ciudad = C.id_ciudad
-                    LEFT JOIN registros_internacional_estados E
-                    ON R.estado = E.id_estado
-                    WHERE ((R.comercio LIKE '%".$buscador."%') OR (R.propietario LIKE '%".$buscador."%') OR (R.ruc LIKE '%".$buscador."%')) ".$ciudad." ".$estado);
+                    E.id, E.documento, E.razonSocial, C.nombre AS ciudad, Z.zona, E.fechaModificacion, E.estado
+                    FROM personasestablecimientos E
+                    LEFT JOIN ciudades C
+                    ON E.idCiudad = C.id 
+                    LEFT JOIN zonas Z
+                    ON E.idZona = Z.id 
+                    WHERE ".$idCiudad." AND ".$idZona." AND ((E.razonSocial LIKE '%".$buscador."%') OR (E.documento LIKE '%".$buscador."%'))");
 
                     $listado = [];
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
                                 array_push($listado, array(
-                                    "id" => (int) $linea['id_lead'],
-                                    "ruc" => $linea['ruc'],
-                                    "comercio" => $linea['comercio'],
-                                    "propietario" => $linea['propietario'],
+                                    "id" => (int) $linea['id'],
+                                    "documento" => $linea['documento'],
+                                    "razonSocial" => $linea['razonSocial'],
                                     "ciudad" => $linea['ciudad'],
-                                    "direccion" => $linea['direccion'],
-                                    "telefono" => $linea['telefono'],
-                                    "celular" => $linea['celular'],
-                                    "fechaAlta" => $linea['fechaAlta'],
+                                    "zona" => $linea['zona'],
                                     "fechaModificacion" => $linea['fechaModificacion'],
                                     "estado" => array(
-                                        "valor" => (int) $linea['estado'],
-                                        "descripcion" => $linea['descripcion'],
-                                        "color" => $linea['color'],
-                                        "icono" => $linea['icono'],
-                                        "linkeable" => (bool) $linea['linkeable']
-                                    ),
+                                        "valor" => (int) $linea['estado']
+                                    )
                                 ));
                             }
                         }
                     }
-                    
+
                     $respuesta['consulta'] = $listado;
                     $respuesta['estado'] = true;
 
@@ -11828,121 +11810,47 @@ $app->group('/api', function() use ($app) {
                 return $newResponse;
             });
 
-            $app->get("/establecimientos/{id}", function(Request $request, Response $response){
+            $app->get("/procesos/{id}", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization');
                 $id = $request->getAttribute('id');
-                $respuesta['estado'] = false; 
+                $respuesta['estado'] = false;
                 
                 try{
                     $mysql = new Database(DATABASE);
-                    $carpeta = "https://api.digitalpaymentnow.com/tmp/"; 
+                    
+                    $consulta = $mysql->Consulta("SELECT
+                    P.id, R.red, P.aprobacion, T.tipo AS tipoCredito, D.tipo AS tipoDocumento, P.tablaFactores, P.idRespuesta, P.observaciones, P.evidencia
+                    FROM personasestablecimientosprocesos P
+                    LEFT JOIN personasestablecimientos E
+                    ON P.idRegistro = E.id 
+                    LEFT JOIN redestipocredito T
+                    ON P.idTipoCredito = T.id
+                    LEFT JOIN redestiposdocumentos D
+                    ON P.idTipoDocumento = D.id
+                    LEFT JOIN redes R
+                    ON P.idRed = R.id 
+                    WHERE (P.idRegistro=".$id.")");
 
-                    $consulta = $mysql->Consulta_Unico("SELECT
-                    R.id_lead, R.ruc, R.comercio, R.propietario, C.ciudad, R.direccion, R.telefono, R.celular, R.fechaAlta, R.fechaModificacion, R.estado, E.descripcion, E.color, E.icono, R.latitud, R.longitud
-                    FROM registros_internacional R
-                    LEFT JOIN registros_internacional_ciudades C
-                    ON R.id_ciudad = C.id_ciudad
-                    LEFT JOIN registros_internacional_estados E
-                    ON R.estado = E.id_estado
-                    WHERE (R.id_lead=".$id.")");
-
-                    if (isset($consulta['id_lead'])){ 
-
-                        $adjuntos = $mysql->Consulta("SELECT
-                        A.id_adjunto, A.archivo, A.extension, A.fechaAlta, A.fechaModificacion, D.nombre, A.estado, E.descripcion, E.color
-                        FROM registros_internacional_adjuntos A
-                        LEFT JOIN registros_internacional_documentacion D
-                        ON A.id_formulario = D.id_formulario
-                        LEFT OUTER JOIN registros_internacional_adjuntos_estado E
-                        ON A.estado = E.id_estado
-                        WHERE (A.id_lead=".$id.") AND (A.archivo!='')");
-
-                        $logs = $mysql->Consulta("SELECT
-                        L.descripcion, L.fecha, UPPER(U.nombres) AS responsable
-                        FROM registros_internacional_logs L
-                        LEFT JOIN usuarios U
-                        ON L.id_usuario = U.id_usuario
-                        WHERE L.id_lead=".$id."
-                        ORDER BY L.fecha DESC");
-
-                        $listaAdjuntos = [];
-                        if (is_array($adjuntos)){
-                            if (count($adjuntos) > 0){
-                                foreach ($adjuntos as $linea) {
-                                    array_push($listaAdjuntos, array(
-                                        "id" => (int) $linea['id_adjunto'],
-                                        "archivo" => array(
-                                            "descripcion" => $linea['nombre'],
-                                            "nombre" => $linea['archivo'],
-                                            "extension" => $linea['extension'],
-                                            "link" => $carpeta.$linea['archivo'].".".$linea['extension']
-                                        ),
-                                        "fechaAlta" => $linea['fechaAlta'],
-                                        "fechaModificacion" => $linea['fechaModificacion'],
-                                        "estado" => array(
-                                            "valor" => (int) $linea['estado'],
-                                            "descripcion" => $linea['descripcion'],
-                                            "color" => $linea['color']
-                                        )
-                                    ));
-                                }
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($listado, array(
+                                    "id" => (int) $linea['id'],
+                                    "red" => $linea['red'],
+                                    "aprobacion" => $linea['aprobacion'],
+                                    "tipoCredito" => $linea['tipoCredito'],
+                                    "tipoDocumento" => $linea['tipoDocumento'],
+                                    "tablaFactores" => $linea['tablaFactores'],
+                                    "respuesta" => (int) $linea['idRespuesta'],
+                                    "observaciones" => $linea['observaciones'],
+                                    "evidencia" => $linea['evidencia'],
+                                ));
                             }
                         }
+                    }
 
-                        $respuesta['consulta'] = array(
-                            "id" => (int) $consulta['id_lead'],
-                            "ruc" => $consulta['ruc'],
-                            "comercio" => $consulta['comercio'],
-                            "propietario" => $consulta['propietario'],
-                            "ciudad" => $consulta['ciudad'],
-                            "direccion" => $consulta['direccion'],
-                            "posicion" => array(
-                                "latitud" => $consulta['latitud'],
-                                "longitud" => $consulta['longitud'],
-                            ),
-                            "telefono" => $consulta['telefono'],
-                            "celular" => $consulta['celular'],
-                            "fechaAlta" => $consulta['fechaAlta'],
-                            "fechaModificacion" => $consulta['fechaModificacion'],
-                            "estado" => array(
-                                "valor" => (int) $consulta['estado'],
-                                "descripcion" => $consulta['descripcion'],
-                                "color" => $consulta['color'],
-                                "icono" => $consulta['icono'],
-                            ),
-                            "adjuntos" => $listaAdjuntos,
-                            "logs" => $logs
-                        );
-
-                        $respuesta['estado'] = true;
-
-                    }else{
-                        $respuesta['error'] = "No se encuentra información del establecimiento.";
-                    } 
-
-                }catch(PDOException $e){
-                    $respuesta['error'] = $e->getMessage();
-                }
-
-                $newResponse = $response->withJson($respuesta);
-            
-                return $newResponse;
-            });
-
-            $app->put("/establecimientos/{id}", function(Request $request, Response $response){
-                $authorization = $request->getHeader('Authorization');
-                $id = $request->getAttribute('id');
-                $data = $request->getParsedBody();
-                $respuesta['estado'] = false; 
-
-                $respuesta['data'] = $data;
-                
-                try{
-                    $mysql = new Database(DATABASE);
-
-                    $modificar = $mysql->Modificar("UPDATE registros_internacional SET estado=? WHERE id_lead=?", array($data['estado'], $id));
-                    
-                    $respuesta['mensaje'] = "Establecimiento actualizado correctamente.";
+                    $respuesta['consulta'] = $listado;
                     $respuesta['estado'] = true;
 
                 }catch(PDOException $e){
@@ -11953,7 +11861,6 @@ $app->group('/api', function() use ($app) {
             
                 return $newResponse;
             });
-
         });
 
     });
