@@ -11835,6 +11835,11 @@ $app->group('/api', function() use ($app) {
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
+                                $link = "https://api.digitalpaymentnow/estab";
+                                if (empty($linea['evidencia'])){
+                                    $link .= "/".$linea['evidencia'];
+                                }
+
                                 array_push($listado, array(
                                     "id" => (int) $linea['id'],
                                     "red" => $linea['red'],
@@ -11844,7 +11849,7 @@ $app->group('/api', function() use ($app) {
                                     "tablaFactores" => $linea['tablaFactores'],
                                     "respuesta" => (int) $linea['idRespuesta'],
                                     "observaciones" => $linea['observaciones'],
-                                    "evidencia" => $linea['evidencia'],
+                                    "link" => $link,
                                 ));
                             }
                         }
