@@ -11671,14 +11671,14 @@ $app->group('/api', function() use ($app) {
                         }
                     }
 
-                    $redes = $mysql->Consulta("SELECT id, red FROM redes WHERE estado=1 ORDER BY id ASC");
-                    if (is_array($redes)){
-                        if (count($redes) > 0){
-                            foreach ($redes as $linea) {
-                                array_push($general['categories'], strtoupper($linea['red']));
-                            }
-                        }
-                    }
+                    // $redes = $mysql->Consulta("SELECT id, red FROM redes WHERE estado=1 ORDER BY id ASC");
+                    // if (is_array($redes)){
+                    //     if (count($redes) > 0){
+                    //         foreach ($redes as $linea) {
+                    //             array_push($general['categories'], strtoupper($linea['red']));
+                    //         }
+                    //     }
+                    // }
 
                     $consulta = $mysql->Consulta("SELECT
                     P.idRed, R.red, P.idRespuesta, COUNT(*) AS total
@@ -11695,23 +11695,25 @@ $app->group('/api', function() use ($app) {
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) { 
 
-                                if ((isset($linea['idRed'])) && ($linea['idRespuesta'] == 1)){
-                                    array_push($general['series'][0]['data'], (int) $linea['total']);
-                                }else{
-                                    array_push($general['series'][0]['data'], 0);
-                                }
+                                array_push($general['categories'], strtoupper($linea['red']));
 
-                                if ((isset($linea['idRed'])) && ($linea['idRespuesta'] == 2)){
-                                    array_push($general['series'][1]['data'], (int) $linea['total']);
-                                }else{
-                                    array_push($general['series'][1]['data'], 0);
-                                }
-
-                                // if ($linea['idRespuesta'] == 1) {
+                                // if ((isset($linea['idRed'])) && ($linea['idRespuesta'] == 1)){
                                 //     array_push($general['series'][0]['data'], (int) $linea['total']);
-                                // }else if ($linea['idRespuesta'] == 2){
+                                // }else{
+                                //     array_push($general['series'][0]['data'], 0);
+                                // }
+
+                                // if ((isset($linea['idRed'])) && ($linea['idRespuesta'] == 2)){
                                 //     array_push($general['series'][1]['data'], (int) $linea['total']);
-                                // } 
+                                // }else{
+                                //     array_push($general['series'][1]['data'], 0);
+                                // }
+
+                                if ($linea['idRespuesta'] == 1) {
+                                    array_push($general['series'][0]['data'], (int) $linea['total']);
+                                }else if ($linea['idRespuesta'] == 2){
+                                    array_push($general['series'][1]['data'], (int) $linea['total']);
+                                } 
 
                                 $general['contador'] += (int) $linea['total'];
                             }
