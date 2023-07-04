@@ -11689,12 +11689,23 @@ $app->group('/api', function() use ($app) {
                     ON P.idRegistro = E.id
                     WHERE ".$porZona." ".$porCiudad."
                     GROUP BY P.idRed, P.idRespuesta
-                    ORDER BY P.idRed ASC, P.idRespuesta ASC");
-
+                    ORDER BY P.idRed ASC, P.idRespuesta ASC"); 
                    
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) { 
+
+                                $conteo = 0;
+                                foreach ($general['categories'] as $cat) {
+                                    if ($cat == $linea['red']){
+                                        $conteo += 1;
+                                    }
+                                }
+                                if ($conteo==0){
+                                    array_push($general['categories'], strtoupper($linea['red']));
+                                }
+                                
+
                                 if ($linea['idRespuesta'] == 1){
                                     array_push($general['series'][0]['data'], (int) $linea['total']);
                                 }else if ($linea['idRespuesta'] == 2){
