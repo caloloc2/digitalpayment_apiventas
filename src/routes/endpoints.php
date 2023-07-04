@@ -11689,7 +11689,7 @@ $app->group('/api', function() use ($app) {
                                 ORDER BY P.idRed ASC, P.idRespuesta ASC"); 
 
                                 if (isset($consultaResp['total'])){
-                                    array_push($general['series'][0]['data'], (int) $linea['total']);
+                                    array_push($general['series'][0]['data'], (int) $consultaResp['total']);
                                 }
 
                                  
@@ -11706,7 +11706,7 @@ $app->group('/api', function() use ($app) {
                                 ORDER BY P.idRed ASC, P.idRespuesta ASC"); 
 
                                 if (isset($consultaResp['total'])){
-                                    array_push($general['series'][1]['data'], (int) $linea['total']);
+                                    array_push($general['series'][1]['data'], (int) $consultaResp['total']);
                                 }
                             }
                         }
