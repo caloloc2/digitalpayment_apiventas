@@ -11873,7 +11873,7 @@ $app->group('/api', function() use ($app) {
                     $mysql = new Database(DATABASE);
                     
                     $consulta = $mysql->Consulta("SELECT
-                    P.id, R.red, P.aprobacion, T.tipo AS tipoCredito, D.tipo AS tipoDocumento, P.tablaFactores, P.idRespuesta, P.observaciones, P.evidencia
+                    P.id, R.red, P.aprobacion, T.tipo AS tipoCredito, D.tipo AS tipoDocumento, P.tablaFactores, P.idRespuesta, P.observaciones, P.evidencia, E.documento
                     FROM personasestablecimientosprocesos P
                     LEFT JOIN personasestablecimientos E
                     ON P.idRegistro = E.id 
@@ -11889,7 +11889,7 @@ $app->group('/api', function() use ($app) {
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
-                                $link = "https://api.digitalpaymentnow/estab";
+                                $link = "https://api.digitalpaymentnow.com/estab/".$linea['documento'];
                                 if (!empty($linea['evidencia'])){
                                     $link .= "/".$linea['evidencia'];
                                 }
