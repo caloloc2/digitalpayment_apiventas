@@ -11768,7 +11768,7 @@ $app->group('/api', function() use ($app) {
                     ON R.id = P.idRed
                     LEFT JOIN personasestablecimientos E
                     ON P.idRegistro = E.id
-                    WHERE ".$porZona." ".$porCiudad." AND (P.idRespuesta=2)
+                    WHERE ".$porZona." ".$porCiudad."
                     GROUP BY P.observaciones");
 
                     
