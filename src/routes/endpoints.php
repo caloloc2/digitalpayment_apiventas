@@ -11690,6 +11690,8 @@ $app->group('/api', function() use ($app) {
 
                                 if (isset($consultaResp['total'])){
                                     array_push($general['series'][0]['data'], (int) $consultaResp['total']);
+                                }else{
+                                    array_push($general['series'][0]['data'], 0);
                                 }
 
                                  
@@ -11707,6 +11709,8 @@ $app->group('/api', function() use ($app) {
 
                                 if (isset($consultaResp['total'])){
                                     array_push($general['series'][1]['data'], (int) $consultaResp['total']);
+                                }else{
+                                    array_push($general['series'][1]['data'], 0);
                                 }
                             }
                         }
