@@ -9,7 +9,7 @@ use Psr\Http\Message\UriInterface;
 use GuzzleHttp\Psr7\Stream;
 use Psr\Http\Message\StreamInterface;
 
-class sri{
+class sriConsultas{
 
     public $options = [
         'body'    => "",

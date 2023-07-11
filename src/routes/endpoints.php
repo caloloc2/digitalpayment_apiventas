@@ -11177,6 +11177,8 @@ $app->group('/api', function() use ($app) {
 
         $app->group('/app', function() use ($app) {
 
+            // ENDPOINTS PARA ACTUALIZACION DE ESTABLECIMIENTOS DINERS
+
             $app->get("/formularios", function(Request $request, Response $response){
                 $authorization = $request->getHeader('Authorization'); 
                 $respuesta['estado'] = false;
@@ -11493,6 +11495,190 @@ $app->group('/api', function() use ($app) {
                     }else{
                         $respuesta['error'] = "Hora de accesibilidad desde 09:00 hasta las 19:00.";
                     }
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
+            // ENDPOINTS PARA INGRESO DE PRUEBAS PARA BANCO INTERNACIONAL
+
+            $app->get("/ruc/{ruc}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $ruc = $request->getAttribute('ruc');
+                $respuesta['estado'] = false;
+                
+                try{
+                    $razonSocial = "";
+
+                    $sri = new sriConsultas();
+                    $consulta = $sri->buscarCedulaRUC($ruc);
+
+                    $respuesta['sri'] = $consulta;
+
+                    if ($consulta['estado']){
+                        $razonSocial = $consulta['consulta']['ruc'][0]['razonSocial'];
+                    }
+
+                    $respuesta['razonSocial'] = $razonSocial;
+                    $respuesta['estado'] = true;
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
+            $app->post("/nuevo-establecimiento", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $data = $request->getParsedBody();
+                $files = $request->getUploadedFiles();      
+                $respuesta['estado'] = false;
+                
+                try{
+                    
+                    $mysql = new Database(DATABASE);
+                    $respuesta['data'] = $data;
+                    $respuesta['files'] = $files;
+
+                    $observaciones = "";
+                    if ((isset($data['observaciones'])) && (!empty($data['observaciones']))){
+                        $observaciones = $data['observaciones'];
+                    }
+
+                    // validacion de ubicacion
+                    $ubicacion = json_decode($data['ubicacion'], true);
+
+                    $latitud = 0;
+                    $longitud = 0;
+
+                    if ((!empty($ubicacion['latitud'])) && (!empty($ubicacion['longitud']))){
+                        $latitud = $ubicacion['latitud'];
+                        $longitud = $ubicacion['longitud'];
+                    }
+
+                    $nuevoNombre = "";
+
+                    // valida que tenga un archivo o foto
+                    if (is_array($files)){  
+                        if (count($files) > 0){
+                            $archivo = $files['voucher0']->file;
+                            $nombreArchivo = $data['nombre_voucher0'];
+                            $extension = pathinfo($nombreArchivo, PATHINFO_EXTENSION);
+                            $nuevoNombre = "evidencia-".date("YmdHis").".".$extension;
+                            
+                            // guarda archivo 
+
+                            $respuesta['procesarArchivo'] = array(
+                                "archivo" => $archivo,
+                                "nombre" => $nombreArchivo,
+                                "extension" => $extension,
+                                "nuevo" => $nuevoNombre
+                            ); 
+
+                            $carpeta = __DIR__."/../../public/evidencias";
+                            // move_uploaded_file($archivo, $carpeta."/".$nuevoNombre);
+
+                            $representante = "";
+                            $correo = "";
+                            $celular = "";
+                            $direccion = "";
+                            $ultimaValidacion = false; 
+
+                            if ((isset($data['ruc'])) && (!empty($data['ruc']))){
+                                $ruc = $data['ruc'];
+
+                                if ((isset($data['razonSocial'])) && (!empty($data['razonSocial']))){
+                                    $razonSocial = $data['razonSocial'];
+
+                                    if ((isset($data['nombreEstablecimiento'])) && (!empty($data['nombreEstablecimiento']))){
+                                        $nombreEstablecimiento = $data['nombreEstablecimiento'];
+
+                                        if ((isset($data['direccion'])) && (!empty($data['direccion']))){
+                                            $direccion = $data['direccion'];
+                                        
+                                            if ((isset($data['representante'])) && (!empty($data['representante']))){
+                                                $representante = strtoupper($data['representante']);
+                        
+                                                if ((isset($data['correo'])) && (!empty($data['correo']))){
+                                                    $correo = strtolower($data['correo']);
+                            
+                                                    if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                                                        
+                                                        if ((isset($data['celular'])) && (!empty($data['celular']))){
+                                                            $celular = $data['celular'];
+
+                                                            if ((strlen($celular) == 10) || (strlen($celular) == 9)){
+                                                                // if (substr($celular, 0, 2) == "09"){
+
+                                                                    $ultimaValidacion = true;
+
+                                                                // }else{
+                                                                //     $respuesta['error'] = "El celular debe empezar con 09.";
+                                                                // }
+                                                            }else{
+                                                                $respuesta['error'] = "El celular debe contener 10 dígitos.";
+                                                            }
+
+                                                        }else{
+                                                            $respuesta['error'] = "Debe ingresar un número de celular.";
+                                                        }
+
+                                                    }else{
+                                                        $respuesta['error'] = "Debe ingresar una dirección de correo válida.";
+                                                    }
+                                                    
+                                                }else{
+                                                    $respuesta['error'] = "Debe ingresar una dirección de correo.";
+                                                }
+                                            }else{
+                                                $respuesta['error'] = "Debe ingresar un representante o persona de contacto.";
+                                            }    
+                                        }else{
+                                            $respuesta['error'] = "Debe ingresar una dirección válida.";
+                                        }
+                                    }else{
+                                        $respuesta['error'] = "Debe ingresar nombre comercial.";
+                                    }
+                                }else{
+                                    $respuesta['error'] = "Debe ingresar la razón social.";
+                                }
+                            }else{
+                                $respuesta['error'] = "Debe ingresar una RUC existente.";
+                            }
+                            
+
+                            if ($ultimaValidacion){
+
+                                // valida que el archivo se haya guardado
+                                // if (file_exists($carpeta."/".$nuevoNombre)){
+                                    // guarda el registro
+                                    $idCiudad = 1;
+                                    $idZona = 1;
+                                    $id = $mysql->Ingreso("INSERT INTO personasestablecimientos (documento, razonSocial, nombreEstablecimiento, direccionPrincipal, idCiudad, idZona, latitud, longitud, telefonoPrincipal, celularPrincipal, correoPrincipal) VALUES (?,?,?,?,?,?,?,?,?,?,?)", array($ruc, $razonSocial, $nombreEstablecimiento, $direccion, $idCiudad, $idZona, $latitud, $longitud, $celular, $celular, $correo));
+
+                                    $respuesta['id'] = $id;  
+                                    $respuesta['estado'] = true;
+                                // }else{
+                                //     $respuesta['error'] = "Existe un error y no se puede guardar la imagen. Favor intente nuevamente.";
+                                // }
+
+                            
+                            }
+                            
+                        }else{
+                            $respuesta['error'] = "Debe ingresar una evidencia fotográfica.";
+                        }
+                    }else{
+                        $respuesta['error'] = "No se incluyen evidencias.";
+                    }  
 
                 }catch(PDOException $e){
                     $respuesta['error'] = $e->getMessage();
@@ -11860,12 +12046,14 @@ $app->group('/api', function() use ($app) {
                     }
 
                     $consulta = $mysql->Consulta("SELECT
-                    E.id, E.documento, E.razonSocial, C.nombre AS ciudad, Z.zona, E.fechaModificacion, E.estado
+                    E.id, E.documento, E.razonSocial, C.nombre AS ciudad, Z.zona, E.fechaModificacion, E.estado, S.descripcion, S.color
                     FROM personasestablecimientos E
                     LEFT JOIN ciudades C
                     ON E.idCiudad = C.id 
                     LEFT JOIN zonas Z
                     ON E.idZona = Z.id 
+                    LEFT JOIN personasestablecimientosestados S
+                    ON E.estado = S.id
                     WHERE ".$idCiudad." AND ".$idZona." AND ((E.razonSocial LIKE '%".$buscador."%') OR (E.documento LIKE '%".$buscador."%'))");
 
                     $listado = [];
@@ -11880,7 +12068,9 @@ $app->group('/api', function() use ($app) {
                                     "zona" => $linea['zona'],
                                     "fechaModificacion" => $linea['fechaModificacion'],
                                     "estado" => array(
-                                        "valor" => (int) $linea['estado']
+                                        "valor" => (int) $linea['estado'],
+                                        "descripcion" => $linea['descripcion'],
+                                        "color" => $linea['color']
                                     )
                                 ));
                             }
@@ -11908,7 +12098,7 @@ $app->group('/api', function() use ($app) {
                     $mysql = new Database(DATABASE);
                     
                     $consulta = $mysql->Consulta("SELECT
-                    P.id, R.red, P.aprobacion, T.tipo AS tipoCredito, D.tipo AS tipoDocumento, P.tablaFactores, P.idRespuesta, P.observaciones, P.evidencia, E.documento
+                    P.id, R.red, P.aprobacion, T.tipo AS tipoCredito, D.tipo AS tipoDocumento, P.tablaFactores, P.idRespuesta, O.observaciones, E.documento
                     FROM personasestablecimientosprocesos P
                     LEFT JOIN personasestablecimientos E
                     ON P.idRegistro = E.id 
@@ -11918,17 +12108,14 @@ $app->group('/api', function() use ($app) {
                     ON P.idTipoDocumento = D.id
                     LEFT JOIN redes R
                     ON P.idRed = R.id 
+                    LEFT JOIN redesobservaciones O
+                    ON P.observaciones = O.id
                     WHERE (P.idRegistro=".$id.")");
 
                     $listado = [];
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
-                                $link = "https://api.digitalpaymentnow.com/estab/".$linea['documento'];
-                                if (!empty($linea['evidencia'])){
-                                    $link .= "/".$linea['evidencia'];
-                                }
-
                                 array_push($listado, array(
                                     "id" => (int) $linea['id'],
                                     "red" => $linea['red'],
@@ -11937,8 +12124,7 @@ $app->group('/api', function() use ($app) {
                                     "tipoDocumento" => $linea['tipoDocumento'],
                                     "tablaFactores" => $linea['tablaFactores'],
                                     "respuesta" => (int) $linea['idRespuesta'],
-                                    "observaciones" => $linea['observaciones'],
-                                    "link" => $link,
+                                    "observaciones" => $linea['observaciones']
                                 ));
                             }
                         }
