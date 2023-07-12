@@ -12046,7 +12046,8 @@ $app->group('/api', function() use ($app) {
                     }
 
                     $consulta = $mysql->Consulta("SELECT
-                    E.id, E.documento, E.razonSocial, C.nombre AS ciudad, Z.zona, E.fechaModificacion, E.estado, S.descripcion, S.color
+                    E.id, E.documento, E.razonSocial, C.nombre AS ciudad, Z.zona, E.fechaModificacion, E.estado, S.descripcion, S.color,
+                    (SELECT COUNT(*) FROM personasestablecimientosprocesos P WHERE P.id=E.id) AS procesos
                     FROM personasestablecimientos E
                     LEFT JOIN ciudades C
                     ON E.idCiudad = C.id 
@@ -12067,6 +12068,7 @@ $app->group('/api', function() use ($app) {
                                     "ciudad" => $linea['ciudad'],
                                     "zona" => $linea['zona'],
                                     "fechaModificacion" => $linea['fechaModificacion'],
+                                    "procesos" => (int) $linea['procesos'],
                                     "estado" => array(
                                         "valor" => (int) $linea['estado'],
                                         "descripcion" => $linea['descripcion'],
@@ -12125,6 +12127,46 @@ $app->group('/api', function() use ($app) {
                                     "tablaFactores" => $linea['tablaFactores'],
                                     "respuesta" => (int) $linea['idRespuesta'],
                                     "observaciones" => $linea['observaciones']
+                                ));
+                            }
+                        }
+                    }
+
+                    $respuesta['consulta'] = $listado;
+                    $respuesta['estado'] = true;
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
+
+            $app->get("/procesos/evidencias/{id}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $id = $request->getAttribute('id');
+                $respuesta['estado'] = false;
+                
+                try{
+                    $mysql = new Database(DATABASE);
+                    
+                    $consulta = $mysql->Consulta("SELECT
+                    CONCAT('https://api.digitalpaymentnow.com/estab/',E.documento,'/',F.evidencia) AS link
+                    FROM personasestablecimientosprocesosfotos F
+                    LEFT JOIN personasestablecimientosprocesos P
+                    ON F.idProceso = P.id 
+                    LEFT JOIN personasestablecimientos E
+                    ON P.idRegistro = E.id
+                    WHERE (P.id=".$id.")");
+
+                    $listado = [];
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($listado, array(
+                                    "link" => $linea['link']
                                 ));
                             }
                         }
