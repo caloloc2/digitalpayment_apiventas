@@ -12183,6 +12183,35 @@ $app->group('/api', function() use ($app) {
             
                 return $newResponse;
             });
+
+            $app->get("/procesos/fotografias/{id}", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $id = $request->getAttribute('id');
+                $respuesta['estado'] = false;
+                
+                try{
+                    $mysql = new Database(DATABASE);
+                    
+                    $consulta = $mysql->Consulta("SELECT documento FROM personasestablecimientos WHERE id=".$id);
+
+                    if (isset($consulta['documento'])){
+                        $respuesta['documento'] = $consulta['documento'];
+
+                        
+                        $respuesta['estado'] = true;
+                    }else{
+                        $respuesta['error'] = "No se encuentra información del establecimiento";
+                    }
+                    
+
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+            
+                return $newResponse;
+            });
         });
 
     });
