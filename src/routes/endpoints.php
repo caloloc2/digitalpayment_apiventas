@@ -12196,8 +12196,11 @@ $app->group('/api', function() use ($app) {
 
                     if (isset($consulta['documento'])){
                         $folder = __DIR__."/../../public/estab/".$consulta['documento'];
-                        $respuesta['documento'] = $folder;
 
+                        $listado = dir($folder);
+
+                        $respuesta['documento'] = $folder;
+                        $respuesta['folder'] = $listado;
 
                         $respuesta['estado'] = true;
                     }else{
