@@ -12196,12 +12196,23 @@ $app->group('/api', function() use ($app) {
 
                     if (isset($consulta['documento'])){
                         $folder = __DIR__."/../../public/estab/".$consulta['documento'];
+ 
+                        $url = "https://api.digitalpaymentnow.com/estab/".$consulta['documento'];
 
-                        $listado = dir($folder);
+                        $listado = [];
+                        $d = dir($folder);
+                        while (false !== ($entry = $d->read())){
+                            if (!is_dir($entry) && ($entry != '.') && ($entry != '..')){ 
+                                array_push($listado, array(
+                                    "link" => $url."/".$entry
+                                ));
+                            }
+                        }
+                        $d->close();  
 
-                        $respuesta['documento'] = $folder;
-                        $respuesta['folder'] = $listado;
-
+                        // $respuesta['documento'] = $folder;
+                        // $respuesta['folder'] = $listado;
+                        $respuesta['consulta'] = $listado;
                         $respuesta['estado'] = true;
                     }else{
                         $respuesta['error'] = "No se encuentra información del establecimiento";
