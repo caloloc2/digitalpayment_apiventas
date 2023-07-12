@@ -12200,15 +12200,17 @@ $app->group('/api', function() use ($app) {
                         $url = "https://api.digitalpaymentnow.com/estab/".$consulta['documento'];
 
                         $listado = [];
-                        $d = dir($folder);
-                        while (false !== ($entry = $d->read())){
-                            if (!is_dir($entry) && ($entry != '.') && ($entry != '..')){ 
-                                array_push($listado, array(
-                                    "link" => $url."/".$entry
-                                ));
+                        if (file_exists($folder)){
+                            $d = dir($folder);
+                            while (false !== ($entry = $d->read())){
+                                if (!is_dir($entry) && ($entry != '.') && ($entry != '..')){ 
+                                    array_push($listado, array(
+                                        "link" => $url."/".$entry
+                                    ));
+                                }
                             }
-                        }
-                        $d->close();  
+                            $d->close();
+                        } 
 
                         $respuesta['consulta'] = $listado;
                         $respuesta['estado'] = true;
