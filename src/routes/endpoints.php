@@ -12192,12 +12192,12 @@ $app->group('/api', function() use ($app) {
                 try{
                     $mysql = new Database(DATABASE);
                     
-                    $consulta = $mysql->Consulta("SELECT documento FROM personasestablecimientos WHERE id=".$id);
+                    $consulta = $mysql->Consulta_Unico("SELECT documento FROM personasestablecimientos WHERE id=".$id);
 
                     if (isset($consulta['documento'])){
                         $respuesta['documento'] = $consulta['documento'];
 
-                        
+
                         $respuesta['estado'] = true;
                     }else{
                         $respuesta['error'] = "No se encuentra información del establecimiento";
