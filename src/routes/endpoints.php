@@ -12199,6 +12199,9 @@ $app->group('/api', function() use ($app) {
  
                         $url = "https://api.digitalpaymentnow.com/estab/".$consulta['documento'];
 
+                        $respuesta['folder'] = $folder;
+                        $respuesta['url'] = $url;
+                        
                         $listado = [];
                         if (file_exists($folder)){
                             $d = dir($folder);
