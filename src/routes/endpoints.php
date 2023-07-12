@@ -12194,7 +12194,7 @@ $app->group('/api', function() use ($app) {
                     
                     $consulta = $mysql->Consulta_Unico("SELECT documento FROM personasestablecimientos WHERE id=".$id);
 
-                    if (isset($consulta['documento'])){
+                    if ((isset($consulta['documento'])) && (!empty($consulta['documento']))){
                         $folder = __DIR__."/../../public/estab/".$consulta['documento'];
  
                         $url = "https://api.digitalpaymentnow.com/estab/".$consulta['documento'];
