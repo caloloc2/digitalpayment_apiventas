@@ -12195,7 +12195,8 @@ $app->group('/api', function() use ($app) {
                     $consulta = $mysql->Consulta_Unico("SELECT documento FROM personasestablecimientos WHERE id=".$id);
 
                     if (isset($consulta['documento'])){
-                        $respuesta['documento'] = $consulta['documento'];
+                        $folder = __DIR__."/../../public/estab/".$consulta['documento'];
+                        $respuesta['documento'] = $folder;
 
 
                         $respuesta['estado'] = true;
