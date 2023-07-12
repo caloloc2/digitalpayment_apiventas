@@ -1,7 +1,12 @@
 <?php 
 
 $folder = __DIR__."/../../public/estab/1722653894001";
-echo file_exists($folder);
-// $listado = dir($folder);
 
+$d = dir($folder);
+
+while (false !== ($entry = $d->read())){
+    if (is_dir($entry) && ($entry != '.') && ($entry != '..'))
+        echo $entry."\n";
+}
+$d->close();
 // print_r($listado);
