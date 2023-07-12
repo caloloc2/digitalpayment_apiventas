@@ -12210,8 +12210,6 @@ $app->group('/api', function() use ($app) {
                         }
                         $d->close();  
 
-                        // $respuesta['documento'] = $folder;
-                        // $respuesta['folder'] = $listado;
                         $respuesta['consulta'] = $listado;
                         $respuesta['estado'] = true;
                     }else{
