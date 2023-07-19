@@ -12047,7 +12047,8 @@ $app->group('/api', function() use ($app) {
 
                     $consulta = $mysql->Consulta("SELECT
                     E.id, E.documento, E.razonSocial, C.nombre AS ciudad, Z.zona, E.fechaModificacion, E.estado, S.descripcion, S.color,
-                    (SELECT COUNT(*) FROM personasestablecimientosprocesos P WHERE P.id=E.id) AS procesos
+                    (SELECT COUNT(*) FROM personasestablecimientosprocesos P WHERE P.id=E.id) AS procesos,
+                    M.apellidos, M.cargo, M.telefono, M.celular, M.documento AS documentoDependiente
                     FROM personasestablecimientos E
                     LEFT JOIN ciudades C
                     ON E.idCiudad = C.id 
@@ -12055,6 +12056,8 @@ $app->group('/api', function() use ($app) {
                     ON E.idZona = Z.id 
                     LEFT JOIN personasestablecimientosestados S
                     ON E.estado = S.id
+                    LEFT JOIN personasestablecimientoscontactos M
+                    ON E.id = M.id
                     WHERE ".$idCiudad." AND ".$idZona." AND ((E.razonSocial LIKE '%".$buscador."%') OR (E.documento LIKE '%".$buscador."%'))");
 
                     $listado = [];
@@ -12073,6 +12076,13 @@ $app->group('/api', function() use ($app) {
                                         "valor" => (int) $linea['estado'],
                                         "descripcion" => $linea['descripcion'],
                                         "color" => $linea['color']
+                                    ),
+                                    "encargado" => array(
+                                        "documento" => $linea['documentoDependiente'],
+                                        "nombres" => strtoupper($linea['apellidos']),
+                                        "cargo" => $linea['cargo'],
+                                        "telefono" => $linea['telefono'],
+                                        "celular" => $linea['celular']
                                     )
                                 ));
                             }
