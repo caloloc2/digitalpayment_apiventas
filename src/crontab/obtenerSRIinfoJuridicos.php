@@ -113,7 +113,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                         $id_lista
                     ));
 
-                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, estadoContribuyenteRuc=?, actividadContribuyente=?, fechaInicioActividades=?, docRepresentanteLegal=?, representanteLegal=?, validadoSRI=? WHERE id_lista=?", array(
+                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, estadoContribuyenteRuc=?, actividadContribuyente=?, fechaInicioActividades=?, docRepresentanteLegal=?, representanteLegal=?, validadoSRI=1 WHERE id_lista=?", array(
                         $guardar['ruc'],
                         $guardar['cedula'],
                         $guardar['razonSocial'],
@@ -122,7 +122,6 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                         $guardar['fechaInicioActividades'],
                         $guardar['representantesLegales']['identificacion'],
                         $guardar['representantesLegales']['nombre'],
-                        1,
                         $id_lista
                     ));
 
