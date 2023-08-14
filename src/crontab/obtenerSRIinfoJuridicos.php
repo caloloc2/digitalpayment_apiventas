@@ -136,7 +136,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                     }
                     
                 
-                    print_r($resultado);
+                    print_r($actualizar);
                 }
 
                 
