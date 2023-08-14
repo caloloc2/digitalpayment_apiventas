@@ -70,9 +70,9 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
     $llave = $buscaLlave['tokenregistrocivil'];
 
     $banco = 30;
-    $identificador = "2023-05-02";
+    $identificador = "2023-08-08";
 
-    $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (ruc='') AND (estado=10) ORDER BY id_lista ASC");
+    $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (validadoSRI=0) ORDER BY id_lista ASC");
 
     if (is_array($consulta)){
         if (count($consulta) > 0){
@@ -113,7 +113,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                         $id_lista
                     ));
 
-                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, estadoContribuyenteRuc=?, actividadContribuyente=?, fechaInicioActividades=?, docRepresentanteLegal=?, representanteLegal=? WHERE id_lista=?", array(
+                    $actualizar = $mysql->Modificar("UPDATE notas_registros SET ruc=?, cedula=?, razonSocial=?, estadoContribuyenteRuc=?, actividadContribuyente=?, fechaInicioActividades=?, docRepresentanteLegal=?, representanteLegal=?, validadoSRI=? WHERE id_lista=?", array(
                         $guardar['ruc'],
                         $guardar['cedula'],
                         $guardar['razonSocial'],
@@ -122,6 +122,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
                         $guardar['fechaInicioActividades'],
                         $guardar['representantesLegales']['identificacion'],
                         $guardar['representantesLegales']['nombre'],
+                        1,
                         $id_lista
                     ));
 
