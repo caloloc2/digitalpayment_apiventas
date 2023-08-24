@@ -831,7 +831,7 @@ $app->group('/api', function() use ($app) {
                     LEFT JOIN notas_registros_bancos B
                     ON R.banco = B.id_banco
                     WHERE ".$porBanco." ".$porIdentificador."
-                    ((R.documento LIKE '%".$buscador."%') OR (R.nombres LIKE '%".$buscador."%') OR (U.nombres LIKE '%".$buscador."%') OR (E.descripcion LIKE '%".$buscador."%'))
+                    ((R.documento LIKE '%".$buscador."%') OR (R.telefono LIKE '%".$buscador."%') OR (R.nombres LIKE '%".$buscador."%') OR (U.nombres LIKE '%".$buscador."%') OR (E.descripcion LIKE '%".$buscador."%'))
                     ORDER BY R.nombres ASC, R.fecha_asignacion ASC ".$limite;
 
                     $consulta = $mysql->Consulta($sql);
