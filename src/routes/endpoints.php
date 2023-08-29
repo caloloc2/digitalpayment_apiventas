@@ -5570,8 +5570,10 @@ $app->group('/api', function() use ($app) {
                     } 
 
                     $identificadores = "";
+                    $identificador_nova = "";
                     if ((isset($identificador)) && (!empty($identificador))){
                         $identificadores = "AND (R.identificador='".$identificador."')";
+                        $identificador_nova = "AND (N.identificador='".$identificador."')";
                     } 
 
                     $filtro = "";
@@ -6096,8 +6098,8 @@ $app->group('/api', function() use ($app) {
                                 )
                             ),
                         ]
-                    );
-                    
+                    ); 
+
                     if (is_array($consulta)){
                         if (count($consulta) > 0){
                             foreach ($consulta as $linea) {
@@ -6106,7 +6108,7 @@ $app->group('/api', function() use ($app) {
                                 FROM notas_registros N
                                 LEFT JOIN notas_registros_nova_valores V
                                 ON N.plan_usado = V.id_valor
-                                WHERE ((N.banco=30) OR (N.banco=31)) AND (N.estado=7) AND (N.plan_usado=".$linea['id_valor'].")");
+                                WHERE ((N.banco=30) OR (N.banco=31)) ".$identificador_nova." AND (N.estado=7) AND (N.plan_usado=".$linea['id_valor'].")");
 
                                 $cantidad = 0;
                                 $total = 0;
@@ -6124,12 +6126,6 @@ $app->group('/api', function() use ($app) {
                     }
 
                     $ventasNova = [];
-
-                    
-
-                   
-
-
 
                     /// COMPARATICA POR MES, SEMANA Y DIA
                     $tipoRango = "week";
