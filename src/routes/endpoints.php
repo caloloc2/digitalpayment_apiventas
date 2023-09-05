@@ -4389,7 +4389,8 @@ $app->group('/api', function() use ($app) {
                                                 $fecha = date("Y-m-d H:i:s");
 
                                                 if (!empty($documento)){
-                                                    $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE ((documento LIKE '%".$documento."%') OR (nombres='".$nombres."') OR (telefono LIKE '%".$principal."%')) AND (banco=".$banco.")");
+                                                    // $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE ((documento LIKE '%".$documento."%') OR (nombres='".$nombres."') OR (telefono LIKE '%".$principal."%')) AND (banco=".$banco.")");
+                                                    $consulta = $mysql->Consulta_Unico("SELECT * FROM notas_registros WHERE ((documento LIKE '%".$documento."%') OR (nombres='".$nombres."')) AND (banco=".$banco.")");
 
                                                     if (!isset($consulta['id_lista'])){
                                                         $id_lista = $mysql->Ingreso("INSERT INTO notas_registros (banco, identificador, documento, nombres, telefono, ciudad, direccion, correo, observaciones, id_notas, asignado, llamado, orden, fecha_alta, fecha_modificacion, estado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", array($banco, $identificador, $documento, $nombres, $principal, $ciudad, $direccion, $correo, $observaciones, 0, 0, 0, 0, $fecha, $fecha, $estado));
