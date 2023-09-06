@@ -70,7 +70,7 @@ if ((isset($buscaLlave['tokenregistrocivil'])) && (!empty($buscaLlave['tokenregi
     $llave = $buscaLlave['tokenregistrocivil'];
 
     $banco = 30;
-    $identificador = "2023-08-08";
+    $identificador = "2023-09-01";
 
     $consulta = $mysql->Consulta("SELECT * FROM notas_registros WHERE (banco=".$banco.") AND (identificador='".$identificador."') AND (validadoSRI=0) ORDER BY id_lista ASC");
 
