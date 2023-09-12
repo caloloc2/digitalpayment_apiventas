@@ -12,7 +12,7 @@ db =  mysql.connect(
   host ="localhost",
   user ="userdp",
   passwd ="385402292Mica_02",
-  database = "vtgsa_ventas"
+  database = "digital"
 )
 
 cursor = db.cursor()

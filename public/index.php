@@ -36,7 +36,8 @@ require '../src/config/core/funciones.php';
 require '../src/config/core/contratos.php';
 require '../src/config/core/nibemi.php';
 require '../src/config/core/sendinblue.php';
-// require '../src/config/core/sri.php';
+require '../src/config/core/sri.php';
+require '../src/config/core/excel.php';
 
 // define("URL_RETURN", "http://devp2p.mvevip.com");
 define("URL_RETURN", "https://pasarelas.mvevip.com");

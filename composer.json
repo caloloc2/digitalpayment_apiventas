@@ -5,6 +5,7 @@
         "ext-simplexml": "^7.2",
         "twilio/sdk": "^6.16",
         "stripe/stripe-php": "^7.125",
-        "spipu/html2pdf": "^5.2"
+        "spipu/html2pdf": "^5.2",
+        "phpoffice/phpspreadsheet": "^1.29"
     }
 }
