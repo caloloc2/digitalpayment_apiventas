@@ -68,24 +68,25 @@ if (is_array($consulta)){
         $url = "https://api.digitalpaymentnow.com/tmp";
 
         print_r($sendinblue->getData());
-        // $envio = $sendinblue->envioMail(array(
-        //     "to" => [array(
-        //         "email" => "calolomino@gmail.com",
-        //         "name" => "CARLOS MINO"
-        //     )],
-        //     "replyTo" => array(
-        //         "email" => "operaciones@digitalpaymentnow.com",
-        //         "name" => "Fernanda Ortiz"
-        //     ),
-        //     "templateId" => 6,
-        //     "params" => array(
-        //         "producto" => "Seguros NOVA",
-        //         "fecha" => $fecha,
-        //         "dia" => $fecha,
-        //         "base" => "Seguros NOVA"
-        //     ),
-        //     "attachment" => $url."/".$archivosGenerados['filename']
-        // )); 
+        $envio = $sendinblue->envioMail(array(
+            "to" => [array(
+                "email" => "calolomino@gmail.com",
+                "name" => "CARLOS MINO"
+            )],
+            "replyTo" => array(
+                "email" => "operaciones@digitalpaymentnow.com",
+                "name" => "Fernanda Ortiz"
+            ),
+            "templateId" => 6,
+            "params" => array(
+                "producto" => "Seguros NOVA",
+                "fecha" => $fecha,
+                "dia" => $fecha,
+                "base" => "Seguros NOVA"
+            ),
+            "attachment" => $url."/".$archivosGenerados['filename']
+        )); 
+        print_r($envio);
     }
 }
 
