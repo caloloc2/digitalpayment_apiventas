@@ -7,7 +7,7 @@ require __DIR__.'/../../src/config/core/sendinblue.php';
 
 define("DATABASE", "vtgsa_ventas");
 
-$mysql = new Database('digitalpayment');
+$mysql = new Database(DATABASE);
 
 $fecha = date("Y-m-12");
 
