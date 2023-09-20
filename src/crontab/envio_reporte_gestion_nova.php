@@ -3,14 +3,17 @@
 require __DIR__.'/../../vendor/autoload.php'; 
 require __DIR__.'/../../src/config/mysql/mysql.php'; 
 require __DIR__.'/../../src/config/core/excel.php';
+require __DIR__.'/../../src/config/core/sendinblue.php';
 
-$mysql = new Database('vtgsa_ventas');
+define("DATABASE", "digitalpayment");
 
-$fecha = date("Y-m-d");
+$mysql = new Database('digitalpayment');
+
+$fecha = date("Y-m-12");
 
 $consulta = $mysql->Consulta("SELECT 
-N.identificador, N.documento, N.nombres, N.telefono, N.observaciones, U.nombres AS asesor, E.descripcion AS estado, N.fecha_asignacion AS fechaAsignacion, 
-N.fecha_ultima_contacto AS fechaUltimoContacto, V.precio, V.actividad
+N.identificador, N.documento, N.nombres, N.telefono, U.nombres AS asesor, E.descripcion AS estado, T.motivo, N.fecha_asignacion AS fechaAsignacion, 
+N.fecha_ultima_contacto AS fechaUltimoContacto, V.precio, V.actividad, N.observaciones, N.estado AS id_estado
 FROM notas_registros N
 LEFT JOIN usuarios U
 ON (N.asignado=U.id_usuario)
@@ -28,4 +31,71 @@ AND
 (DATE(N.fecha_ultima_contacto) BETWEEN '".$fecha."' AND '".$fecha."')
 ORDER BY N.fecha_ultima_contacto ASC, N.estado DESC");
 
-print_r($consulta);
+if (is_array($consulta)){
+    if (count($consulta) > 0){
+        $excel = new excel();
+
+        $titulos = ["BASE", "DOCUMENTO", "ESTABLECIMIENTO", "TELEFONO", "ASESOR", "ESTADO", "MOTIVO", "FECHA ASIGNADO", "ULTIMO CONTACTO", "VALOR", "TIPO SEGURO", "OBSERVACIONES"];
+
+        $registros = array();
+
+        foreach ($consulta as $linea) {
+            $nodesea = "";
+            if ($linea['id_estado'] == 5){
+                $nodesea = $linea['motivo'];
+            }
+
+            array_push($registros, array(
+                $linea['identificador'],
+                $linea['documento'],
+                $linea['nombres'],
+                $linea['telefono'],
+                $linea['asesor'],
+                $linea['estado'],
+                $nodesea,
+                $linea['fechaAsignacion'],
+                $linea['fechaUltimoContacto'],
+                $linea['precio'],
+                $linea['actividad'],
+                $linea['observaciones']
+            ));
+        } 
+        
+        $archivosGenerados = $excel->createExcel($titulos, $registros, "GESTION_NOVA_");
+
+        // envio de archivo a correo
+        $sendinblue = new sendinblue();
+        $url = "https://api.digitalpaymentnow.com/tmp";
+        $envio = $sendinblue->envioMail(array(
+            "to" => [array(
+                "email" => "calolomino@gmail.com",
+                "name" => "CARLOS MINO"
+            )], 
+            // "bcc" => [ 
+            //     array(
+            //         "email" => "soporte@digitalpaymentnow.com",
+            //         "name" => "Ing. Carlos Mino"
+            //     ),
+            //     array(
+            //         "email" => "operaciones@digitalpaymentnow.com",
+            //         "name" => "Fernanda Ortiz"
+            //     ),
+            // ],
+            "replyTo" => array(
+                "email" => "operaciones@digitalpaymentnow.com",
+                "name" => "Fernanda Ortiz"
+            ),
+            "templateId" => 6,
+            "params" => array(
+                "producto" => "Seguros NOVA",
+                "fecha" => $fecha,
+                "dia" => $fecha,
+                "base" => "Seguros NOVA"
+            ),
+            "attachment" => $url."/".$archivosGenerados['filename']
+        ));
+
+    }
+}
+
+// print_r($consulta);
