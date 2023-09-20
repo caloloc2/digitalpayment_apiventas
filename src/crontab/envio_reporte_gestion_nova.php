@@ -66,34 +66,34 @@ if (is_array($consulta)){
         // envio de archivo a correo
         $sendinblue = new sendinblue();
         $url = "https://api.digitalpaymentnow.com/tmp";
-        $envio = $sendinblue->envioMail(array(
-            "to" => [array(
-                "email" => "calolomino@gmail.com",
-                "name" => "CARLOS MINO"
-            )], 
-            // "bcc" => [ 
-            //     array(
-            //         "email" => "soporte@digitalpaymentnow.com",
-            //         "name" => "Ing. Carlos Mino"
-            //     ),
-            //     array(
-            //         "email" => "operaciones@digitalpaymentnow.com",
-            //         "name" => "Fernanda Ortiz"
-            //     ),
-            // ],
-            "replyTo" => array(
-                "email" => "operaciones@digitalpaymentnow.com",
-                "name" => "Fernanda Ortiz"
-            ),
-            "templateId" => 6,
-            "params" => array(
-                "producto" => "Seguros NOVA",
-                "fecha" => $fecha,
-                "dia" => $fecha,
-                "base" => "Seguros NOVA"
-            ),
-            "attachment" => $url."/".$archivosGenerados['filename']
-        ));
+        // $envio = $sendinblue->envioMail(array(
+        //     "to" => [array(
+        //         "email" => "calolomino@gmail.com",
+        //         "name" => "CARLOS MINO"
+        //     )], 
+        //     // "bcc" => [ 
+        //     //     array(
+        //     //         "email" => "soporte@digitalpaymentnow.com",
+        //     //         "name" => "Ing. Carlos Mino"
+        //     //     ),
+        //     //     array(
+        //     //         "email" => "operaciones@digitalpaymentnow.com",
+        //     //         "name" => "Fernanda Ortiz"
+        //     //     ),
+        //     // ],
+        //     "replyTo" => array(
+        //         "email" => "operaciones@digitalpaymentnow.com",
+        //         "name" => "Fernanda Ortiz"
+        //     ),
+        //     "templateId" => 6,
+        //     "params" => array(
+        //         "producto" => "Seguros NOVA",
+        //         "fecha" => $fecha,
+        //         "dia" => $fecha,
+        //         "base" => "Seguros NOVA"
+        //     ),
+        //     "attachment" => $url."/".$archivosGenerados['filename']
+        // ));
 
     }
 }
