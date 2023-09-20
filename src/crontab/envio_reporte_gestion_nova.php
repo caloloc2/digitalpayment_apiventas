@@ -94,7 +94,7 @@ if (is_array($consulta)){
         //     ),
         //     "attachment" => $url."/".$archivosGenerados['filename']
         // ));
-
+        echo $url."/".$archivosGenerados['filename'];
     }
 }
 
