@@ -67,7 +67,7 @@ if (is_array($consulta)){
         $sendinblue = new sendinblue();
         $url = "https://api.digitalpaymentnow.com/tmp";
 
-        echo $sendinblue->getData();
+        print_r($sendinblue->getData());
         // $envio = $sendinblue->envioMail(array(
         //     "to" => [array(
         //         "email" => "calolomino@gmail.com",
