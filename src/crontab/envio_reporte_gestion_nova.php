@@ -66,8 +66,6 @@ if (is_array($consulta)){
         // envio de archivo a correo
         $sendinblue = new sendinblue();
         $url = "https://api.digitalpaymentnow.com/tmp";
-
-        print_r($sendinblue->getData());
         $envio = $sendinblue->envioMail(array(
             "to" => [array(
                 "email" => "calolomino@gmail.com",
@@ -84,10 +82,10 @@ if (is_array($consulta)){
                 "dia" => $fecha,
                 "base" => "Seguros NOVA"
             ),
-            "attachment" => array(
+            "attachment" => [array(
                 "url" => $url."/".$archivosGenerados['filename'],
                 "name" => $archivosGenerados['filename']
-            )
+            )]
         )); 
         print_r($envio);
     }
