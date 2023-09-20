@@ -84,7 +84,10 @@ if (is_array($consulta)){
                 "dia" => $fecha,
                 "base" => "Seguros NOVA"
             ),
-            "attachment" => $url."/".$archivosGenerados['filename']
+            "attachment" => array(
+                "url" => $url."/".$archivosGenerados['filename'],
+                "name" => $archivosGenerados['filename']
+            )
         )); 
         print_r($envio);
     }
