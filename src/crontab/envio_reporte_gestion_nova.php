@@ -5,7 +5,7 @@ require __DIR__.'/../../src/config/mysql/mysql.php';
 require __DIR__.'/../../src/config/core/excel.php';
 require __DIR__.'/../../src/config/core/sendinblue.php';
 
-define("DATABASE", "digitalpayment");
+define("DATABASE", "vtgsa_ventas");
 
 $mysql = new Database('digitalpayment');
 
