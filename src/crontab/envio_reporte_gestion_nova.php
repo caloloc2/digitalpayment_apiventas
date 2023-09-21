@@ -95,7 +95,7 @@ if (is_array($consulta)){
         $url = "https://api.digitalpaymentnow.com/tmp";
         $envio = $sendinblue->envioMail(array(
             "to" => $destinatarioPrincipal,
-            "bcc" => $destinatarioBCC,
+            // "bcc" => $destinatarioBCC,
             "replyTo" => array(
                 "email" => "operaciones@digitalpaymentnow.com",
                 "name" => "Fernanda Ortiz"
