@@ -78,9 +78,7 @@ if (is_array($consulta)){
             "templateId" => 6,
             "params" => array(
                 "producto" => "Seguros NOVA",
-                "fecha" => $fecha,
-                "dia" => $fecha,
-                "base" => "Seguros NOVA"
+                "fecha" => $fecha
             ),
             "attachment" => [array(
                 "url" => $url."/".$archivosGenerados['filename'],
