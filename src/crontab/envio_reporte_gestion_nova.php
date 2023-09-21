@@ -63,14 +63,39 @@ if (is_array($consulta)){
         
         $archivosGenerados = $excel->createExcel($titulos, $registros, "GESTION_NOVA_");
 
+        // obtiene los destinatarios
+        $destinatarios = $mysql->Consulta("SELECT nombres, destinatario, principal FROM reportes_destinatarios WHERE (producto='nova') AND (estado=1) ORDER BY principal DESC");
+
+        $destinatarioPrincipal = [];
+        $destinatarioBCC = [];
+
+        if (is_array($destinatarios)){
+            if (count($destinatarios) > 0){
+
+                foreach ($destinatarios as $lineaDestinatario) {
+                    if ($lineaDestinatario['principal']){
+                        array_push($destinatarioPrincipal, array(
+                            "email" => strtolower($lineaDestinatario['destinatario']),
+                            "name" => $lineaDestinatario['nombres']
+                        ));
+                    }else{
+                        array_push($destinatarioBCC, array(
+                            "email" => strtolower($lineaDestinatario['destinatario']),
+                            "name" => $lineaDestinatario['nombres']
+                        ));
+                    }
+                }
+
+            }
+        }
+        
+
         // envio de archivo a correo
         $sendinblue = new sendinblue();
         $url = "https://api.digitalpaymentnow.com/tmp";
         $envio = $sendinblue->envioMail(array(
-            "to" => [array(
-                "email" => "calolomino@gmail.com",
-                "name" => "CARLOS MINO"
-            )],
+            "to" => $destinatarioPrincipal,
+            "bcc" => $destinatarioBCC,
             "replyTo" => array(
                 "email" => "operaciones@digitalpaymentnow.com",
                 "name" => "Fernanda Ortiz"
