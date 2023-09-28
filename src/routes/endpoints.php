@@ -909,6 +909,158 @@ $app->group('/api', function() use ($app) {
                 
                 return $newResponse;
             });
+
+            $app->get("/cuadro", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization');
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false; 
+            
+                try{
+                    $mysql = new Database(DATABASE);
+
+                    $categories = [];
+                    $series = []; 
+                    array_push($series, array(
+                        "name" => "Gestión Efectiva",
+                        "data" => []
+                    ));
+                    array_push($series, array(
+                        "name" => "Gestión no Efectiva",
+                        "data" => []
+                    ));
+                    
+
+                    $bancos = $mysql->Consulta("SELECT 
+                    id_banco, banco
+                    FROM notas_registros_bancos
+                    WHERE (estado=0)"); 
+
+                    $listado = [];
+                    $fecha = date("Y-m-d");
+
+                    if (is_array($bancos)){
+                        if (count($bancos) > 0){
+                            foreach ($bancos as $lineaBanco) {
+                                $id_banco = $lineaBanco['id_banco'];
+
+                                // AND (DATE(N.fecha_ultima_contacto=".$fecha."))
+
+                                $consulta = $mysql->Consulta("SELECT 
+                                E.gestion_efectiva, COUNT(*) AS total 
+                                FROM notas_registros N 
+                                LEFT JOIN notas_registros_estados E 
+                                ON N.estado = E.id_estados
+                                WHERE (N.banco=".$id_banco.") AND (E.gestion_efectiva>0)
+                                GROUP BY E.gestion_efectiva
+                                ORDER BY E.gestion_efectiva ASC");
+
+                                $detalle = [];
+                                if (is_array($consulta)){
+                                    if (count($consulta) > 0){
+                                        foreach ($consulta as $linea) {
+                                            if (!is_null($linea['gestion_efectiva'])){
+                                                switch ($linea['gestion_efectiva']) {
+                                                    case 1:
+                                                        array_push($series[0]['data'], (int) $linea['total']);
+                                                        break;
+                                                    case 2:
+                                                        array_push($series[1]['data'], (int) $linea['total']);
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                array_push($categories, $lineaBanco['banco']);
+                            }
+                        }
+                    }
+
+                    $respuesta['grafico'] = array(
+                        "categories" => $categories,
+                        "series" => $series
+                    );
+
+
+
+
+
+
+
+
+                    $ahora = date("Y-m-d");
+                    $categories = [];
+                    $series = [];
+
+                    /// LISTADO DE ASESORES DISPONIBLES
+                    $consulta = $mysql->Consulta("SELECT 
+                    id_usuario, nombres
+                    FROM usuarios
+                    WHERE (tipo=6) AND (estado=0) ORDER BY nombres ASC");
+
+                    if (is_array($consulta)){
+                        if (count($consulta) > 0){
+                            foreach ($consulta as $linea) {
+                                array_push($categories, $linea['nombres']);
+                            }
+                        }
+                    } 
+
+                    // LISTADO DE BANCOS DISPONIBLES
+                    $consultaAsesores = $mysql->Consulta("SELECT 
+                    id_usuario, nombres
+                    FROM usuarios
+                    WHERE (tipo=6) AND (estado=0) ORDER BY nombres ASC");
+
+                    $registros = $mysql->Consulta("SELECT
+                    *
+                    FROM notas_registros_bancos B
+                    WHERE (B.estado=0) ORDER BY B.id_banco ASC");                                
+
+                    if (is_array($registros)){
+                        if (count($registros) > 0){
+                            
+                            foreach ($registros as $lineaRegistro) { 
+  
+                                if (is_array($consultaAsesores)){
+                                    if (count($consultaAsesores) > 0){
+
+                                        $detalle = []; 
+                                        foreach ($consultaAsesores as $lineaAsesor) {
+                                            // Consulta las ventas de un asesor en un banco
+                                            $consultaValores = $mysql->Consulta_Unico("SELECT
+                                            COUNT(*) AS total
+                                            FROM notas_registros R 
+                                            WHERE (banco=".$lineaRegistro['id_banco'].") AND (asignado=".$lineaAsesor['id_usuario'].") AND (estado=7) AND (DATE(fecha_ultima_contacto)='".$ahora."')");
+                                            
+                                            if (isset($consultaValores['total'])){
+                                                array_push($detalle, (int) $consultaValores['total']);
+                                            } 
+                                        }
+
+                                        array_push($series, array(
+                                            "name" => $lineaRegistro['banco'],
+                                            "data" => $detalle
+                                        ));
+                                    }
+                                }  
+                            } 
+                        }
+                    }
+
+                    $respuesta['grafico']['categories'] = $categories;
+                    $respuesta['grafico']['series'] = $series;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
         });
 
         $app->group('/ventas', function() use ($app) {
@@ -5554,7 +5706,9 @@ $app->group('/api', function() use ($app) {
                 $params = $request->getQueryParams();
                 $respuesta['estado'] = false; 
 
-                $respuesta['params'] = $params;
+                $respuesta['input']['params'] = $params;
+                $respuesta['input']['identificador'] = $identificador;
+                $respuesta['input']['idBanco'] = $idBanco;
             
                 try{
                     $mysql = new Database(DATABASE);
@@ -12237,6 +12391,91 @@ $app->group('/api', function() use ($app) {
             
                 return $newResponse;
             });
+        });
+
+        $app->group('/nova', function() use ($app) {
+
+            $app->get("/estadisticas", function(Request $request, Response $response){
+                $authorization = $request->getHeader('Authorization'); 
+                $params = $request->getQueryParams();
+                $respuesta['estado'] = false; 
+
+                $respuesta['params'] = $params;
+            
+                try{
+                    $mysql = new Database(DATABASE); 
+
+                    $producto = "";
+                    if ((isset($params['producto'])) && (!empty($params['producto']))){
+                        $producto = $params['producto'];
+                    }
+
+                    $identificador = "";
+                    if ((isset($params['identificador'])) && (!empty($params['identificador']))){
+                        $identificador = " AND (R.identificador='".$params['identificador']."')";
+                    } 
+
+                    // WIDGETS
+                    $widgets = [];
+
+                    $consulta = $mysql->Consulta_Unico("SELECT 
+                    COUNT(*) AS total
+                    FROM notas_registros R
+                    WHERE (R.banco=".$producto.") ".$identificador);
+
+                    $totalBase = 0;
+                    if (isset($consulta['total'])){
+                        $totalBase = $consulta['total'];
+                        array_push($widgets, array(
+                            "total" => (int) $totalBase, 
+                            "nombre" => "Total", 
+                            "icon" => "aperture",
+                            "color" => "blue"
+                        ));
+                    }
+
+                    $efectividad = $mysql->Consulta_Unico("SELECT 
+                    E.gestion_efectiva, COUNT(*) AS total 
+                    FROM notas_registros R 
+                    LEFT JOIN notas_registros_estados E 
+                    ON R.estado = E.id_estados
+                    WHERE (banco=30) AND (identificador='2023-09-01')
+                    AND (E.gestion_efectiva=1)
+                    GROUP BY E.gestion_efectiva
+                    ORDER BY E.gestion_efectiva ASC");
+
+                    if (isset($efectividad['total'])){
+                        $total = $efectividad['total'];
+                        $porcentaje = ($total / $totalBase) * 100;
+
+                        array_push($widgets, array(
+                            "total" => (int) $total, 
+                            "nombre" => "Contacto Efectivo", 
+                            "icon" => "aperture",
+                            "color" => "success"
+                        ));
+
+                        array_push($widgets, array(
+                            "total" => (float) number_format($porcentaje, 2)." %", 
+                            "nombre" => "Porcentaje Efectividad", 
+                            "icon" => "aperture",
+                            "color" => "info"
+                        ));
+                    }
+
+                     
+                    $respuesta['widgets'] = $widgets;
+                    $respuesta['estado'] = true;
+                    
+                }catch(PDOException $e){
+                    $respuesta['error'] = $e->getMessage();
+                }
+
+                $newResponse = $response->withJson($respuesta);
+                
+                return $newResponse;
+            });
+
         });
 
     });
