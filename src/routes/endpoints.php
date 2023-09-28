@@ -990,6 +990,7 @@ $app->group('/api', function() use ($app) {
 
 
                     $ahora = date("Y-m-d");
+                    $inicio = date("Y-m-01");
                     $categories = [];
                     $series = [];
 
@@ -1032,7 +1033,7 @@ $app->group('/api', function() use ($app) {
                                             $consultaValores = $mysql->Consulta_Unico("SELECT
                                             COUNT(*) AS total
                                             FROM notas_registros R 
-                                            WHERE (banco=".$lineaRegistro['id_banco'].") AND (asignado=".$lineaAsesor['id_usuario'].") AND (estado=7) AND (DATE(fecha_ultima_contacto)='".$ahora."')");
+                                            WHERE (banco=".$lineaRegistro['id_banco'].") AND (asignado=".$lineaAsesor['id_usuario'].") AND (estado=7) AND (DATE(fecha_ultima_contacto) BETWEEN '".$inicio."' AND '".$ahora."')");
                                             
                                             if (isset($consultaValores['total'])){
                                                 array_push($detalle, (int) $consultaValores['total']);
